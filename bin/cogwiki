@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+#!/usr/bin/perl
+
+# For development:
+use FindBin; use lib "$FindBin::RealBin/../lib";
+
+use CogWiki::Command;
+
+exit CogWiki::Command->new($0, @ARGV)->run;

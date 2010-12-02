@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+use strict;
+use Class::Throwable qw(Error);
+use IO::All;
+use FindBin ();
+use Convert::Base32 ();
+srand();
+
+use XXX;
+
+my @list = @ARGV
+    ? io(shift @ARGV)->chomp->slurp
+    : grep not(/^\./), map $_->filename, io('.')->all_files;
+
+my $time = time;
+
+my $cog_node_dir = ".wiki/cog/node";
+
+for my $title (@list) {
+    throw Error "title cannot contain a '/' character"
+        if $title =~ m!/!;
+    my ($head, $body) = read_page($title);
+    my $original = $head . (($head and $body) ? "\n" : '') . $body;
+    my $heading = '';
+    $heading .= ($head =~ s/^(Wiki: .*\n)//m) ? $1 :
+        "Wiki: cog 0.0.1\n";
+    $heading .= ($head =~ s/^(Id: +[A-Z2-7]{4}-[A-Z2-7]{22}\n)//m) ? $1 :
+        "Id: " . new_cog_id() . "\n";
+    $heading .= ($head =~ s/^(Rev: [0-9]+\n)//m) ? $1 :
+        "Rev: 1\n";
+    $heading .= ($head =~ s/^(Time: [0-9]+\n)//m) ? $1 :
+        "Time: $time\n";
+    $heading .= ($head =~ s/^(User: .*\n)//m) ? $1 :
+        "User: $ENV{USER}\n";
+    $heading .= ($head =~ s/^(Name: .*\n)//m) ? $1 :
+        "Name: $title\n";
+    while ($head =~ s/^(Name: .*\n)//m) {
+        $heading .= $1;
+    }
+    while ($head =~ s/^(Tag: .*\n)//m) {
+        $heading .= $1;
+    }
+    $head =~ s/^[A-Z].*\n//mg;
+    $heading .= $head;
+
+    my $text = $heading . ($body ? "\n" : '') . $body;
+    if ($text ne $original) {
+        $heading =~ /^Id: +([A-Z2-7]{4})-/m
+            or throw Error "No cog id for '$title'";
+        my $stamp = io("$cog_node_dir/$1");
+        $stamp->exists or $stamp->assert->print('');
+        $heading =~ /^Time: +(\d+)$/m
+            or throw Error "No time for '$title'";
+        print "Updating $title\n";
+        io($title)->print($text);
+    }
+}
+
+sub new_cog_id {
+    while (1) {
+        # Upper cased base32 128bit random number.
+        my $id = uc Convert::Base32::encode_base32(
+            join "", map { pack "S", int(rand(65536)) } 1..8
+        ); 
+        next unless $id =~ /^((?:[A-Z][2-7]|[2-7][A-Z])..)(.*)/;
+        next if -e "$cog_node_dir/$1";
+        return "$1-$2";
+    }
+}
+
+# Wiki: cog 0.0.1
+# Id: 6YUM-I4EVO573JQGYN4S5QXFIOU
+# Rev: 1
+# Time: 1291163596
+# User: ingy
+# Name: Salad Club
+# Name: Salad Lunch Club
+# Tag: lunch
+# Tag: joshh
+
+sub read_page {
+    my $title = shift;
+    my ($head, $body) = ('', '');
+    my $page = io($title);
+    if ($page->exists) {
+        my $text = $page->all;
+        if ($text =~ s/\A((?:[\w\-]+:\ .*\n)+)(\n|\z)//) {
+            $head = $1;
+        }
+        $body = $text;
+    }
+    return ($head, $body);
+}

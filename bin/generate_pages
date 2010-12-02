@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use FindBin ();
+use IO::All;
+use Template::Toolkit::Simple;
+use IPC::Run ();
+use XXX;
+
+BEGIN { chdir "$FindBin::Bin/.." }
+use lib 'lib';
+
+use CogWiki;
+
+my $page_dir = '..';
+my $pages = [];
+
+for my $page_file (io($page_dir)->all_files) {
+    next if $page_file->filename =~ /^\./;
+    my $page = CogWiki::Page->from_text($page_file->all);
+    push @$pages, $page;
+    my $id = $page->id;
+    $id =~ s/-.*// or next;
+
+    my $html_filename = "cache/view/$id";
+
+    next if -e $html_filename and -M $html_filename < -M $page_file->name;
+
+    my ($in, $out, $err) = ($page->content, '', '');
+
+    my @cmd = qw(asciidoc -s -);
+    
+    print $page_file->filename . " -> $html_filename\n";
+    IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(10));
+    my $html = '<h1 class="page-title">' . $page->title . qq{</h1><hr class="page-title" />\n} . $out ;
+
+    io($html_filename)->assert->print($html);
+}

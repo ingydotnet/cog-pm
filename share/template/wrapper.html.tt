@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+  <title>[% title %]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="shortcut icon" type="image/x-icon" href="[% favicon_file || "/images/favicon.ico" %]">
+  <link rel="stylesheet" href="/static/css/common.css" type="text/css">
+  <link rel="stylesheet" href="/static/css/[% view.type %].css" type="text/css">
+  <script type="text/javascript" src="/static/js/common.js"></script>
+  <script type="text/javascript" src="/static/js/[% view.type %].js"></script>
+</head>
+
+<body>
+<div class="page">
+[% PROCESS header.html.tt %]
+<div class="bottom">
+[% PROCESS sidebar.html.tt %]
+<div class="content">
+[% content %]
+</div>
+</div>
+</div>
+</body>
+
+</html>

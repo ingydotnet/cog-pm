@@ -1,0 +1,11 @@
+<div class="sidebar">
+  <ul>
+    <li><a href="[% base_url %]/view/Home">Home</a></li>
+    <li><a href="[% base_url %]/view">Recent Changes</a>
+    <li><a href="[% base_url %]/view">New Page</a>
+    <li><a href="[% base_url %]/edit/">Edit</a>
+    <li><a href="[% base_url %]/tags/">Tags</a>
+    <li><a href="[% base_url %]/login/">Login</a>
+    <li><a href="[% base_url %]/prefs/">Preferences</a>
+  </ul>
+</div>
