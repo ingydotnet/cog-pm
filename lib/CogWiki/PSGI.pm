@@ -1,15 +1,15 @@
-package Strategic::Wiki::PSGI;
+package CogWiki::PSGI;
 use Mouse;
 use Class::Throwable qw(Error);
 
 use Plack::Builder;
-use Strategic::Wiki::App;
+use CogWiki::App;
 
 sub app {
     my $self = shift;
 
-    my $webapp = Strategic::Wiki::App->new();
-    throw Error "Strategic Wiki is not set up"
+    my $webapp = CogWiki::App->new();
+    throw Error "CogWiki is not set up"
         unless $webapp->config->is_wiki;
 
     return builder {

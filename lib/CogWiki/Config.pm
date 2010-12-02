@@ -20,7 +20,7 @@ around BUILDARGS => sub {
 
 sub get_config_file {
     my $class = shift;
-    my $file = '.strategic-wiki/config.yaml';
+    my $file = '.wiki/config.yaml';
     return -f $file ? $file : '';
 }
 

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Strategic::Wiki::Manual - Full Documentation for Strategic Wiki
+CogWiki::Manual - Full Documentation for CogWiki
 
 =head1 NOTE
 
@@ -14,37 +14,37 @@ This manual consists of a number of documents.
 
 =over 4
 
-=item L<Strategic::Wiki::Manual::Introduction>
+=item L<CogWiki::Manual::Introduction>
 
-What is Strategic Wiki, and why does it rock out?
+What is CogWiki, and why does it rock out?
 
-=item L<Strategic::Wiki::Manual::Installation>
+=item L<CogWiki::Manual::Installation>
 
-How to install Strategic Wiki and its prerequisites.
+How to install CogWiki and its prerequisites.
 
-=item L<Strategic::Wiki::Manual::Configuration>
+=item L<CogWiki::Manual::Configuration>
 
-How to configure and customize Strategic Wiki.
+How to configure and customize CogWiki.
 
-=item L<Strategic::Wiki::Manual::Plugins>
+=item L<CogWiki::Manual::Plugins>
 
-Some of the common plugins available to extend Strategic Wiki.
+Some of the common plugins available to extend CogWiki.
 
-=item L<Strategic::Wiki::Manual::FAQ>
+=item L<CogWiki::Manual::FAQ>
 
-Frequently asked questions about Strategic Wiki.
+Frequently asked questions about CogWiki.
 
-=item L<Strategic::Wiki::Manual::RestAPI>
+=item L<CogWiki::Manual::RestAPI>
 
-Frequently asked questions about Strategic Wiki.
+Frequently asked questions about CogWiki.
 
-=item L<Strategic::Wiki::Manual::Development>
+=item L<CogWiki::Manual::Development>
 
-How to get involved in the Strategic Wiki project.
+How to get involved in the CogWiki project.
 
-=item L<Strategic::Wiki::Manual::Internals>
+=item L<CogWiki::Manual::Internals>
 
-How Strategic Wiki works from the inside out.
+How CogWiki works from the inside out.
 
 =head1 AUTHOR
 

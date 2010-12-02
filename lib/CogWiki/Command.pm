@@ -70,7 +70,7 @@ sub handle_up {
 sub usage {
     my $self = shift;
     return <<'...';
-Usage: strategic-wiki command
+Usage: cogwiki command
 
 Commands:
     init - Make current directory into a CogWiki
@@ -79,7 +79,7 @@ Commands:
     down - Stop the server
 
 See:
-    `perldoc strategic-wiki` - Documentation on this command.
+    `perldoc cogwiki` - Documentation on this command.
     `perldoc CogWiki::Manual` - Complete CogWiki documentation.
 ...
 }
@@ -92,7 +92,7 @@ sub _parse_args {
     if ($script =~ /^(pre-commit|post-commit)$/) {
         ($args->{action} = $script) =~ s/-/_/;
     }
-    elsif ($script ne 'strategic-wiki') {
+    elsif ($script ne 'cogwiki') {
         throw Error "unexpected script name '$script'\n";
     }
     elsif (@argv and $argv[0] =~ /^\w+$/) {
@@ -115,20 +115,20 @@ sub _parse_args {
 
 =head1 NAME
 
-strategic-wiki - Turn any directory into a wiki.
+cogwiki - Turn Anything into a Wiki
 
 =head1 SYNOPSIS
 
-    > strategic-wiki init
-    > edit .strategic-wiki/config.yaml
-    > strategic-wiki make
-    > strategic-wiki up
+    > cogwiki init
+    > edit .wiki/config.yaml
+    > cogwiki make
+    > cogwiki up
 
 =head1 DESCRIPTION
 
 CogWiki (SW) lets you turn any directory on your computer into a
 wiki. Every file in the directory is a wiki page. All SW files are put
-into a C<.strategic-wiki/> subdirectory. SW uses git for wiki history.
+into a C<.wiki/> subdirectory. SW uses git for wiki history.
 If your directory is already a git repo, SW can use its GIT_DIR, or it
 can set up its own. SW is a Perl Plack program, so you can run it in any
 web environment. The 'up' command will start a local web server that you
@@ -136,23 +136,23 @@ can use immediately (even offline).
 
 =head1 COMMANDS
 
-The strategic-wiki command has a number of simple subcommands:
+The cogwiki command has a number of simple subcommands:
 
 =head2 init
 
-The C<init> command creates a .strategic-wiki subdirectory with all the
-necessary components, thus making your directory into a wiki.
+The C<init> command creates a .wiki subdirectory with all the necessary
+components, thus making your directory into a wiki.
 
-The most important file is .strategic-wiki/config.yaml. It is the
-configuration file for the wiki. Whenever you change it, you need to run
-C<strategic-wiki make> to apply the updates. See below.
+The most important file is .wiki/config.yaml. It is the configuration
+file for the wiki. Whenever you change it, you need to run C<cogwiki
+make> to apply the updates. See below.
 
 =head2 make
 
 The C<make> command performs all the actions necessary to bring your
 wiki up to date. Whenever you change anything (new or updated file,
-configuration changes, etc) just run C<strategic-wiki build> to apply
-the changes to the wiki.
+configuration changes, etc) just run C<cogwiki build> to apply the
+changes to the wiki.
 
 The wiki will run this for you, when you make changes through your
 web browser. SW can also be configured to run C<make> when you do
@@ -169,12 +169,12 @@ all the same options as plackup. See L<plackup> for more information.
 =head2 down
 
 This command will attempt to stop the web server started by
-C<strategic-wiki up>.
+C<cogwiki up>.
 
 =head1 CONFIGURATION
 
-After you run the C<strategic-wiki init> command, you will have a file
-called C<.strategic-wiki/config.yaml>. See
+After you run the C<cogwiki init> command, you will have a file
+called C<.wiki/config.yaml>. See
 L<CogWiki::Manual::Configuration> for full details.
 
 =head1 
