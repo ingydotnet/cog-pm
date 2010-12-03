@@ -1,0 +1,12 @@
+h1.page-title {
+    text-align: center;
+}
+
+hr.page-title {
+    width: 75%;
+    text-align: center;
+}
+
+.content li p {
+    margin: 0;
+}

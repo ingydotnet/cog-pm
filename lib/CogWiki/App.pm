@@ -5,6 +5,7 @@ use YAML::XS;
 use Try::Tiny;
 use Class::Throwable qw(Error);
 use CogWiki::Config;
+use IO::All;
 use XXX;
 
 has config => (
@@ -14,7 +15,7 @@ has config => (
 
 sub handle_init {
     my $self = shift;
-    throw Error "Can't init. Already is a wiki."
+    throw Error "Can't init. Already is a cogwiki."
         if $self->config->is_wiki;
 }
 
