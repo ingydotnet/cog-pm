@@ -5,6 +5,9 @@ use Plack::Middleware::Static;
 use Plack::Middleware::Debug;
 use Plack::Runner;
 
+use CogWiki::Store;
+use CogWiki::Page;
+
 use Template::Toolkit::Simple;
 use IO::All;
 
@@ -20,7 +23,7 @@ sub app {
         my $e = shift;
         my $list = [
             sub { m!^/view/! } =>
-                sub { CogWiki->view(@_) },
+                sub { $self->view(@_) },
             sub { $_ ne '/' } =>
                 sub {
                     my $r = Plack::Response->new;
@@ -28,7 +31,7 @@ sub app {
                     $r->finalize();
                 },
             sub { 1 } =>
-                sub { CogWiki->index(@_) },
+                sub { $self->index(@_) },
         ];
         for (my $i = 0; $i < @$list; $i += 2) {
             $_ = $e->{PATH_INFO};
@@ -78,6 +81,8 @@ sub view {
 
 sub index {
     my $self = shift;
+
+    # TODO Get pages objects for CogWiki::Store
 
     my $pages = [];
     for my $file (io('..')->all_files) {

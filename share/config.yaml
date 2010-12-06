@@ -1,0 +1,11 @@
+# Delete the following line:
+not_config: 1
+
+# Basics
+site_name: Wiki Name
+content_root: ..
+home_page_id: ""
+plugins: []
+
+# Options:
+use_git_repository: true

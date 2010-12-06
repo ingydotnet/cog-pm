@@ -7,6 +7,7 @@ use XXX;
 has is_init => (is => 'ro', default => 0);
 has is_config => (is => 'ro', default => 1);
 has not_config => (is => 'ro', default => 0);
+has is_ready => (is => 'ro', default => 0);
 has root_dir => (is => 'ro', default => '.');
 
 around BUILDARGS => sub {
@@ -21,10 +22,11 @@ around BUILDARGS => sub {
 sub BUILD {
     my $self = shift;
     if ($self->not_config) {
-        $self->is_config(0);
+        $self->{is_config} = 0;
         return $self;
     }
     chdir $self->root_dir or die;
+    $self->{is_ready} = 1;
     return $self;
 }
 
@@ -34,7 +36,7 @@ sub get_config_file {
     return '' unless -e $file;
     $file =~ s!(.*/)!!;
     chdir $1 or die;
-    return -f $file;
+    return $file;
 }
 
 1;

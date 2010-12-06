@@ -2,9 +2,6 @@
 use strict;
 use Class::Throwable qw(Error);
 use IO::All;
-use FindBin ();
-use Convert::Base32 ();
-srand();
 
 use XXX;
 
@@ -13,8 +10,6 @@ my @list = @ARGV
     : grep not(/^\./), map $_->filename, io('.')->all_files;
 
 my $time = time;
-
-my $cog_node_dir = ".wiki/cog/node";
 
 for my $title (@list) {
     throw Error "title cannot contain a '/' character"
@@ -55,28 +50,6 @@ for my $title (@list) {
         io($title)->print($text);
     }
 }
-
-sub new_cog_id {
-    while (1) {
-        # Upper cased base32 128bit random number.
-        my $id = uc Convert::Base32::encode_base32(
-            join "", map { pack "S", int(rand(65536)) } 1..8
-        ); 
-        next unless $id =~ /^((?:[A-Z][2-7]|[2-7][A-Z])..)(.*)/;
-        next if -e "$cog_node_dir/$1";
-        return "$1-$2";
-    }
-}
-
-# Wiki: cog 0.0.1
-# Id: 6YUM-I4EVO573JQGYN4S5QXFIOU
-# Rev: 1
-# Time: 1291163596
-# User: ingy
-# Name: Salad Club
-# Name: Salad Lunch Club
-# Tag: lunch
-# Tag: joshh
 
 sub read_page {
     my $title = shift;

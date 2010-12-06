@@ -8,9 +8,9 @@ use IO::All;
 use XXX;
 
 has config => (is => 'ro', builder => sub {CogWiki::Config->new()});
-has 'app' => (is => 'ro', builder => '_app_builder');
-has 'action' => (is => 'ro');
-has 'argv' => (is => 'ro');
+has app => (is => 'ro', builder => '_app_builder');
+has action => (is => 'ro');
+has argv => (is => 'ro');
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;
@@ -33,7 +33,8 @@ sub run {
         $method->($self);
     }
     catch {
-        throw Error "'action' failed:\n$_\n";
+        s/^Error : //;
+        throw Error "'$action' failed:\n$_\n";
     };
     return 0;
 }
@@ -54,8 +55,8 @@ Commands:
     up   - Start up a local wiki server
     down - Stop the server
 
-    edit name|id
-         - Start an editor with the contents of the wiki page
+    bless file-name - Turn a text file into a wiki file
+    edit name|id - Start an editor with the contents of the wiki page
 
 See:
     `perldoc cogwiki` - Documentation on this command.

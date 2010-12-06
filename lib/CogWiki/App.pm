@@ -1,10 +1,24 @@
 package CogWiki::App;
 use Mouse;
+use IO::All;
+
+use XXX;
 
 sub handle_init {
     my $self = shift;
-    throw Error "Can't init. Already is a cogwiki."
-        if $self->config->is_wiki;
+    throw Error "Can't init. .wiki/ already exists."
+        if $self->config->is_init;
+
+    my $config_file = _find_share_file($self, 'config.yaml');
+    my $config = io($config_file)->all;
+    io('.wiki/config.yaml')->assert->print($config);
+}
+
+# TODO - Make real
+sub _find_share_file {
+    my $self = shift;
+    my $file = shift;
+    return '../share/config.yaml';
 }
 
 sub handle_make {
@@ -19,20 +33,11 @@ sub handle_make {
 }
 
 sub handle_up {
-    require Plack::Runner;
-    require CogWiki::PSGI;
+    require CogWiki::WebApp;
     my $self = shift;
-    try {
-        my $runner = Plack::Runner->new();
-        $runner->parse_options(@{$self->argv});
-        my $app = CogWiki::PSGI->new->app;
-        $runner->run($app);
-    }
-    catch {
-        chomp;
-        XXX $_;
-        throw Error "up failed.\n$_\n";
-    };
+    my $webapp = CogWiki::WebApp->new(config => $self->config);
+    my $app = $webapp->app;
+    $webapp->run($app);
 }
 
 sub handle_edit {

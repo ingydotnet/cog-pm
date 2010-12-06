@@ -3,6 +3,7 @@
 
 # For development:
 use FindBin; use lib "$FindBin::RealBin/../lib";
+# use diagnostics;
 
 use CogWiki::Command;
 
