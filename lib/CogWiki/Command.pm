@@ -2,9 +2,12 @@ package CogWiki::Command;
 use Mouse;
 use Try::Tiny;
 use Class::Throwable qw(Error);
-use CogWiki::App;
+use CogWiki::Config;
+use IO::All;
+
 use XXX;
 
+has config => (is => 'ro', builder => sub {CogWiki::Config->new()});
 has 'app' => (is => 'ro', builder => sub {CogWiki::App->new});
 has 'action' => (is => 'ro');
 has 'argv' => (is => 'ro');
@@ -30,13 +33,8 @@ sub handle_help {
 
 sub handle_init {
     my $self = shift;
-    try {
-        $self->app->handle_init;
-    }
-    catch {
-        chomp;
-        throw Error "init failed.\n$_\n";
-    };
+    throw Error "Can't init. Already is a cogwiki."
+        if $self->config->is_wiki;
 }
 
 sub handle_make {
@@ -67,6 +65,29 @@ sub handle_up {
     };
 }
 
+sub edit {
+    my $class = shift;
+    my $filename = shift or die "No filename supplied";
+    die "Bad filename" if $filename =~ m/[\n\\]/;
+    die "Too many args" if @_;
+
+    my $oldtext = -e $filename ? io( $filename )->all : '';
+    my $oldpage = CogWiki::Page->from_text($oldtext);
+    my $rev = $oldpage->rev;
+
+    system("vim $filename") == 0 or die;
+
+    my $newtext = -e $filename ? io( $filename )->all : '';
+#     my $newpage = CogWiki::Page->from_text($newtext);
+    $rev++;
+    $newtext =~ s/^Rev: +.*\n/Rev: $rev\n/m or die;
+    my $time = time;
+    $newtext =~ s/^Time: +.*\n/Time: $time\n/m or die;
+    io($filename)->print($newtext);
+
+    system("generate_pages") == 0 or die;
+}
+
 sub usage {
     my $self = shift;
     return <<'...';
@@ -77,6 +98,9 @@ Commands:
     make - Bring the wiki up to date
     up   - Start up a local wiki server
     down - Stop the server
+
+    edit name|id
+         - Start an editor with the contents of the wiki page
 
 See:
     `perldoc cogwiki` - Documentation on this command.
@@ -115,7 +139,7 @@ sub _parse_args {
 
 =head1 NAME
 
-cogwiki - Turn Anything into a Wiki
+CogWiki - Turn Anything into a Wiki
 
 =head1 SYNOPSIS
 
@@ -126,11 +150,11 @@ cogwiki - Turn Anything into a Wiki
 
 =head1 DESCRIPTION
 
-CogWiki (SW) lets you turn any directory on your computer into a
-wiki. Every file in the directory is a wiki page. All SW files are put
-into a C<.wiki/> subdirectory. SW uses git for wiki history.
-If your directory is already a git repo, SW can use its GIT_DIR, or it
-can set up its own. SW is a Perl Plack program, so you can run it in any
+CogWiki lets you turn any directory on your computer into a wiki. Every
+file in the directory is a wiki page. All CogWiki files are put into a
+C<.wiki/> subdirectory. CogWiki uses git for wiki history. If your
+directory is already a git repo, CogWiki can use its GIT_DIR, or it can
+set up its own. CogWiki is a Perl PSGI program, so you can run it in any
 web environment. The 'up' command will start a local web server that you
 can use immediately (even offline).
 

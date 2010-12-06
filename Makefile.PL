@@ -5,14 +5,17 @@ readme_from;
 manifest_skip;
 version_check;
 ack_xxx;
-repository 'git://github.com/ingydotnet/cogwiki.git';
+repository 'git://github.com/ingydotnet/cogwiki-pm.git';
 
 requires 'Mouse';
+requires 'YAML::XS';
+requires 'IO::All';
 requires 'Try::Tiny';
 requires 'Class::Throwable';
+requires 'Time::Duration';
 
 install_script 'bin/cogwiki';
 
-clean_files 't/output/';
+install_share;
 
 WriteAll;
