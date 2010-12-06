@@ -8,7 +8,7 @@ use IO::All;
 use XXX;
 
 has config => (is => 'ro', builder => sub {CogWiki::Config->new()});
-has 'app' => (is => 'ro', builder => sub {CogWiki::App->new});
+has 'app' => (is => 'ro', builder => '_app_builder');
 has 'action' => (is => 'ro');
 has 'argv' => (is => 'ro');
 
@@ -17,75 +17,30 @@ around BUILDARGS => sub {
     $class->$orig($class->_parse_args(@_));
 };
 
+sub _app_builder {
+    my $self = shift;
+    require CogWiki::App;
+    return CogWiki::App->new(config => $self->config);
+}
+
 sub run {
     my $self = shift;
-    my $method = "handle_" . $self->action;
-    throw Error "'${\$self->action}' is an invalid action\n"
-        unless $self->can($method);
-    $self->$method();
+    my $action = $self->action;
+    my $method = "handle_$action";
+    $method = $self->can($method) || $self->app->can($method)
+        or throw Error "'$action' is an invalid action\n";
+    try {
+        $method->($self);
+    }
+    catch {
+        throw Error "'action' failed:\n$_\n";
+    };
     return 0;
 }
 
 sub handle_help {
     my $self = shift;
     print $self->usage;
-}
-
-sub handle_init {
-    my $self = shift;
-    throw Error "Can't init. Already is a cogwiki."
-        if $self->config->is_wiki;
-}
-
-sub handle_make {
-    my $self = shift;
-    try {
-        $self->app->make;
-    }
-    catch {
-        chomp;
-        throw Error "make failed.\n$_\n";
-    };
-}
-
-sub handle_up {
-    require Plack::Runner;
-    require CogWiki::PSGI;
-    my $self = shift;
-    try {
-        my $runner = Plack::Runner->new();
-        $runner->parse_options(@{$self->argv});
-        my $app = CogWiki::PSGI->new->app;
-        $runner->run($app);
-    }
-    catch {
-        chomp;
-        XXX $_;
-        throw Error "up failed.\n$_\n";
-    };
-}
-
-sub edit {
-    my $class = shift;
-    my $filename = shift or die "No filename supplied";
-    die "Bad filename" if $filename =~ m/[\n\\]/;
-    die "Too many args" if @_;
-
-    my $oldtext = -e $filename ? io( $filename )->all : '';
-    my $oldpage = CogWiki::Page->from_text($oldtext);
-    my $rev = $oldpage->rev;
-
-    system("vim $filename") == 0 or die;
-
-    my $newtext = -e $filename ? io( $filename )->all : '';
-#     my $newpage = CogWiki::Page->from_text($newtext);
-    $rev++;
-    $newtext =~ s/^Rev: +.*\n/Rev: $rev\n/m or die;
-    my $time = time;
-    $newtext =~ s/^Time: +.*\n/Time: $time\n/m or die;
-    io($filename)->print($newtext);
-
-    system("generate_pages") == 0 or die;
 }
 
 sub usage {
@@ -198,8 +153,8 @@ C<cogwiki up>.
 =head1 CONFIGURATION
 
 After you run the C<cogwiki init> command, you will have a file
-called C<.wiki/config.yaml>. See
-L<CogWiki::Manual::Configuration> for full details.
+called C<.wiki/config.yaml>. See L<CogWiki::Manual::Configuration>
+for full details.
 
 =head1 
 

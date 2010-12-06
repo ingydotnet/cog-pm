@@ -25,9 +25,9 @@ CogWiki lets you turn any directory on your computer into a wiki. Every
 file in the directory is a wiki page. All CogWiki files are put into a
 C<.wiki/> subdirectory. CogWiki uses git for wiki history. If your
 directory is already a git repo, CogWiki can use its GIT_DIR, or it can
-set up its own. CogWiki is a Perl Plack program, so you can run it in
-any web environment. The 'up' command will start a local web server that
-you can use immediately (even offline).
+set up its own. CogWiki is a Perl PSGI program, so you can run it in any
+web environment. The 'up' command will start a local web server that you
+can use immediately (even offline).
 
 CogWiki installs a command line utility called C<cogwiki>. This command
 can be used to create and update the wiki. It can also act as a git
