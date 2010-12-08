@@ -2,6 +2,7 @@ package CogWiki::App;
 use Mouse;
 use IO::All;
 use CogWiki::Store;
+use Template::Toolkit::Simple;
 
 use XXX;
 
@@ -55,17 +56,30 @@ sub _find_share_files {
 sub handle_make {
     require CogWiki::Page;
     require IPC::Run;
+    require JSON;
 
     my $self = shift;
     $self->config->chdir_root();
 
+    my $json = JSON->new;
+    $json->allow_blessed;
+    $json->convert_blessed;
+
+    io('cache')->mkdir;
+    my $data = +{%{$self->config}};
+    my $html = tt
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('wrapper.html.tt');
+    io('cache/index.html')->print($html);
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
         my $page = CogWiki::Page->from_text($page_file->all);
         my $id = $page->id;
         $id =~ s/-.*// or next;
 
-        my $html_filename = "cache/view/$id";
+        my $html_filename = "cache/$id.html";
 
         next if -e $html_filename and -M $html_filename < -M $page_file->name;
 
@@ -75,9 +89,11 @@ sub handle_make {
         
         print $page_file->filename . " -> $html_filename\n";
         IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(10));
-        my $html = '<h1 class="page-title">' . $page->title . qq{</h1><hr class="page-title" />\n} . $out ;
 
-        io($html_filename)->assert->print($html);
+        io($html_filename)->assert->print($out);
+
+        delete $page->{content};
+        io("cache/$id.json")->print($json->encode({%$page}));
     }
 
     print <<'...';
