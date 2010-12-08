@@ -11,6 +11,8 @@ use CogWiki::Page;
 use Template::Toolkit::Simple;
 use IO::All;
 
+use XXX;
+
 has config => (is => 'ro', required => 1);
 
 sub app {
@@ -69,11 +71,12 @@ sub view {
     }
     my $html_cache = "cache/view/$name";
     return unless -e $html_cache;
-    $self->config->page_html(io($html_cache)->all);
-    $self->config->view->{type} = 'view';
+    my $data = {%{$self->config}};
+    $data->{page_html} = io($html_cache)->all;
+    $data->{view}{type} = 'view';
     my $html = tt
         ->path(['template/'])
-        ->data($self->config)
+        ->data($data)
         ->post_chomp
         ->render('view.html.tt');
     return [ 200, [ 'Content-Type' => 'text/html' ], [ $html ] ];
@@ -94,12 +97,13 @@ sub index {
         $b->time <=> $a->time or
         lc($a->title) cmp lc($b->title)
     } @$pages;
-    $self->config->{pages} = $pages;
-    $self->config->{view}{type} = 'index';
+    my $data = {%{$self->config}};
+    $data->{pages} = $pages;
+    $data->{view}{type} = 'index';
 
     my $html = tt
         ->path(['template/'])
-        ->data($self->config)
+        ->data($data)
         ->post_chomp
         ->render('index.html.tt');
 

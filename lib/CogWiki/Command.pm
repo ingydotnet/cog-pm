@@ -5,12 +5,10 @@ use Class::Throwable qw(Error);
 use CogWiki::Config;
 use IO::All;
 
-use XXX;
-
 has config => (is => 'ro', builder => sub {CogWiki::Config->new()});
 has app => (is => 'ro', builder => '_app_builder');
 has action => (is => 'ro');
-has argv => (is => 'ro');
+has argv => (is => 'ro', default => sub {[]});
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;
@@ -27,10 +25,14 @@ sub run {
     my $self = shift;
     my $action = $self->action;
     my $method = "handle_$action";
-    $method = $self->can($method) || $self->app->can($method)
+    my ($object, $function);
+
+    $function =
+        ($object = $self)->can($method) ||
+        ($object = $self->app)->can($method)
         or throw Error "'$action' is an invalid action\n";
     try {
-        $method->($self);
+        $function->($object, @{$self->argv});
     }
     catch {
         s/^Error : //;
