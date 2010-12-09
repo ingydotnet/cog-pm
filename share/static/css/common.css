@@ -6,7 +6,7 @@ body {
     font-size: 100%;
     font-family: Helvetica;
 
-    background:url("/images/tile.gif") repeat scroll 0 0 #84856A;
+    background:url("/static/image/tile.gif") repeat scroll 0 0 #84856A;
     min-width: 960px;
 }
 
@@ -19,7 +19,7 @@ html, body {
     padding: 10px;
     border-bottom: 20px solid #888;
     height: auto;
-    background:url("/images/gradient.jpg") repeat scroll 0 0 #8f8;
+    background: #8f8;
 }
 
 .logo {

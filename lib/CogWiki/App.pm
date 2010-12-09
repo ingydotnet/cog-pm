@@ -22,8 +22,8 @@ sub handle_init {
 
     my $files = $self->_find_share_files;
     for my $file (keys %$files) {
-        my $content = io($files->{$file})->all;
-        io('.wiki/' . $file)->assert->print($content);
+#         io('.wiki/' . $file)->assert->print(io($files->{$file})->all);
+        io('.wiki/' . $file)->assert->symlink($files->{$file});
     }
 
     CogWiki::Store->new(root => '.wiki/cog')->create;
@@ -134,7 +134,10 @@ sub handle_up {
 CogWiki web server is starting up...
 
 ...
-    $webapp->run($app, @_);
+    my @args = @_;
+    unshift @args, ('-p' => $self->config->server_port)
+        if $self->config->server_port;
+    $webapp->run($app, @args);
 }
 
 sub handle_edit {

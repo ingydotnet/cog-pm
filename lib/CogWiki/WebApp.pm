@@ -10,7 +10,7 @@ use CogWiki::Page;
 
 use IO::All;
 
-use XXX;
+# use XXX;
 
 has config => (is => 'ro', required => 1);
 
@@ -43,7 +43,7 @@ sub app {
         }
     };
 
-    $app = Plack::Middleware::Debug->wrap($app);
+#     $app = Plack::Middleware::Debug->wrap($app);
     $app = Plack::Middleware::Static->wrap($app, path => qr{^/(static|cache)/}, root => './');
     return $app;
 }

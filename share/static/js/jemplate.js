@@ -1919,13 +1919,8 @@ Jemplate.templateMap['changes.html.tt'] = function(context) {
     var output = '';
 
     try {
-//line 18 "changes.html.tt"
-
-// WRAPPER
-output += (function() {
-    var output = '';
-output += '\n<table class="pages">\n<tr>\n<th class="time">Changed</th>\n<th>Name</th>\n<th class="size">Size</th>\n<th>Id</th>\n</tr>\n';
-//line 16 "changes.html.tt"
+output += '<h1>Recent Changes</h1>\n<hr />\n<table class="pages">\n<tr>\n<th class="time">Changed</th>\n<th>Name</th>\n<th class="size">Size</th>\n<th>Id</th>\n</tr>\n';
+//line 17 "changes.html.tt"
 
 // FOREACH 
 (function() {
@@ -1941,22 +1936,22 @@ output += '\n<table class="pages">\n<tr>\n<th class="time">Changed</th>\n<th>Nam
         while (! done) {
             stash.data['page'] = value;
 output += '\n<tr>\n<td class="time"><tt>';
-//line 11 "changes.html.tt"
-output += stash.get(['page', 0, 'duration', 0]);
-output += ' ago</tt></td>\n<td><a href="/view/';
 //line 12 "changes.html.tt"
+output += stash.get(['page', 0, 'duration', 0]);
+output += ' ago</tt></td>\n<td><a href="/stories/';
+//line 13 "changes.html.tt"
 output += stash.get(['page', 0, 'id', 0]);
 output += '">';
-//line 12 "changes.html.tt"
+//line 13 "changes.html.tt"
 output += stash.get(['page', 0, 'title', 0]);
 output += '</a></td>\n<td class="size">';
-//line 13 "changes.html.tt"
+//line 14 "changes.html.tt"
 output += stash.get(['page', 0, 'size', 0]);
 output += '</td>\n<td><tt><b>';
-//line 14 "changes.html.tt"
+//line 15 "changes.html.tt"
 output += stash.get(['page', 0, 'short', 0]);
 output += '</b>0';
-//line 14 "changes.html.tt"
+//line 15 "changes.html.tt"
 output += stash.get(['page', 0, 'rev', 0]);
 output += '</tt></td>\n</tr>\n';;
             retval = list.get_next();
@@ -1970,11 +1965,7 @@ output += '</tt></td>\n</tr>\n';;
     stash.set('loop', oldloop);
 })();
 
-output += '\n</table>\n';;
-    return context.include('wrapper.html.tt', { 'content': output });
-})();
-
-output += '\n';
+output += '\n</table>\n';
     }
     catch(e) {
         var error = context.set_error(e, output);
@@ -1999,19 +1990,19 @@ output += stash.get('favicon_file') || '/images/favicon.ico';
 output += '">\n  <link rel="stylesheet" href="/static/css/common.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/common.js"></script>\n</head>\n\n<body>\n<div class="page">\n <div class="header">\n  <h1 id="site-name"><a href="';
 //line 17 "layout.html.tt"
 output += stash.get('base_url');
-output += '/view/Home">';
+output += '/stories/Home">';
 //line 17 "layout.html.tt"
 output += stash.get('site_name');
 output += '</a></h1>\n </div>\n <div class="bottom">\n  <div class="sidebar">\n   <ul>\n    <li><a href="';
 //line 22 "layout.html.tt"
 output += stash.get('base_url');
-output += '/view/Home">Home</a></li>\n    <li><a href="';
+output += '/stories/Home">Home</a></li>\n    <li><a href="';
 //line 23 "layout.html.tt"
 output += stash.get('base_url');
-output += '/view">Recent Changes</a>\n    <li><a href="';
+output += '/stories/">Recent Changes</a>\n    <li><a href="';
 //line 24 "layout.html.tt"
 output += stash.get('base_url');
-output += '/view">New Page</a>\n    <li><a href="';
+output += '/new/">New Page</a>\n    <li><a href="';
 //line 25 "layout.html.tt"
 output += stash.get('base_url');
 output += '/edit/">Edit</a>\n    <li><a href="';
