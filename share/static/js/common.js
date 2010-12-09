@@ -11,11 +11,17 @@ CogWiki.prototype = {
     run: function() {
         if (this.path.match(/^\/stories\/([A-Z2-7]{4})/)) {
             var id = RegExp.$1;
-            $.get('/cache/' + id + '.html', function(data) {
-                $('div.story').html(data);
-            });
             $.getJSON('/cache/' + id + '.json', function(data) {
-                $('h1.title').html(data['title']);
+                Jemplate.process('story.html.tt', data, $('div.content')[0]);
+                $.get('/cache/' + id + '.html', function(data) {
+                    $('div.story').html(data);
+                });
+            });
+        }
+        else if (this.path.match(/^\/stories\/?$/)) {
+            $.getJSON('/cache/changes.json', function(data) {
+                data = {pages: data};
+                Jemplate.process('changes.html.tt', data, $('div.content')[0]);
             });
         }
     },

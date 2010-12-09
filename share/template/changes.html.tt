@@ -1,4 +1,5 @@
-[% WRAPPER wrapper.html.tt %]
+<h1>Recent Changes</h1>
+<hr />
 <table class="pages">
 <tr>
 <th class="time">Changed</th>
@@ -9,10 +10,9 @@
 [% FOR page = pages %]
 <tr>
 <td class="time"><tt>[% page.duration %] ago</tt></td>
-<td><a href="/view/[% page.id %]">[% page.title %]</a></td>
+<td><a href="/stories/[% page.id %]">[% page.title %]</a></td>
 <td class="size">[% page.size %]</td>
 <td><tt><b>[% page.short %]</b>0[% page.rev %]</tt></td>
 </tr>
 [% END %]
 </table>
-[% END %]

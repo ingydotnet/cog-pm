@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+  <title>[% title %]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="shortcut icon" type="image/x-icon" href="[% favicon_file || "/images/favicon.ico" %]">
+  <link rel="stylesheet" href="/static/css/common.css" type="text/css">
+  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>
+  <script type="text/javascript" src="/static/js/jemplate.js"></script>
+  <script type="text/javascript" src="/static/js/common.js"></script>
+</head>
+
+<body>
+<div class="page">
+ <div class="header">
+  <h1 id="site-name"><a href="[% base_url %]/stories/Home">[% site_name %]</a></h1>
+ </div>
+ <div class="bottom">
+  <div class="sidebar">
+   <ul>
+    <li><a href="[% base_url %]/stories/Home">Home</a></li>
+    <li><a href="[% base_url %]/stories/">Recent Changes</a>
+    <li><a href="[% base_url %]/new/">New Page</a>
+    <li><a href="[% base_url %]/edit/">Edit</a>
+    <li><a href="[% base_url %]/tags/">Tags</a>
+    <li><a href="[% base_url %]/login/">Login</a>
+    <li><a href="[% base_url %]/prefs/">Preferences</a>
+   </ul>
+  </div>
+  <div class="content"></div>
+ </div>
+</div>
+</body>
+
+</html>

@@ -1,3 +1,0 @@
-<div class="header">
-  <h1 id="site-name"><a href="[% base_url %]/view/Home">[% site_name %]</a></h1>
-</div>

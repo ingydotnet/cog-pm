@@ -2,7 +2,6 @@ package CogWiki::App;
 use Mouse;
 use IO::All;
 use CogWiki::Store;
-use Template::Toolkit::Simple;
 
 use XXX;
 
@@ -40,9 +39,14 @@ next step is to edit the .wiki/config.yaml file. Then run the command:
 
 # TODO - Make real
 sub _find_share_files {
+    require File::ShareDir;
     my $self = shift;
 
-    my $dir = '../share'; # XXX - needs to be module based
+    my $dir = eval { File::ShareDir::dist_dir('CogWiki') } || do {
+        $_ = $@ or die;
+        /.* at (.*\/\.\.)/s or die;
+        "$1/share/";
+    };
     my $hash = {};
     %$hash = map {
         my $full = $_->pathname;
@@ -54,9 +58,11 @@ sub _find_share_files {
 }
 
 sub handle_make {
+    eval "use Template::Toolkit::Simple; 1" or die $@;
     require CogWiki::Page;
     require IPC::Run;
     require JSON;
+    require Time::Duration;
 
     my $self = shift;
     $self->config->chdir_root();
@@ -67,17 +73,28 @@ sub handle_make {
 
     io('cache')->mkdir;
     my $data = +{%{$self->config}};
-    my $html = tt
+    my $html = tt()
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('wrapper.html.tt');
+        ->render('layout.html.tt');
     io('cache/index.html')->print($html);
+    my $changes = [];
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
         my $page = CogWiki::Page->from_text($page_file->all);
         my $id = $page->id;
         $id =~ s/-.*// or next;
+        my $duration = Time::Duration::duration($page->time, 1);
+
+        push @$changes, {
+            id => $id,
+            rev => $page->rev,
+            title => $page->title,
+            time => $page->time,
+            size => length($page->content),
+            duration => $duration,
+        };
 
         my $html_filename = "cache/$id.html";
 
@@ -95,6 +112,7 @@ sub handle_make {
         delete $page->{content};
         io("cache/$id.json")->print($json->encode({%$page}));
     }
+    io("cache/changes.json")->print($json->encode($changes));
 
     print <<'...';
 CogWiki is up to date and ready to use. To start the wiki web server,
@@ -116,7 +134,7 @@ sub handle_up {
 CogWiki web server is starting up...
 
 ...
-    $webapp->run($app);
+    $webapp->run($app, @_);
 }
 
 sub handle_edit {

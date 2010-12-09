@@ -1,3 +1,0 @@
-[% WRAPPER wrapper.html.tt %]
-[% page_html %]
-[% END %]
