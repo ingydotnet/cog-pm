@@ -2,6 +2,7 @@ package CogWiki::App;
 use Mouse;
 use IO::All;
 use CogWiki::Store;
+use Class::Throwable qw(Error);
 
 use XXX;
 
@@ -22,8 +23,12 @@ sub handle_init {
 
     my $files = $self->_find_share_files;
     for my $file (keys %$files) {
-#         io('.wiki/' . $file)->assert->print(io($files->{$file})->all);
-        io('.wiki/' . $file)->assert->symlink($files->{$file});
+        if ($ENV{COGWIKI_SYMLINK_INSTALL}) {
+            io('.wiki/' . $file)->assert->symlink($files->{$file});
+        }
+        else {
+            io('.wiki/' . $file)->assert->print(io($files->{$file})->all);
+        }
     }
 
     CogWiki::Store->new(root => '.wiki/cog')->create;
