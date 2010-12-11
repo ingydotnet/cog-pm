@@ -18,28 +18,58 @@ has time => (is => 'ro', builder => sub { time() });
 
 sub handle_init {
     my $self = shift;
-    throw Error "Can't init. .wiki/ already exists."
+    my $root = $self->config->root_dir;
+    throw Error "Can't init. '$root/' already exists."
         if $self->config->is_init;
 
-    my $files = $self->_find_share_files;
-    for my $file (keys %$files) {
-        if ($ENV{COGWIKI_SYMLINK_INSTALL}) {
-            io('.wiki/' . $file)->assert->symlink($files->{$file});
-        }
-        else {
-            io('.wiki/' . $file)->assert->print(io($files->{$file})->all);
-        }
-    }
+    $self->_copy_assets();
 
-    CogWiki::Store->new(root => '.wiki/cog')->create;
+    CogWiki::Store->new(root => "$root/cog")->create;
 
-    print <<'...';
-CogWiki was successfully initialized in the .wiki/ subdirectory. The
-next step is to edit the .wiki/config.yaml file. Then run the command:
+    print <<"...";
+CogWiki was successfully initialized in the $root/ subdirectory. The
+next step is to:
+
+    cp $root/config.yaml.example $root/config.yaml
+
+Edit the config.yaml file, then run:
 
     cogwiki make
 
 ...
+}
+
+sub handle_update {
+    my $self = shift;
+    my $root = $self->config->root_dir;
+
+    $self->_copy_assets();
+
+    print <<"...";
+CogWiki was successfully updated in the $root/ subdirectory.
+
+Now run:
+
+    cogwiki make
+
+...
+}
+
+sub _copy_assets {
+    my $self = shift;
+    my $files = $self->_find_share_files;
+    my $root = $self->config->root_dir;
+
+    for my $file (keys %$files) {
+        my $target = "$root/$file";
+        unlink $target;
+        if ($ENV{COGWIKI_SYMLINK_INSTALL}) {
+            io($target)->assert->symlink($files->{$file});
+        }
+        else {
+            io($target)->assert->print(io($files->{$file})->all);
+        }
+    }
 }
 
 # TODO - Make real

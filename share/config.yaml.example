@@ -1,0 +1,6 @@
+# Basics
+site_name: My Wiki
+home_page_id: "L3E7"
+
+# Options:
+server_port: 1234

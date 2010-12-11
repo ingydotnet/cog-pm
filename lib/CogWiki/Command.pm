@@ -52,10 +52,11 @@ sub usage {
 Usage: cogwiki command
 
 Commands:
-    init - Make current directory into a CogWiki
-    make - Bring the wiki up to date
-    up   - Start up a local wiki server
-    down - Stop the server
+    init   - Make current directory into a CogWiki
+    update - Update the wiki with the latest assets
+    make   - Prepare the wiki content for the web
+    up     - Start up a local wiki server
+    down   - Stop the server
 
     bless file-name - Turn a text file into a wiki file
     edit name|id - Start an editor with the contents of the wiki page
@@ -102,6 +103,7 @@ CogWiki - Turn Anything into a Wiki
 =head1 SYNOPSIS
 
     > cogwiki init
+    > cp .wiki/config.yaml.example .wiki/config.yaml
     > edit .wiki/config.yaml
     > cogwiki make
     > cogwiki up

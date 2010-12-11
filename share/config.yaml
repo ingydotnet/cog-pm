@@ -1,9 +1,0 @@
-# Basics
-site_name: Strategic Story Board
-content_root: ..
-home_page_id: "H5NG"
-plugins: []
-
-# Options:
-use_git_repository: true
-server_port: 1234

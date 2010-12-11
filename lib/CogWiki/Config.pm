@@ -5,38 +5,36 @@ use Cwd;
 
 # use XXX;
 
-has is_init => (is => 'ro', default => 0);
-has is_config => (is => 'ro', default => 1);
-has not_config => (is => 'ro', default => 0);
-has is_ready => (is => 'ro', default => 0);
-has root_dir => (is => 'ro', default => '.');
+my $root_dir = ($ENV{COGWIKI_ROOT} || '.wiki');
+has root_dir => (is => 'ro', default => $root_dir);
+
 has site_name => (is => 'ro');
-has content_root => (is => 'ro');
+has home_page_id => (is => 'ro');
 has server_port => (is => 'ro', default => '');
+
+has is_init => (is => 'ro', default => 0);
+has is_config => (is => 'ro', default => 0);
+has is_ready => (is => 'ro', default => 0);
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;
 
-    my $config_file = '.wiki/config.yaml';
-    my $hash = {is_init => 0};
-    if (-e $config_file) {
-        $hash = YAML::XS::LoadFile($config_file);
-        $hash->{is_init} = 1;
-        $config_file =~ s!(.*)/!!;
-        $hash->{root_dir} = $1;
-    }
+    my $config_file = "$root_dir/config.yaml";
+    my $hash = -e $config_file
+        ? YAML::XS::LoadFile($config_file)
+        : {};
     $class->$orig($hash);
 };
 
 sub BUILD {
     my $self = shift;
-    if ($self->not_config) {
-        $self->{is_config} = 0;
-        return $self;
-    }
-    if (-d $self->root_dir) {
-        $self->{is_ready} = 1;
-    }
+    my $root = $self->root_dir;
+    $self->{is_init} = 1
+        if -d "$root/static";
+    $self->{is_config} = 1
+        if -e "$root/config.yaml";
+    $self->{is_ready} = 1
+        if -d "$root/static";
     return $self;
 }
 
