@@ -114,7 +114,18 @@ sub handle_make {
         ->post_chomp
         ->render('layout.html.tt');
     io('cache/index.html')->print($html);
-    my $changes = [];
+
+    $data = {
+        json => $json->encode(YAML::XS::LoadFile("config.yaml")),
+    };
+    my $javascript = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('config.js.tt');
+    io('cache/config.js')->print($javascript);
+
+    my $news = [];
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
         my $page = CogWiki::Page->from_text($page_file->all);
@@ -122,7 +133,7 @@ sub handle_make {
         $id =~ s/-.*// or next;
         my $duration = Time::Duration::duration($page->time, 1);
 
-        push @$changes, {
+        push @$news, {
             id => $id,
             rev => $page->rev,
             title => $page->title,
@@ -147,7 +158,7 @@ sub handle_make {
         delete $page->{content};
         io("cache/$id.json")->print($json->encode({%$page}));
     }
-    io("cache/changes.json")->print($json->encode($changes));
+    io("cache/news.json")->print($json->encode($news));
 
     print <<'...';
 CogWiki is up to date and ready to use. To start the wiki web server,

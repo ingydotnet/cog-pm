@@ -12,6 +12,8 @@ has site_name => (is => 'ro');
 has home_page_id => (is => 'ro');
 has server_port => (is => 'ro', default => '');
 
+has content_root => (is => 'ro', default => '..');
+
 has is_init => (is => 'ro', default => 0);
 has is_config => (is => 'ro', default => 0);
 has is_ready => (is => 'ro', default => 0);

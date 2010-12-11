@@ -10,7 +10,7 @@
 [% FOR page = pages %]
 <tr>
 <td class="time"><tt>[% page.duration %] ago</tt></td>
-<td><a href="/stories/[% page.id %]">[% page.title %]</a></td>
+<td><a href="/story/[% page.id %]">[% page.title %]</a></td>
 <td class="size">[% page.size %]</td>
 <td><tt><b>[% page.short %]</b>0[% page.rev %]</tt></td>
 </tr>

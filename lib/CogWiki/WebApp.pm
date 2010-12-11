@@ -23,7 +23,8 @@ sub app {
     my $app = sub {
         my $e = shift;
         my $list = [
-            sub { m!^/stories/! } =>
+            # XXX Paths need to come from config
+            sub { m!^/(story|news|home)/! } =>
                 sub { $self->layout(@_) },
             sub { $_ ne '/' } =>
                 sub {

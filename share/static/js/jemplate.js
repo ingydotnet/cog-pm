@@ -1913,59 +1913,16 @@ Jemplate.JSON = {
 if (typeof(Jemplate) == 'undefined')
     throw('Jemplate.js must be loaded before any Jemplate template files');
 
-Jemplate.templateMap['changes.html.tt'] = function(context) {
+Jemplate.templateMap['config.js.tt'] = function(context) {
     if (! context) throw('Jemplate function called without context\n');
     var stash = context.stash;
     var output = '';
 
     try {
-output += '<h1>Recent Changes</h1>\n<hr />\n<table class="pages">\n<tr>\n<th class="time">Changed</th>\n<th>Name</th>\n<th class="size">Size</th>\n<th>Id</th>\n</tr>\n';
-//line 17 "changes.html.tt"
-
-// FOREACH 
-(function() {
-    var list = stash.get('pages');
-    list = new Jemplate.Iterator(list);
-    var retval = list.get_first();
-    var value = retval[0];
-    var done = retval[1];
-    var oldloop;
-    try { oldloop = stash.get('loop') } finally {}
-    stash.set('loop', list);
-    try {
-        while (! done) {
-            stash.data['page'] = value;
-output += '\n<tr>\n<td class="time"><tt>';
-//line 12 "changes.html.tt"
-output += stash.get(['page', 0, 'duration', 0]);
-output += ' ago</tt></td>\n<td><a href="/stories/';
-//line 13 "changes.html.tt"
-output += stash.get(['page', 0, 'id', 0]);
-output += '">';
-//line 13 "changes.html.tt"
-output += stash.get(['page', 0, 'title', 0]);
-output += '</a></td>\n<td class="size">';
-//line 14 "changes.html.tt"
-output += stash.get(['page', 0, 'size', 0]);
-output += '</td>\n<td><tt><b>';
-//line 15 "changes.html.tt"
-output += stash.get(['page', 0, 'short', 0]);
-output += '</b>0';
-//line 15 "changes.html.tt"
-output += stash.get(['page', 0, 'rev', 0]);
-output += '</tt></td>\n</tr>\n';;
-            retval = list.get_next();
-            value = retval[0];
-            done = retval[1];
-        }
-    }
-    catch(e) {
-        throw(context.set_error(e, output));
-    }
-    stash.set('loop', oldloop);
-})();
-
-output += '\n</table>\n';
+output += 'CogWiki.config = ';
+//line 1 "config.js.tt"
+output += stash.get('json');
+output += ';\n';
     }
     catch(e) {
         var error = context.set_error(e, output);
@@ -1987,34 +1944,96 @@ output += stash.get('title');
 output += '</title>\n  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n  <link rel="shortcut icon" type="image/x-icon" href="';
 //line 7 "layout.html.tt"
 output += stash.get('favicon_file') || '/images/favicon.ico';
-output += '">\n  <link rel="stylesheet" href="/static/css/common.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/common.js"></script>\n</head>\n\n<body>\n<div class="page">\n <div class="header">\n  <h1 id="site-name"><a href="';
-//line 17 "layout.html.tt"
+output += '">\n  <link rel="stylesheet" href="/static/css/common.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/common.js"></script>\n  <script type="text/javascript" src="/cache/config.js"></script>\n</head>\n\n<body>\n<div class="page">\n <div class="header">\n  <h1 id="site-name"><a href="';
+//line 18 "layout.html.tt"
 output += stash.get('base_url');
-output += '/stories/Home">';
-//line 17 "layout.html.tt"
+output += '/">';
+//line 18 "layout.html.tt"
 output += stash.get('site_name');
 output += '</a></h1>\n </div>\n <div class="bottom">\n  <div class="sidebar">\n   <ul>\n    <li><a href="';
-//line 22 "layout.html.tt"
-output += stash.get('base_url');
-output += '/stories/Home">Home</a></li>\n    <li><a href="';
 //line 23 "layout.html.tt"
 output += stash.get('base_url');
-output += '/stories/">Recent Changes</a>\n    <li><a href="';
+output += '/home/">Home</a></li>\n    <li><a href="';
 //line 24 "layout.html.tt"
 output += stash.get('base_url');
-output += '/new/">New Page</a>\n    <li><a href="';
+output += '/news/">Recent Changes</a>\n    <li><a href="';
 //line 25 "layout.html.tt"
 output += stash.get('base_url');
-output += '/edit/">Edit</a>\n    <li><a href="';
+output += '/new/">New Page</a>\n    <li><a href="';
 //line 26 "layout.html.tt"
 output += stash.get('base_url');
-output += '/tags/">Tags</a>\n    <li><a href="';
+output += '/edit/">Edit</a>\n    <li><a href="';
 //line 27 "layout.html.tt"
 output += stash.get('base_url');
-output += '/login/">Login</a>\n    <li><a href="';
+output += '/tags/">Tags</a>\n    <li><a href="';
 //line 28 "layout.html.tt"
 output += stash.get('base_url');
-output += '/prefs/">Preferences</a>\n   </ul>\n  </div>\n  <div class="content"></div>\n </div>\n</div>\n</body>\n\n</html>\n';
+output += '/login/">Login</a>\n    <li><a href="';
+//line 29 "layout.html.tt"
+output += stash.get('base_url');
+output += '/prefs/">Preferences</a>\n   </ul>\n  </div>\n\n  <div class="content"></div>\n\n </div>\n</div>\n</body>\n\n</html>\n';
+    }
+    catch(e) {
+        var error = context.set_error(e, output);
+        throw(error);
+    }
+
+    return output;
+}
+
+Jemplate.templateMap['page-list.html.tt'] = function(context) {
+    if (! context) throw('Jemplate function called without context\n');
+    var stash = context.stash;
+    var output = '';
+
+    try {
+output += '<h1>Recent Changes</h1>\n<hr />\n<table class="pages">\n<tr>\n<th class="time">Changed</th>\n<th>Name</th>\n<th class="size">Size</th>\n<th>Id</th>\n</tr>\n';
+//line 17 "page-list.html.tt"
+
+// FOREACH 
+(function() {
+    var list = stash.get('pages');
+    list = new Jemplate.Iterator(list);
+    var retval = list.get_first();
+    var value = retval[0];
+    var done = retval[1];
+    var oldloop;
+    try { oldloop = stash.get('loop') } finally {}
+    stash.set('loop', list);
+    try {
+        while (! done) {
+            stash.data['page'] = value;
+output += '\n<tr>\n<td class="time"><tt>';
+//line 12 "page-list.html.tt"
+output += stash.get(['page', 0, 'duration', 0]);
+output += ' ago</tt></td>\n<td><a href="/story/';
+//line 13 "page-list.html.tt"
+output += stash.get(['page', 0, 'id', 0]);
+output += '">';
+//line 13 "page-list.html.tt"
+output += stash.get(['page', 0, 'title', 0]);
+output += '</a></td>\n<td class="size">';
+//line 14 "page-list.html.tt"
+output += stash.get(['page', 0, 'size', 0]);
+output += '</td>\n<td><tt><b>';
+//line 15 "page-list.html.tt"
+output += stash.get(['page', 0, 'short', 0]);
+output += '</b>0';
+//line 15 "page-list.html.tt"
+output += stash.get(['page', 0, 'rev', 0]);
+output += '</tt></td>\n</tr>\n';;
+            retval = list.get_next();
+            value = retval[0];
+            done = retval[1];
+        }
+    }
+    catch(e) {
+        throw(context.set_error(e, output));
+    }
+    stash.set('loop', oldloop);
+})();
+
+output += '\n</table>\n';
     }
     catch(e) {
         var error = context.set_error(e, output);
