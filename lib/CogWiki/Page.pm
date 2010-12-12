@@ -12,6 +12,7 @@ has content => ( is => 'rw' );
 has title => ( is => 'rw' );
 has short => ( is => 'rw' );
 has size => ( is => 'rw' );
+has color => ( is => 'rw' );
 has duration => ( is => 'rw' );
 
 sub from_file {

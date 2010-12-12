@@ -142,6 +142,7 @@ sub handle_make {
             time => $page->time,
             user => $page->user,
             size => length($page->content),
+            color => $page->color,
             # XXX Needs to be client side
             duration => $duration,
         };

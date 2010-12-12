@@ -23,6 +23,12 @@ CogWiki.prototype = {
             var id = CogWiki.config.home_page_id;
             this.render_page(id);
         }
+        else if (this.path == '/') {
+            this.story_board();
+        }
+        else {
+            Jemplate.process('404.html.tt', null, $('div.content')[0]);
+        }
     },
     render_page: function(id) {
         $.getJSON('/cache/' + id + '.json', function(data) {
@@ -30,6 +36,17 @@ CogWiki.prototype = {
             $.get('/cache/' + id + '.html', function(data) {
                 $('div.story').html(data);
             });
+        });
+    },
+    story_board: function() {
+        $.getJSON('/cache/news.json', function(data) {
+            var $content = $('div.content').addClass('wide');
+            var $tmp = $('<div></div>');
+            for (var i = 0; i < data.length; i++) {
+                var datum = {page: data[i]};
+                Jemplate.process('postit.html.tt', datum, $tmp[0]);
+                $content.append($tmp.children());
+            }
         });
     },
     THE: 'END'

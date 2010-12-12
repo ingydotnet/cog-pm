@@ -74,6 +74,10 @@ html, body {
     background-color: #fff;
 }
 
+.wide {
+    width: 1200px;
+}
+
 .content a, .content a:visited {
     color: #00f;
     text-decoration: none;

@@ -1913,6 +1913,22 @@ Jemplate.JSON = {
 if (typeof(Jemplate) == 'undefined')
     throw('Jemplate.js must be loaded before any Jemplate template files');
 
+Jemplate.templateMap['404.html.tt'] = function(context) {
+    if (! context) throw('Jemplate function called without context\n');
+    var stash = context.stash;
+    var output = '';
+
+    try {
+output += '<h1>Resource Not Found</h1>\n';
+    }
+    catch(e) {
+        var error = context.set_error(e, output);
+        throw(error);
+    }
+
+    return output;
+}
+
 Jemplate.templateMap['config.js.tt'] = function(context) {
     if (! context) throw('Jemplate function called without context\n');
     var stash = context.stash;
@@ -1944,32 +1960,32 @@ output += stash.get('title');
 output += '</title>\n  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n  <link rel="shortcut icon" type="image/x-icon" href="';
 //line 7 "layout.html.tt"
 output += stash.get('favicon_file') || '/images/favicon.ico';
-output += '">\n  <link rel="stylesheet" href="/static/css/layout.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/page-list.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/story.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/cogwiki.js"></script>\n  <script type="text/javascript" src="/cache/config.js"></script>\n</head>\n\n<body>\n<div class="layout">\n <div class="header">\n  <h1 id="site-name"><a href="';
-//line 20 "layout.html.tt"
+output += '">\n  <link rel="stylesheet" href="/static/css/layout.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/page-list.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/story.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/postit.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jquery-ui-1.8.7.custom.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/cogwiki.js"></script>\n  <script type="text/javascript" src="/cache/config.js"></script>\n</head>\n\n<body>\n<div class="layout">\n <div class="header">\n  <h1 id="site-name"><a href="';
+//line 22 "layout.html.tt"
 output += stash.get('base_url');
 output += '/">';
-//line 20 "layout.html.tt"
+//line 22 "layout.html.tt"
 output += stash.get('site_name');
 output += '</a></h1>\n </div>\n <div class="bottom">\n  <div class="sidepanel">\n   <ul>\n    <li><a href="';
-//line 25 "layout.html.tt"
-output += stash.get('base_url');
-output += '/home/">Home</a></li>\n    <li><a href="';
-//line 26 "layout.html.tt"
-output += stash.get('base_url');
-output += '/news/">Recent Changes</a>\n    <li><a href="';
 //line 27 "layout.html.tt"
 output += stash.get('base_url');
-output += '/new/">New Page</a>\n    <li><a href="';
+output += '/home/">Home</a></li>\n    <li><a href="';
 //line 28 "layout.html.tt"
 output += stash.get('base_url');
-output += '/edit/">Edit</a>\n    <li><a href="';
+output += '/news/">Recent Changes</a>\n    <li><a href="';
 //line 29 "layout.html.tt"
 output += stash.get('base_url');
-output += '/tags/">Tags</a>\n    <li><a href="';
+output += '/new/">New Page</a>\n    <li><a href="';
 //line 30 "layout.html.tt"
 output += stash.get('base_url');
-output += '/login/">Login</a>\n    <li><a href="';
+output += '/edit/">Edit</a>\n    <li><a href="';
 //line 31 "layout.html.tt"
+output += stash.get('base_url');
+output += '/tags/">Tags</a>\n    <li><a href="';
+//line 32 "layout.html.tt"
+output += stash.get('base_url');
+output += '/login/">Login</a>\n    <li><a href="';
+//line 33 "layout.html.tt"
 output += stash.get('base_url');
 output += '/prefs/">Preferences</a>\n   </ul>\n  </div>\n\n  <div class="content"></div>\n\n </div>\n</div>\n</body>\n\n</html>\n';
     }
@@ -2037,6 +2053,34 @@ output += '</td>\n</tr>\n';;
 })();
 
 output += '\n</table>\n';
+    }
+    catch(e) {
+        var error = context.set_error(e, output);
+        throw(error);
+    }
+
+    return output;
+}
+
+Jemplate.templateMap['postit.html.tt'] = function(context) {
+    if (! context) throw('Jemplate function called without context\n');
+    var stash = context.stash;
+    var output = '';
+
+    try {
+output += '<a href="/story/';
+//line 1 "postit.html.tt"
+output += stash.get(['page', 0, 'id', 0]);
+output += '/" title="';
+//line 1 "postit.html.tt"
+output += stash.get(['page', 0, 'title', 0]);
+output += '">\n<div class="';
+//line 2 "postit.html.tt"
+output += stash.get(['page', 0, 'color', 0]);
+output += ' postit ui-draggable">\n<span class="id">';
+//line 3 "postit.html.tt"
+output += stash.get(['page', 0, 'id', 0]);
+output += '</span>\n</div>\n</a>\n';
     }
     catch(e) {
         var error = context.set_error(e, output);
