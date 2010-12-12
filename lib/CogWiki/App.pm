@@ -125,20 +125,23 @@ sub handle_make {
         ->render('config.js.tt');
     io('cache/config.js')->print($javascript);
 
+    my $time = time;
     my $news = [];
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
         my $page = CogWiki::Page->from_text($page_file->all);
         my $id = $page->id;
         $id =~ s/-.*// or next;
-        my $duration = Time::Duration::duration($page->time, 1);
+        my $duration = Time::Duration::duration($time - $page->time, 1);
 
         push @$news, {
             id => $id,
             rev => $page->rev,
             title => $page->title,
             time => $page->time,
+            user => $page->user,
             size => length($page->content),
+            # XXX Needs to be client side
             duration => $duration,
         };
 
@@ -160,6 +163,8 @@ sub handle_make {
     }
     io("cache/news.json")->print($json->encode($news));
 
+    $self->make_js();
+
     print <<'...';
 CogWiki is up to date and ready to use. To start the wiki web server,
 run this command:
@@ -168,6 +173,15 @@ run this command:
 
 ...
     
+}
+
+sub make_js {
+    my $self = shift;
+    my $root = $self->config->root_dir;
+    my $js = "$root/static/js";
+    if (-e "$js/Makefile") {
+        system("(cd $js; make)") == 0 or die;
+    }
 }
 
 sub handle_up {

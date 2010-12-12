@@ -17,7 +17,7 @@ has config => (is => 'ro', required => 1);
 sub app {
     my $self = shift;
 
-    throw Error "CogWiki is not set up"
+    throw Error "CogWiki is not properly set up"
         unless $self->config->is_ready;
 
     my $app = sub {
