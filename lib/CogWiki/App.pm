@@ -170,7 +170,7 @@ sub handle_make {
 CogWiki is up to date and ready to use. To start the wiki web server,
 run this command:
 
-    cogwiki up
+    cogwiki start
 
 ...
     
@@ -185,7 +185,7 @@ sub make_js {
     }
 }
 
-sub handle_up {
+sub handle_start {
     require CogWiki::WebApp;
     my $self = shift;
     $self->config->chdir_root();

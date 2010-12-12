@@ -55,8 +55,8 @@ Commands:
     init   - Make current directory into a CogWiki
     update - Update the wiki with the latest assets
     make   - Prepare the wiki content for the web
-    up     - Start up a local wiki server
-    down   - Stop the server
+    start  - Start the local wiki server
+    stop   - Stop the server
 
     bless file-name - Turn a text file into a wiki file
     edit name|id - Start an editor with the contents of the wiki page
@@ -106,7 +106,7 @@ CogWiki - Turn Anything into a Wiki
     > cp .wiki/config.yaml.example .wiki/config.yaml
     > edit .wiki/config.yaml
     > cogwiki make
-    > cogwiki up
+    > cogwiki start
 
 =head1 DESCRIPTION
 
@@ -115,8 +115,8 @@ file in the directory is a wiki page. All CogWiki files are put into a
 C<.wiki/> subdirectory. CogWiki uses git for wiki history. If your
 directory is already a git repo, CogWiki can use its GIT_DIR, or it can
 set up its own. CogWiki is a Perl PSGI program, so you can run it in any
-web environment. The 'up' command will start a local web server that you
-can use immediately (even offline).
+web environment. The 'start' command will start a local web server that
+you can use immediately (even offline).
 
 =head1 COMMANDS
 
@@ -142,7 +142,7 @@ The wiki will run this for you, when you make changes through your
 web browser. SW can also be configured to run C<make> when you do
 git commits.
 
-=head2 up [plackup-options]
+=head2 start [plackup-options]
 
 This command will start a localhost web server for you. By default, you
 can access the wiki on http://127.0.0.1:5000.
@@ -150,10 +150,10 @@ can access the wiki on http://127.0.0.1:5000.
 This command is a proxy for Perl Plack's plackup. That means you can use
 all the same options as plackup. See L<plackup> for more information.
 
-=head2 down
+=head2 stop
 
 This command will attempt to stop the web server started by
-C<cogwiki up>.
+C<cogwiki start>.
 
 =head1 CONFIGURATION
 
