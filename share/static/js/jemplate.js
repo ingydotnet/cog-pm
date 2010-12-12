@@ -1944,13 +1944,13 @@ output += stash.get('title');
 output += '</title>\n  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n  <link rel="shortcut icon" type="image/x-icon" href="';
 //line 7 "layout.html.tt"
 output += stash.get('favicon_file') || '/images/favicon.ico';
-output += '">\n  <link rel="stylesheet" href="/static/css/cogwiki.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/page-list.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/story.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/cogwiki.js"></script>\n  <script type="text/javascript" src="/cache/config.js"></script>\n</head>\n\n<body>\n<div class="page">\n <div class="header">\n  <h1 id="site-name"><a href="';
+output += '">\n  <link rel="stylesheet" href="/static/css/layout.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/page-list.css" type="text/css">\n  <link rel="stylesheet" href="/static/css/story.css" type="text/css">\n  <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>\n  <script type="text/javascript" src="/static/js/jemplate.js"></script>\n  <script type="text/javascript" src="/static/js/cogwiki.js"></script>\n  <script type="text/javascript" src="/cache/config.js"></script>\n</head>\n\n<body>\n<div class="layout">\n <div class="header">\n  <h1 id="site-name"><a href="';
 //line 20 "layout.html.tt"
 output += stash.get('base_url');
 output += '/">';
 //line 20 "layout.html.tt"
 output += stash.get('site_name');
-output += '</a></h1>\n </div>\n <div class="bottom">\n  <div class="sidebar">\n   <ul>\n    <li><a href="';
+output += '</a></h1>\n </div>\n <div class="bottom">\n  <div class="sidepanel">\n   <ul>\n    <li><a href="';
 //line 25 "layout.html.tt"
 output += stash.get('base_url');
 output += '/home/">Home</a></li>\n    <li><a href="';
@@ -1987,8 +1987,8 @@ Jemplate.templateMap['page-list.html.tt'] = function(context) {
     var output = '';
 
     try {
-output += '<h1>Recent Changes</h1>\n<hr />\n<table class="page-list">\n<tr>\n<th>Id</th>\n<th class="duration">When</th>\n<th>What</th>\n<th>Who</th>\n<th class="size">Size</th>\n</tr>\n';
-//line 19 "page-list.html.tt"
+output += '<div class="page-list">\n<h1>Recent Changes</h1>\n<hr />\n<table>\n<tr>\n<th class="id">Id</th>\n<th class="duration">When</th>\n<th class="name">What</th>\n<th class="user">Who</th>\n<th class="size">Size</th>\n</tr>\n';
+//line 20 "page-list.html.tt"
 
 // FOREACH 
 (function() {
@@ -2003,27 +2003,27 @@ output += '<h1>Recent Changes</h1>\n<hr />\n<table class="page-list">\n<tr>\n<th
     try {
         while (! done) {
             stash.data['page'] = value;
-output += '\n<tr>\n<td><tt><b>';
-//line 13 "page-list.html.tt"
-output += stash.get(['page', 0, 'short', 0]);
+output += '\n<tr>\n<td class="id"><tt><b>';
+//line 14 "page-list.html.tt"
+output += stash.get(['page', 0, 'id', 0]);
 output += '</b>0';
-//line 13 "page-list.html.tt"
+//line 14 "page-list.html.tt"
 output += stash.get(['page', 0, 'rev', 0]);
 output += '</tt></td>\n<td class="duration"><tt>';
-//line 14 "page-list.html.tt"
-output += stash.get(['page', 0, 'duration', 0]);
-output += ' ago</tt></td>\n<td><a href="/story/';
 //line 15 "page-list.html.tt"
+output += stash.get(['page', 0, 'duration', 0]);
+output += ' ago</tt></td>\n<td class="name"><a href="/story/';
+//line 16 "page-list.html.tt"
 output += stash.get(['page', 0, 'id', 0]);
 output += '">';
-//line 15 "page-list.html.tt"
-output += stash.get(['page', 0, 'title', 0]);
-output += '</a></td>\n<td class="size">';
 //line 16 "page-list.html.tt"
-output += stash.get(['page', 0, 'size', 0]);
-output += '</td>\n<td class="user">';
+output += stash.get(['page', 0, 'title', 0]);
+output += '</a></td>\n<td class="user">';
 //line 17 "page-list.html.tt"
 output += stash.get(['page', 0, 'user', 0]);
+output += '</td>\n<td class="size">';
+//line 18 "page-list.html.tt"
+output += stash.get(['page', 0, 'size', 0]);
 output += '</td>\n</tr>\n';;
             retval = list.get_next();
             value = retval[0];

@@ -20,7 +20,7 @@
   <h1 id="site-name"><a href="[% base_url %]/">[% site_name %]</a></h1>
  </div>
  <div class="bottom">
-  <div class="sidebar">
+  <div class="sidepanel">
    <ul>
     <li><a href="[% base_url %]/home/">Home</a></li>
     <li><a href="[% base_url %]/news/">Recent Changes</a>
