@@ -1,7 +1,6 @@
 package CogWiki::App;
 use Mouse;
 use IO::All;
-use CogWiki::Store;
 use Class::Throwable qw(Error);
 
 use XXX;
@@ -11,7 +10,9 @@ has store => (
     is => 'ro',
     builder => sub {
         my $self = shift;
-        CogWiki::Store->new(root => $self->config->root_dir . '/cog');
+        require CogWiki::Store;
+        my $root = $self->config->root_dir;
+        CogWiki::Store->new(root => "$root/cog");
     },
 );
 has time => (is => 'ro', builder => sub { time() });
@@ -113,7 +114,7 @@ sub handle_make {
         ->data($data)
         ->post_chomp
         ->render('layout.html.tt');
-    io('cache/index.html')->print($html);
+    io('cache/layout.html')->print($html);
 
     $data = {
         json => $json->encode(YAML::XS::LoadFile("config.yaml")),

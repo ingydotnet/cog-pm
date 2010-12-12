@@ -1,7 +1,6 @@
 package CogWiki::Config;
 use Mouse;
 use YAML::XS;
-use Cwd;
 
 # use XXX;
 
@@ -17,6 +16,8 @@ has content_root => (is => 'ro', default => '..');
 has is_init => (is => 'ro', default => 0);
 has is_config => (is => 'ro', default => 0);
 has is_ready => (is => 'ro', default => 0);
+
+has plack_debug => (is => 'ro', default => 0);
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;
