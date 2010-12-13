@@ -1,3 +1,11 @@
 <h1 class="story_title">[% title %]</h1>
+[% IF tag.size %]
+<hr />
+<ul class="tag-list">
+[% FOR t = tag %]
+<li><a href="/tag/[% t %]/">[% t %]</li>
+[% END %]
+</ul>
+[% END %]
 <hr />
 <div class="story">[% content %]</div>

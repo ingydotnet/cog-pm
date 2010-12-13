@@ -2099,8 +2099,48 @@ Jemplate.templateMap['story.html.tt'] = function(context) {
 output += '<h1 class="story_title">';
 //line 1 "story.html.tt"
 output += stash.get('title');
-output += '</h1>\n<hr />\n<div class="story">';
-//line 3 "story.html.tt"
+output += '</h1>\n';
+//line 9 "story.html.tt"
+if (stash.get(['tag', 0, 'size', 0])) {
+output += '\n<hr />\n<ul class="tag-list">\n';
+//line 7 "story.html.tt"
+
+// FOREACH 
+(function() {
+    var list = stash.get('tag');
+    list = new Jemplate.Iterator(list);
+    var retval = list.get_first();
+    var value = retval[0];
+    var done = retval[1];
+    var oldloop;
+    try { oldloop = stash.get('loop') } finally {}
+    stash.set('loop', list);
+    try {
+        while (! done) {
+            stash.data['t'] = value;
+output += '\n<li><a href="/tag/';
+//line 6 "story.html.tt"
+output += stash.get('t');
+output += '/">';
+//line 6 "story.html.tt"
+output += stash.get('t');
+output += '</li>\n';;
+            retval = list.get_next();
+            value = retval[0];
+            done = retval[1];
+        }
+    }
+    catch(e) {
+        throw(context.set_error(e, output));
+    }
+    stash.set('loop', oldloop);
+})();
+
+output += '\n</ul>\n';
+}
+
+output += '\n<hr />\n<div class="story">';
+//line 11 "story.html.tt"
 output += stash.get('content');
 output += '</div>\n';
     }

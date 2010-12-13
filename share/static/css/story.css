@@ -10,3 +10,12 @@ hr.page-title {
 .content li p {
     margin: 0;
 }
+
+.tag-list {
+    display: inline;
+}
+
+.tag-list li {
+    /*list-style: none;*/
+    display: inline;
+}
