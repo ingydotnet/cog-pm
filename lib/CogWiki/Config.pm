@@ -17,6 +17,8 @@ has is_init => (is => 'ro', default => 0);
 has is_config => (is => 'ro', default => 0);
 has is_ready => (is => 'ro', default => 0);
 
+has plugins => (is => 'ro', default => sub{[]});
+
 has plack_debug => (is => 'ro', default => 0);
 
 around BUILDARGS => sub {
