@@ -257,6 +257,9 @@ sub handle_bless {
         while ($head =~ s/^(Tag: .*\n)//m) {
             $heading .= $1;
         }
+        while ($head =~ s/^(Url: .*\n)//m) {
+            $heading .= $1;
+        }
         $head =~ s/^[A-Z].*\n//mg;
         $heading .= $head;
 

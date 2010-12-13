@@ -8,6 +8,7 @@ has time => ( is => 'rw' );
 has user => ( is => 'rw' );
 has name => ( is => 'rw', default => sub {[]} );
 has tag => ( is => 'rw', default => sub {[]} );
+has url => ( is => 'rw', default => sub {[]} );
 has content => ( is => 'rw' );
 has title => ( is => 'rw' );
 has short => ( is => 'rw' );
@@ -32,7 +33,7 @@ sub from_text {
     while ($head =~ s/\A(\w+): +(.*)\n//) {
         my $key = lc $1;
         my $value = $2;
-        if ($key =~ /^(?:name|tag)$/) {
+        if ($key =~ /^(?:name|tag|url)$/) {
             $hash{$key} ||= [];
             push @{$hash{$key}}, $value;
         }

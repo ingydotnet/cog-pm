@@ -1975,17 +1975,14 @@ output += stash.get('base_url');
 output += '/news/">Recent Changes</a>\n    <li><a href="';
 //line 29 "layout.html.tt"
 output += stash.get('base_url');
-output += '/new/">New Page</a>\n    <li><a href="';
+output += '/tags/">Tag Cloud</a>\n    <li><a href="';
 //line 30 "layout.html.tt"
 output += stash.get('base_url');
-output += '/edit/">Edit</a>\n    <li><a href="';
-//line 31 "layout.html.tt"
-output += stash.get('base_url');
-output += '/tags/">Tags</a>\n    <li><a href="';
-//line 32 "layout.html.tt"
+output += '/new/">New Page</a>\n   </ul>\n   <br />\n   <ul>\n    <li><a href="';
+//line 34 "layout.html.tt"
 output += stash.get('base_url');
 output += '/login/">Login</a>\n    <li><a href="';
-//line 33 "layout.html.tt"
+//line 35 "layout.html.tt"
 output += stash.get('base_url');
 output += '/prefs/">Preferences</a>\n   </ul>\n  </div>\n\n  <div class="content"></div>\n\n </div>\n</div>\n</body>\n\n</html>\n';
     }
@@ -2096,14 +2093,14 @@ Jemplate.templateMap['story.html.tt'] = function(context) {
     var output = '';
 
     try {
-output += '<h1 class="story_title">';
-//line 1 "story.html.tt"
+output += '<ul class="story-nav">\n  <li><a href="#">Edit</a></li>\n  <li><a href="#">Tag</a></li>\n</ul>\n\n<h1 class="story-title">';
+//line 6 "story.html.tt"
 output += stash.get('title');
-output += '</h1>\n';
-//line 9 "story.html.tt"
+output += '</h1>\n<hr />\n\n';
+//line 17 "story.html.tt"
 if (stash.get(['tag', 0, 'size', 0])) {
-output += '\n<hr />\n<ul class="tag-list">\n';
-//line 7 "story.html.tt"
+output += '\n<b>Tags:</b>\n<ul class="tag-list">\n';
+//line 14 "story.html.tt"
 
 // FOREACH 
 (function() {
@@ -2119,10 +2116,10 @@ output += '\n<hr />\n<ul class="tag-list">\n';
         while (! done) {
             stash.data['t'] = value;
 output += '\n<li><a href="/tag/';
-//line 6 "story.html.tt"
+//line 13 "story.html.tt"
 output += stash.get('t');
 output += '/">';
-//line 6 "story.html.tt"
+//line 13 "story.html.tt"
 output += stash.get('t');
 output += '</li>\n';;
             retval = list.get_next();
@@ -2136,11 +2133,51 @@ output += '</li>\n';;
     stash.set('loop', oldloop);
 })();
 
-output += '\n</ul>\n';
+output += '\n</ul>\n<hr />\n';
 }
 
-output += '\n<hr />\n<div class="story">';
-//line 11 "story.html.tt"
+output += '\n\n';
+//line 27 "story.html.tt"
+if (stash.get(['url', 0, 'size', 0])) {
+output += '\n<b>Links:</b>\n<ul class="url-list">\n';
+//line 24 "story.html.tt"
+
+// FOREACH 
+(function() {
+    var list = stash.get('url');
+    list = new Jemplate.Iterator(list);
+    var retval = list.get_first();
+    var value = retval[0];
+    var done = retval[1];
+    var oldloop;
+    try { oldloop = stash.get('loop') } finally {}
+    stash.set('loop', list);
+    try {
+        while (! done) {
+            stash.data['u'] = value;
+output += '\n<li><a href="';
+//line 23 "story.html.tt"
+output += stash.get('u');
+output += '">';
+//line 23 "story.html.tt"
+output += stash.get('u');
+output += '</li>\n';;
+            retval = list.get_next();
+            value = retval[0];
+            done = retval[1];
+        }
+    }
+    catch(e) {
+        throw(context.set_error(e, output));
+    }
+    stash.set('loop', oldloop);
+})();
+
+output += '\n</ul>\n<hr />\n';
+}
+
+output += '\n\n<div class="story">';
+//line 29 "story.html.tt"
 output += stash.get('content');
 output += '</div>\n';
     }

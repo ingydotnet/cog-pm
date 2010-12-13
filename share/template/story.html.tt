@@ -1,11 +1,29 @@
-<h1 class="story_title">[% title %]</h1>
-[% IF tag.size %]
+<ul class="story-nav">
+  <li><a href="#">Edit</a></li>
+  <li><a href="#">Tag</a></li>
+</ul>
+
+<h1 class="story-title">[% title %]</h1>
 <hr />
+
+[% IF tag.size %]
+<b>Tags:</b>
 <ul class="tag-list">
 [% FOR t = tag %]
-<li><a href="/tag/[% t %]/">[% t %]</li>
+<li><a href="/tag/[% t %]/">[% t %]</a></li>
 [% END %]
 </ul>
-[% END %]
 <hr />
+[% END %]
+
+[% IF url.size %]
+<b>Links:</b>
+<ul class="url-list">
+[% FOR u = url %]
+<li><a href="[% u %]">[% u %]</li>
+[% END %]
+</ul>
+<hr />
+[% END %]
+
 <div class="story">[% content %]</div>
