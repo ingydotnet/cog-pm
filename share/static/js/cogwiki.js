@@ -26,6 +26,13 @@ CogWiki.prototype = {
         else if (this.path.match(/^\/tags\/?$/)) {
             this.tag_cloud();
         }
+        else if (this.path.match(/^\/tag\/([^\/]+)\/?/)) {
+            var tag = RegExp.$1;
+            $.getJSON('/cache/tag/' + tag + '.json', function(data) {
+                data = {pages: data};
+                Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+            });
+        }
         else if (this.path == '/') {
             this.story_board();
         }
@@ -65,7 +72,7 @@ CogWiki.prototype = {
                     Date.parse('2010/12/25 00:00:00')
                 )
             }
-            tc.loadEffector('CountSize').base(30).range(8);
+            tc.loadEffector('CountSize').base(30).range(15);
             /*tc.loadEffector('DateTimeColor');*/
             tc.setup('mytagcloud');
         });

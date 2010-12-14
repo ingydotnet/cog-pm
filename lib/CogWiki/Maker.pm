@@ -45,6 +45,7 @@ sub make {
 
     my $time = time;
     my $news = [];
+    my $blobs = {};
 
     $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
     for my $page_file (io($self->config->content_root)->all_files) {
@@ -55,8 +56,8 @@ sub make {
         $self->store->index_tag($_, $id)
             for @{$page->tag};
 
-        push @$news, {
-            id => $page->short,
+        my $blob = {
+            id => $id,
             rev => $page->rev,
             title => $page->title,
             time => $page->time,
@@ -66,6 +67,8 @@ sub make {
             # XXX Needs to be client side
             duration => $page->duration,
         };
+        push @$news, $blob;
+        $blobs->{$id} = $blob;
 
         $self->make_page_html($page, $page_file);
 
@@ -74,17 +77,23 @@ sub make {
     }
     io("cache/news.json")->print($self->json->encode($news));
 
-    $self->make_tag_cloud;
+    $self->make_tag_cloud($blobs);
     $self->make_js();
 }
 
 sub make_tag_cloud {
     my $self = shift;
+    my $blobs = shift;
     my $hash = {};
+    my $index = {};
     for my $tag (@{$self->store->all_tags}) {
-        $hash->{$tag} = scalar @{$self->store->indexed_tag($tag)};
+        my $ids = $self->store->indexed_tag($tag);
+        $hash->{$tag} = scalar @$ids;
+        my $tagged = [ map $blobs->{$_}, @$ids ];
+        io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
     }
     io("cache/tag-cloud.json")->print($self->json->encode($hash));
+
 }
 
 sub make_page_html {
