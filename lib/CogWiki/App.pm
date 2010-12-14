@@ -90,7 +90,7 @@ sub _find_share_files {
 
         (my $path = "$plugin.pm") =~ s!::!/!g;
         $path = $INC{$path} or die;
-        $path =~ s!^(.*\.\.)/lib/.*!$1/share!;
+        $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
         my $dir = -e $path
             ? $path
             : do {
@@ -102,7 +102,7 @@ sub _find_share_files {
                 };
             };
 
-        for (io($dir)->All_Files) {
+        for (io->dir($dir)->All_Files) {
             my $full = $_->pathname;
             my $short = $full;
             $short =~ s!^\Q$dir\E/?!! or die;
