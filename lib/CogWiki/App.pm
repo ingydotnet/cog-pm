@@ -3,18 +3,18 @@ use Mouse;
 use IO::All;
 use Class::Throwable qw(Error);
 
-use XXX;
-
 has config => (is => 'ro', 'required' => 1);
-has store => (
-    is => 'ro',
-    builder => sub {
-        my $self = shift;
-        require CogWiki::Store;
-        my $root = $self->config->root_dir;
-        CogWiki::Store->new(root => "$root/cog");
-    },
-);
+has store => (is => 'ro', builder => sub {
+    my $self = shift;
+    require CogWiki::Store;
+    my $root = $self->config->root_dir;
+    CogWiki::Store->new(root => "$root/cog");
+});
+has maker => (is => 'ro', builder => sub {
+    my $self = shift;
+    require CogWiki::Maker;
+    CogWiki::Maker->new(config => $self->config);
+});
 has time => (is => 'ro', builder => sub { time() });
 
 sub handle_init {
@@ -73,120 +73,9 @@ sub _copy_assets {
     }
 }
 
-# TODO - Make real
-sub _find_share_files {
-    require File::ShareDir;
-    my $self = shift;
-
-    my $hash = {};
-
-    my @plugins = ('CogWiki', @{$self->config->plugins});
-
-    for my $plugin (@plugins) {
-        my $module = $plugin;
-        eval "use $plugin; 1" or die;
-        my $object = $module->new;
-        next unless $plugin eq 'CogWiki' or $object->layout;
-
-        (my $path = "$plugin.pm") =~ s!::!/!g;
-        $path = $INC{$path} or die;
-        $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
-        my $dir = -e $path
-            ? $path
-            : do {
-                (my $dist = $plugin) =~ s/::/-/g;
-                eval { File::ShareDir::dist_dir($dist) } || do {
-                    $_ = $@ or die;
-                    /.* at (.*\/\.\.)/s or die;
-                    "$1/share/";
-                };
-            };
-
-        for (io->dir($dir)->All_Files) {
-            my $full = $_->pathname;
-            my $short = $full;
-            $short =~ s!^\Q$dir\E/?!! or die;
-            $hash->{$short} = $full;
-        }
-    }
-
-    return $hash;
-}
-
 sub handle_make {
-    eval "use Template::Toolkit::Simple; 1" or die $@;
-    require CogWiki::Page;
-    require IPC::Run;
-    require JSON;
-    require Time::Duration;
-
     my $self = shift;
-    $self->config->chdir_root();
-
-    my $json = JSON->new;
-    $json->allow_blessed;
-    $json->convert_blessed;
-
-    io('cache')->mkdir;
-    my $data = +{%{$self->config}};
-    my $html = tt()
-        ->path(['template/'])
-        ->data($data)
-        ->post_chomp
-        ->render('layout.html.tt');
-    io('cache/layout.html')->print($html);
-
-    $data = {
-        json => $json->encode(YAML::XS::LoadFile("config.yaml")),
-    };
-    my $javascript = tt()
-        ->path(['template/'])
-        ->data($data)
-        ->post_chomp
-        ->render('config.js.tt');
-    io('cache/config.js')->print($javascript);
-
-    my $time = time;
-    my $news = [];
-    for my $page_file (io($self->config->content_root)->all_files) {
-        next if $page_file->filename =~ /^\./;
-        my $page = CogWiki::Page->from_text($page_file->all);
-        my $id = $page->id;
-        $id =~ s/-.*// or next;
-        my $duration = Time::Duration::duration($time - $page->time, 1);
-
-        push @$news, {
-            id => $id,
-            rev => $page->rev,
-            title => $page->title,
-            time => $page->time,
-            user => $page->user,
-            size => length($page->content),
-            color => $page->color,
-            # XXX Needs to be client side
-            duration => $duration,
-        };
-
-        my $html_filename = "cache/$id.html";
-
-        next if -e $html_filename and -M $html_filename < -M $page_file->name;
-
-        my ($in, $out, $err) = ($page->content, '', '');
-
-        my @cmd = qw(asciidoc -s -);
-        
-        print $page_file->filename . " -> $html_filename\n";
-        IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(10));
-
-        io($html_filename)->assert->print($out);
-
-        delete $page->{content};
-        io("cache/$id.json")->print($json->encode({%$page}));
-    }
-    io("cache/news.json")->print($json->encode($news));
-
-    $self->make_js();
-
+    $self->maker->make;
     print <<'...';
 CogWiki is up to date and ready to use. To start the wiki web server,
 run this command:
@@ -195,15 +84,6 @@ run this command:
 
 ...
     
-}
-
-sub make_js {
-    my $self = shift;
-    my $root = $self->config->root_dir;
-    my $js = "$root/static/js";
-    if (-e "$js/Makefile") {
-        system("(cd $js; make)") == 0 or die;
-    }
 }
 
 sub handle_start {
@@ -245,6 +125,7 @@ sub handle_edit {
     system("generate_pages") == 0 or die;
 }
 
+# TODO Move most of this method to CogWiki::Page
 sub handle_bless {
     my $self = shift;
     die "Run 'cogwiki init' first\n"
@@ -256,7 +137,7 @@ sub handle_bless {
             warn "Can't bless '$title'. No such file.\n";
             next;
         }
-        my ($head, $body) = $self->read_page($file);
+        my ($head, $body) = $self->_read_page($file);
         my $original = $head . (($head and $body) ? "\n" : '') . $body;
         my $heading = '';
         $heading .= ($head =~ s/^(Wiki: .*\n)//m) ? $1 :
@@ -298,7 +179,51 @@ sub handle_bless {
     }
 }
 
-sub read_page {
+sub handle_clean {
+    # TODO - Remove .wiki files except config.yaml (if present)
+}
+
+# TODO - Make real
+sub _find_share_files {
+    require File::ShareDir;
+    my $self = shift;
+
+    my $hash = {};
+
+    my @plugins = ('CogWiki', @{$self->config->plugins});
+
+    for my $plugin (@plugins) {
+        my $module = $plugin;
+        eval "use $plugin; 1" or die;
+        my $object = $module->new;
+        next unless $plugin eq 'CogWiki' or $object->layout;
+
+        (my $path = "$plugin.pm") =~ s!::!/!g;
+        $path = $INC{$path} or die;
+        $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
+        my $dir = -e $path
+            ? $path
+            : do {
+                (my $dist = $plugin) =~ s/::/-/g;
+                eval { File::ShareDir::dist_dir($dist) } || do {
+                    $_ = $@ or die;
+                    /.* at (.*\/\.\.)/s or die;
+                    "$1/share/";
+                };
+            };
+
+        for (io->dir($dir)->All_Files) {
+            my $full = $_->pathname;
+            my $short = $full;
+            $short =~ s!^\Q$dir\E/?!! or die;
+            $hash->{$short} = $full;
+        }
+    }
+
+    return $hash;
+}
+
+sub _read_page {
     my $self = shift;
     my $file = shift;
     my ($head, $body) = ('', '');

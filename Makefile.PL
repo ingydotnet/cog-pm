@@ -18,6 +18,7 @@ requires 'Git::Wrapper';
 requires 'Convert::Base32';
 requires 'Template::Toolkit::Simple';
 requires 'IPC::Run';
+requires 'Jemplate';
 
 install_script 'bin/cogwiki';
 

@@ -3,14 +3,13 @@ use Mouse;
 use Plack::Middleware::Static;
 use Plack::Runner;
 
-# use XXX;
-
 has config => (is => 'ro', required => 1);
+
+my $layout_file = 'cache/layout.html';
 
 sub app {
     my $self = shift;
 
-    my $layout_file = 'cache/layout.html';
     open LAYOUT, $layout_file or die "Can't open '$layout_file'";
     my $layout = do {local $/; <LAYOUT>};
     close LAYOUT or die;
@@ -28,9 +27,8 @@ sub app {
 
 sub run {
     my $class = shift;
-    my $runner = Plack::Runner->new;
     my @args = @_;
-
+    my $runner = Plack::Runner->new;
     $runner->parse_options(@args);
     $runner->run($class->app);
 }

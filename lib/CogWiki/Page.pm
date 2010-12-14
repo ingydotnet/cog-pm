@@ -2,19 +2,28 @@ package CogWiki::Page;
 use Mouse;
 use Time::Duration;
 
-has id => ( is => 'rw' );
-has rev => ( is => 'rw' );
-has time => ( is => 'rw' );
-has user => ( is => 'rw' );
-has name => ( is => 'rw', default => sub {[]} );
-has tag => ( is => 'rw', default => sub {[]} );
-has url => ( is => 'rw', default => sub {[]} );
-has content => ( is => 'rw' );
-has title => ( is => 'rw' );
-has short => ( is => 'rw' );
-has size => ( is => 'rw' );
-has color => ( is => 'rw' );
-has duration => ( is => 'rw' );
+has id => (is => 'rw');
+has rev => (is => 'rw');
+has time => (is => 'rw');
+has user => (is => 'rw');
+has name => (is => 'rw', default => sub {[]} );
+has tag => (is => 'rw', default => sub {[]} );
+has url => (is => 'rw', default => sub {[]} );
+has content => (is => 'rw');
+has title => (is => 'rw');
+has short => (is => 'rw');
+has size => (is => 'rw');
+has color => (is => 'rw');
+
+has short => (is => 'rw', builder => sub {
+    $_[0]->id =~ m!^(\w{4,})-! or return;
+    return $1;
+});
+
+my $time = time;
+has duration => (is => 'rw', builder => sub {
+    return Time::Duration::duration($time - $_[0]->time, 1);
+});
 
 sub from_file {
     my $self = shift;
