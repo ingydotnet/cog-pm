@@ -2121,7 +2121,7 @@ output += stash.get('t');
 output += '/">';
 //line 13 "story.html.tt"
 output += stash.get('t');
-output += '</li>\n';;
+output += '</a></li>\n';;
             retval = list.get_next();
             value = retval[0];
             done = retval[1];

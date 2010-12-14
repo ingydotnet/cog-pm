@@ -80,34 +80,34 @@ sub _find_share_files {
 
     my $hash = {};
 
-    my $dir = eval { File::ShareDir::dist_dir('CogWiki') } || do {
-        $_ = $@ or die;
-        /.* at (.*\/\.\.)/s or die;
-        "$1/share/";
-    };
-    %$hash = map {
-        my $full = $_->pathname;
-        my $short = $full;
-        $short =~ s!^\Q$dir\E/?!! or die;
-        ($short, $full);
-    } io($dir)->All_Files;
+    my @plugins = ('CogWiki', @{$self->config->plugins});
 
-    for my $plugin (@{$self->config->plugins}) {
+    for my $plugin (@plugins) {
+        my $module = $plugin;
         eval "use $plugin; 1" or die;
-        my $p = $plugin->new;
-        next unless $plugin->layout;
-        (my $dist = $plugin) =~ s/::/-/g;
-        my $dir = eval { File::ShareDir::dist_dir($dist) } || do {
-            $_ = $@ or die;
-            /.* at (.*\/\.\.)/s or die;
-            "$1/share/";
-        };
-        map {
+        my $object = $module->new;
+        next unless $plugin eq 'CogWiki' or $object->layout;
+
+        (my $path = "$plugin.pm") =~ s!::!/!g;
+        $path = $INC{$path} or die;
+        $path =~ s!^(.*\.\.)/lib/.*!$1/share!;
+        my $dir = -e $path
+            ? $path
+            : do {
+                (my $dist = $plugin) =~ s/::/-/g;
+                eval { File::ShareDir::dist_dir($dist) } || do {
+                    $_ = $@ or die;
+                    /.* at (.*\/\.\.)/s or die;
+                    "$1/share/";
+                };
+            };
+
+        for (io($dir)->All_Files) {
             my $full = $_->pathname;
             my $short = $full;
             $short =~ s!^\Q$dir\E/?!! or die;
             $hash->{$short} = $full;
-        } io($dir)->All_Files;
+        }
     }
 
     return $hash;
