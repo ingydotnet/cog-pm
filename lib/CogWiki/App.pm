@@ -5,15 +5,16 @@ use Class::Throwable qw(Error);
 
 has config => (is => 'ro', 'required' => 1);
 has store => (is => 'ro', builder => sub {
-    my $self = shift;
     require CogWiki::Store;
-    my $root = $self->config->root_dir;
-    CogWiki::Store->new(root => "$root/cog");
+    CogWiki::Store->new();
 });
 has maker => (is => 'ro', builder => sub {
     my $self = shift;
     require CogWiki::Maker;
-    CogWiki::Maker->new(config => $self->config);
+    CogWiki::Maker->new(
+        config => $self->config,
+        store => $self->store,
+    );
 });
 has time => (is => 'ro', builder => sub { time() });
 

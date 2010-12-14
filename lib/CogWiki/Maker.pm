@@ -12,6 +12,7 @@ use JSON;
 use Time::Duration;
 
 has config => ('is' => 'ro', required => 1);
+has store => ('is' => 'ro', required => 1);
 has json => ('is' => 'ro', builder => sub {
     my $json = JSON->new;
     $json->allow_blessed;
@@ -44,10 +45,15 @@ sub make {
 
     my $time = time;
     my $news = [];
+
+    $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
         my $page = CogWiki::Page->from_text($page_file->all);
         my $id = $page->short or next;
+
+        $self->store->index_tag($_, $id)
+            for @{$page->tag};
 
         push @$news, {
             id => $page->short,
@@ -68,7 +74,17 @@ sub make {
     }
     io("cache/news.json")->print($self->json->encode($news));
 
+    $self->make_tag_cloud;
     $self->make_js();
+}
+
+sub make_tag_cloud {
+    my $self = shift;
+    my $hash = {};
+    for my $tag (@{$self->store->all_tags}) {
+        $hash->{$tag} = scalar @{$self->store->indexed_tag($tag)};
+    }
+    io("cache/tag-cloud.json")->print($self->json->encode($hash));
 }
 
 sub make_page_html {

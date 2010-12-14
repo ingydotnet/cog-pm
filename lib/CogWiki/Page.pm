@@ -42,6 +42,7 @@ sub from_text {
     while ($head =~ s/\A(\w+): +(.*)\n//) {
         my $key = lc $1;
         my $value = $2;
+        $value =~ s/^\s*(.*?)\s*$/$1/;
         if ($key =~ /^(?:name|tag|url)$/) {
             $hash{$key} ||= [];
             push @{$hash{$key}}, $value;

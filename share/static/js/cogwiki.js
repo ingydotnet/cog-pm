@@ -23,6 +23,9 @@ CogWiki.prototype = {
             var id = CogWiki.config.home_page_id;
             this.render_page(id);
         }
+        else if (this.path.match(/^\/tags\/?$/)) {
+            this.tag_cloud();
+        }
         else if (this.path == '/') {
             this.story_board();
         }
@@ -47,6 +50,24 @@ CogWiki.prototype = {
                 Jemplate.process('postit.html.tt', datum, $tmp[0]);
                 $content.append($tmp.children());
             }
+        });
+    },
+    tag_cloud: function() {
+        Jemplate.process('tag-cloud.html.tt', {}, $('div.content')[0]);
+        $.getJSON('/cache/tag-cloud.json', function(data) {
+            var tc = TagCloud.create();
+            for (var tag in data) {
+                num = data[tag];
+                tc.add(
+                    tag,
+                    num,
+                    '/tag/' + tag,
+                    Date.parse('2010/12/25 00:00:00')
+                )
+            }
+            tc.loadEffector('CountSize').base(30).range(8);
+            /*tc.loadEffector('DateTimeColor');*/
+            tc.setup('mytagcloud');
         });
     },
     THE: 'END'

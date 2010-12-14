@@ -5,14 +5,19 @@
   <title>[% title %]</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <link rel="shortcut icon" type="image/x-icon" href="[% favicon_file || "/images/favicon.ico" %]">
+
   <link rel="stylesheet" href="/static/css/layout.css" type="text/css">
   <link rel="stylesheet" href="/static/css/page-list.css" type="text/css">
   <link rel="stylesheet" href="/static/css/story.css" type="text/css">
   <link rel="stylesheet" href="/static/css/postit.css" type="text/css">
+  <link rel="stylesheet" href="/static/css/tag-cloud.css" type="text/css">
+
   <script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>
   <script type="text/javascript" src="/static/js/jquery-ui-1.8.7.custom.min.js"></script>
   <script type="text/javascript" src="/static/js/jemplate.js"></script>
   <script type="text/javascript" src="/static/js/cogwiki.js"></script>
+  <script type="text/javascript" src="/static/js/tag-cloud.js"></script>
+
   <script type="text/javascript" src="/cache/config.js"></script>
 </head>
 

@@ -42,4 +42,30 @@ sub new_cog_id {
     return $full;
 }
 
+sub index_tag {
+    my $self = shift;
+    my $root = $self->root;
+    my ($tag, $id) = @_;
+    io->file("$root/index/tag/$tag/$id")->assert->touch();
+}
+
+sub all_tags {
+    my $self = shift;
+    my $root = $self->root;
+    return [map $_->filename, io("$root/index/tag/")->all];
+}
+
+sub indexed_tag {
+    my $self = shift;
+    my $tag = shift;
+    my $root = $self->root;
+    return [map $_->filename, io("$root/index/tag/$tag")->all];
+}
+
+sub delete_tag_index {
+    my $self = shift;
+    my $root = $self->root;
+    io->dir("$root/index/tag")->rmtree;
+}
+
 1;
