@@ -85,16 +85,16 @@ sub make {
 sub make_tag_cloud {
     my $self = shift;
     my $blobs = shift;
-    my $hash = {};
+    my $list = [];
     my $index = {};
-    for my $tag (@{$self->store->all_tags}) {
+    for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
         my $ids = $self->store->indexed_tag($tag);
-        $hash->{$tag} = scalar @$ids;
+        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{time}) > $t) { $t = $t1 } }
+        push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];
         io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
     }
-    io("cache/tag-cloud.json")->print($self->json->encode($hash));
-
+    io("cache/tag-cloud.json")->print($self->json->encode($list));
 }
 
 sub make_page_html {
@@ -111,7 +111,7 @@ sub make_page_html {
     my @cmd = qw(asciidoc -s -);
     
     print $page_file->filename . " -> $html_filename\n";
-    IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(10));
+    IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(30));
 
     io($html_filename)->assert->print($out);
 }

@@ -63,17 +63,19 @@ CogWiki.prototype = {
         Jemplate.process('tag-cloud.html.tt', {}, $('div.content')[0]);
         $.getJSON('/cache/tag-cloud.json', function(data) {
             var tc = TagCloud.create();
-            for (var tag in data) {
-                num = data[tag];
+            for (var i = 0; i < data.length; i++) {
+                var tag = data[i][0];
+                var num = data[i][1];
+                var time = data[i][2];
                 tc.add(
                     tag,
                     num,
                     '/tag/' + tag,
-                    Date.parse('2010/12/25 00:00:00')
+                    time
                 )
             }
             tc.loadEffector('CountSize').base(30).range(15);
-            /*tc.loadEffector('DateTimeColor');*/
+            tc.loadEffector('DateTimeColor');
             tc.setup('mytagcloud');
         });
     },

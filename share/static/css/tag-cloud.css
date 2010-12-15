@@ -23,7 +23,10 @@ li.tagcloud-base {
 a.tagcloud-anchor {
   text-decoration: none;
 }
-a.tagcloud-ealiest {
+a.tagcloud-anchor:hover {
+  text-decoration: underline;
+}
+a.tagcloud-earliest {
   color: #ccc;
 }
 a.tagcloud-earlier {
