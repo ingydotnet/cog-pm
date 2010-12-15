@@ -79,6 +79,7 @@ sub make {
 
     $self->make_tag_cloud($blobs);
     $self->make_js();
+    $self->make_css();
 }
 
 sub make_tag_cloud {
@@ -121,6 +122,15 @@ sub make_js {
     my $js = "$root/static/js";
     if (-e "$js/Makefile") {
         system("(cd $js; make)") == 0 or die;
+    }
+}
+
+sub make_css {
+    my $self = shift;
+    my $root = $self->config->root_dir;
+    my $css = "$root/static/css";
+    if (-e "$css/Makefile") {
+        system("(cd $css; make)") == 0 or die;
     }
 }
 
