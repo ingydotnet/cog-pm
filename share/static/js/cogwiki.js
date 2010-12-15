@@ -50,7 +50,7 @@ CogWiki.prototype = {
     },
     story_board: function() {
         $.getJSON('/cache/news.json', function(data) {
-            var $content = $('div.content').addClass('wide');
+            var $content = $('div.content'); //.addClass('wide');
             var $tmp = $('<div></div>');
             for (var i = 0; i < data.length; i++) {
                 var datum = {page: data[i]};
