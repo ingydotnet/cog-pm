@@ -27,22 +27,8 @@
   <h1 id="site-name"><a href="[% base_url %]/">[% site_name %]</a></h1>
  </div>
  <div class="bottom">
-  <div class="sidepanel">
-   <ul>
-    <li><a href="[% base_url %]/home/">Home</a></li>
-    <li><a href="[% base_url %]/news/">Recent Changes</a>
-    <li><a href="[% base_url %]/tags/">Tag Cloud</a>
-    <li><a href="[% base_url %]/new/">New Page</a>
-   </ul>
-   <br />
-   <ul>
-    <li><a href="[% base_url %]/login/">Login</a>
-    <li><a href="[% base_url %]/prefs/">Preferences</a>
-   </ul>
-  </div>
-
+[% INCLUDE sidepanel.html.tt %]
   <div class="content"></div>
-
  </div>
 </div>
 </body>
