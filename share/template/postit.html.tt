@@ -1,5 +1,5 @@
 <a href="/story/[% page.id %]/" title="[% page.title %]">
 <div class="[% page.color %] postit ui-draggable">
-<span class="id">[% page.id %]</span>
+<span class="tiny">[% page.title %]</span>
 </div>
 </a>

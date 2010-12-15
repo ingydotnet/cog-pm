@@ -7,6 +7,8 @@
     font-weight: bold;
     text-align: center;
     color: black;
+    font-size: 50%;
+    overflow: hidden;
 }
 
 .orange {
