@@ -9,7 +9,19 @@ CogWiki.prototype = {
         this.path = location.pathname;
     },
     run: function() {
-        if (this.path.match(/^\/story\/([A-Z2-7]{4})/)) {
+        var self = this;
+        if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
+            var name = RegExp.$1
+                .toLowerCase()
+                .replace(/%[0-9a-fA-F]{2}/g, '_')
+                .replace(/[^\w]+/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_*(.*?)_*$/, '$1');
+            $.get('/cache/name/' + name + '.txt', function(id) {
+                self.render_page(id);
+            });
+        }
+        else if (this.path.match(/^\/story\/([A-Z2-7]{4})/)) {
             var id = RegExp.$1;
             this.render_page(id);
         }
@@ -41,11 +53,15 @@ CogWiki.prototype = {
         }
     },
     render_page: function(id) {
+        var self = this;
         $.getJSON('/cache/' + id + '.json', function(data) {
             Jemplate.process('story.html.tt', data, $('div.content')[0]);
             $.get('/cache/' + id + '.html', function(data) {
                 $('div.story').html(data);
             });
+            setTimeout(function() {
+                self.setup_links();
+            }, 500);
         });
     },
     story_board: function() {
@@ -78,6 +94,16 @@ CogWiki.prototype = {
             tc.loadEffector('DateTimeColor');
             tc.setup('mytagcloud');
         });
+    },
+    setup_links: function() {
+        var $links = $('.content .sectionbody a')
+            .each(function() {
+                var $link = $(this);
+                Q = $link;
+                if ($link.attr('href') == 'story') {
+                    $link.attr('href', '/story/name/' + $link.text());
+                }
+            });
     },
     THE: 'END'
 };

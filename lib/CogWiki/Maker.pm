@@ -53,6 +53,11 @@ sub make {
         my $page = CogWiki::Page->from_text($page_file->all);
         my $id = $page->short or next;
 
+        for my $Name (@{$page->name}) {
+            my $name = $self->store->index_name($Name, $id);
+            io->file("cache/name/$name.txt")->assert->print($id);
+        }
+
         $self->store->index_tag($_, $id)
             for @{$page->tag};
 

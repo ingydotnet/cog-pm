@@ -129,9 +129,10 @@ sub handle_edit {
 # TODO Move most of this method to CogWiki::Page
 sub handle_bless {
     my $self = shift;
+    $self->config->chdir_root();
     die "Run 'cogwiki init' first\n"
         unless $self->store->exists;
-    my $dir = '.';
+    my $dir = '..';
     for my $title (@_) {
         my $file = "$dir/$title";
         if (not -e $file) {

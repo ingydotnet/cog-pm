@@ -86,8 +86,9 @@ sub _parse_args {
         $args->{action} = 'help';
     }
     else {
-        use XXX;
-        XXX @_;
+        require XXX;
+        warn "\nInvalid cogwiki command. Can't parse these arguments:\n";
+        XXX::XXX(@_);
     }
     return $args;
 }

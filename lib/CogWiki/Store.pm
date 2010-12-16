@@ -42,6 +42,19 @@ sub new_cog_id {
     return $full;
 }
 
+sub index_name {
+    my $self = shift;
+    my $root = $self->root;
+    my ($name, $id) = @_;
+    $name = lc($name);
+    $name =~ s/[^a-z0-9]+/_/g;
+    $name =~ s/^_*(.*?)_*$/$1/;
+    $name ||= '_';
+
+    io->file("$root/index/name/$name/$id")->assert->touch();
+    return $name;
+}
+
 sub index_tag {
     my $self = shift;
     my $root = $self->root;
