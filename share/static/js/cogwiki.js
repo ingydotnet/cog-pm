@@ -1,14 +1,9 @@
 (function($) { // Wrapper
 
-CogWiki = function() {
-    this.init.apply(this, arguments);
-}
+(CogWiki = function() {}).prototype = {
+    path: location.pathname,
 
-CogWiki.prototype = {
-    init: function() {
-        this.path = location.pathname;
-    },
-    run: function() {
+    dispatch: function() {
         var self = this;
         if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
             var name = RegExp.$1
@@ -110,4 +105,4 @@ CogWiki.prototype = {
 
 })(jQuery); // End of Wrapper
 
-jQuery(function() {(new CogWiki()).run()});
+jQuery(function() {(new CogWiki()).dispatch()});
