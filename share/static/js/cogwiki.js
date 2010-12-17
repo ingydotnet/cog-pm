@@ -4,7 +4,10 @@
     path: location.pathname,
 
     dispatch: function() {
-        if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
+        if (this.path == '/') {
+            location = '/story/board'
+        }
+        else if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
             this.page_by_name(RegExp.$1);
         }
         else if (this.path.match(/^\/story\/([A-Z2-7]{4})/)) {
@@ -22,9 +25,6 @@
         }
         else if (this.path.match(/^\/tag\/([^\/]+)\/?/)) {
             this.render_tag_list(RegExp.$1);
-        }
-        else if (this.path == '/') {
-            location = '/story/board'
         }
         else if (this.path.match(/^\/story\/board\/([^\/]+)\/?/)) {
             this.story_board(RegExp.$1);

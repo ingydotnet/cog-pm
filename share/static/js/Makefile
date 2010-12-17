@@ -5,6 +5,8 @@ ALL_JS=\
        separator.js \
        cogwiki.js \
        separator.js \
+       sidepanel.js \
+       separator.js \
        tag-cloud.js \
        separator.js \
 
