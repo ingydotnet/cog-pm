@@ -4,27 +4,14 @@
     path: location.pathname,
 
     dispatch: function() {
-        var self = this;
         if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
-            var name = RegExp.$1
-                .toLowerCase()
-                .replace(/%[0-9a-fA-F]{2}/g, '_')
-                .replace(/[^\w]+/g, '_')
-                .replace(/_+/g, '_')
-                .replace(/^_*(.*?)_*$/, '$1');
-            $.get('/cache/name/' + name + '.txt', function(id) {
-                self.render_page(id);
-            });
+            this.page_by_name(RegExp.$1);
         }
         else if (this.path.match(/^\/story\/([A-Z2-7]{4})/)) {
-            var id = RegExp.$1;
-            this.render_page(id);
+            this.render_page(RegExp.$1);
         }
         else if (this.path.match(/^\/news\/?$/)) {
-            $.getJSON('/cache/news.json', function(data) {
-                data = {pages: data};
-                Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
-            });
+            this.render_news();
         }
         else if (this.path.match(/^\/home\/?$/)) {
             var id = CogWiki.config.home_page_id;
@@ -34,11 +21,7 @@
             this.tag_cloud();
         }
         else if (this.path.match(/^\/tag\/([^\/]+)\/?/)) {
-            var tag = RegExp.$1;
-            $.getJSON('/cache/tag/' + tag + '.json', function(data) {
-                data = {pages: data};
-                Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
-            });
+            this.render_tag_list(RegExp.$1);
         }
         else if (this.path == '/') {
             this.story_board();
@@ -70,6 +53,12 @@
             }
         });
     },
+    render_news: function() {
+        $.getJSON('/cache/news.json', function(data) {
+            data = {pages: data};
+            Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+        });
+    },
     tag_cloud: function() {
         Jemplate.process('tag-cloud.html.tt', {}, $('div.content')[0]);
         $.getJSON('/cache/tag-cloud.json', function(data) {
@@ -88,6 +77,24 @@
             tc.loadEffector('CountSize').base(30).range(15);
             tc.loadEffector('DateTimeColor');
             tc.setup('mytagcloud');
+        });
+    },
+    render_tag_list: function(tag) {
+        $.getJSON('/cache/tag/' + tag + '.json', function(data) {
+            data = {pages: data};
+            Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+        });
+    },
+    page_by_name: function(name) {
+        var self = this;
+        var name = name
+            .toLowerCase()
+            .replace(/%[0-9a-fA-F]{2}/g, '_')
+            .replace(/[^\w]+/g, '_')
+            .replace(/_+/g, '_')
+            .replace(/^_*(.*?)_*$/, '$1');
+        $.get('/cache/name/' + name + '.txt', function(id) {
+            self.render_page(id);
         });
     },
     setup_links: function() {
