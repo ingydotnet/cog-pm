@@ -29,3 +29,6 @@
 .purple {
     background-color: #F0F;
 }
+.none {
+    border: 2px solid black;
+}
