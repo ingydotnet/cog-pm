@@ -24,7 +24,13 @@
             this.render_tag_list(RegExp.$1);
         }
         else if (this.path == '/') {
-            this.story_board();
+            location = '/story/board'
+        }
+        else if (this.path.match(/^\/story\/board\/([^\/]+)\/?/)) {
+            this.story_board(RegExp.$1);
+        }
+        else if (this.path.match(/^\/story\/board\/?/)) {
+            this.story_board(null);
         }
         else {
             Jemplate.process('404.html.tt', null, $('div.content')[0]);
@@ -42,13 +48,14 @@
             }, 500);
         });
     },
-    story_board: function() {
+    story_board: function(status) {
         $.getJSON('/cache/news.json', function(data) {
             var $content = $('div.content'); //.addClass('wide');
             var $tmp = $('<div></div>');
             for (var i = 0; i < data.length; i++) {
-                var datum = {page: data[i]};
-                Jemplate.process('postit.html.tt', datum, $tmp[0]);
+                var datum = data[i];
+                if (status && ! (datum.status && datum.status.toLowerCase() == status)) continue;  
+                Jemplate.process('postit.html.tt', {page: datum}, $tmp[0]);
                 $content.append($tmp.children());
             }
         });

@@ -61,6 +61,8 @@ sub make {
         $self->store->index_tag($_, $id)
             for @{$page->tag};
 
+        my ($status) = grep {/^(Decide|Doing|Done)$/} @{$page->tag};
+
         my $blob = {
             id => $id,
             rev => $page->rev,
@@ -71,6 +73,7 @@ sub make {
             color => $page->color,
             # XXX Needs to be client side
             duration => $page->duration,
+            $status ? (status => $status) : (),
         };
         push @$news, $blob;
         $blobs->{$id} = $blob;
