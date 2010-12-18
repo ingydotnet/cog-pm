@@ -4,6 +4,6 @@
 # For development:
 # use FindBin; use lib "$FindBin::RealBin/../lib";
 
-use CogWiki::Command;
+use Cog::Command;
 
-exit CogWiki::Command->new($0, @ARGV)->run;
+exit Cog::Command->new($0, @ARGV)->run;

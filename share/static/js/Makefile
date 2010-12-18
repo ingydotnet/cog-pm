@@ -3,16 +3,9 @@ ALL_JS=\
        separator.js \
        jemplate.js \
        separator.js \
-       cogwiki.js \
-       separator.js \
+       cog.js \
        sidepanel.js \
-       separator.js \
        tag-cloud.js \
-       separator.js \
-
-#        config.js \
-
-#        jquery-ui-1.8.7.custom.min.js \
 
 all: all.js
 

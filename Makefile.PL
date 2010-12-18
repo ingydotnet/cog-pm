@@ -1,11 +1,11 @@
 use inc::Module::Install;
 
-all_from 'lib/CogWiki.pm';
+all_from 'lib/Cog.pm';
 readme_from;
 manifest_skip;
 version_check;
 ack_xxx;
-repository 'git://github.com/ingydotnet/cogwiki-pm.git';
+repository 'git://github.com/ingydotnet/cog-pm.git';
 
 requires 'Plack';
 requires 'Mouse';
@@ -20,7 +20,7 @@ requires 'Template::Toolkit::Simple';
 requires 'IPC::Run';
 requires 'Jemplate';
 
-install_script 'bin/cogwiki';
+install_script 'bin/cog';
 
 install_share;
 

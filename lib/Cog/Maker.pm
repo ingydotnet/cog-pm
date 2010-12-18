@@ -1,7 +1,7 @@
-package CogWiki::Maker;
+package Cog::Maker;
 use Mouse;
 
-use CogWiki::Page;
+use Cog::Page;
 
 # NOTE This module should generate a Makefile to do all this work.
 
@@ -50,7 +50,7 @@ sub make {
     $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
     for my $page_file (io($self->config->content_root)->all_files) {
         next if $page_file->filename =~ /^\./;
-        my $page = CogWiki::Page->from_text($page_file->all);
+        my $page = Cog::Page->from_text($page_file->all);
         my $id = $page->short or next;
 
         for my $Name (@{$page->name}) {

@@ -1,6 +1,6 @@
 (function($) { // Wrapper
 
-(CogWiki = function() {}).prototype = {
+(Cog = function() {}).prototype = {
     path: location.pathname,
 
     dispatch: function() {
@@ -17,7 +17,7 @@
             this.render_news();
         }
         else if (this.path.match(/^\/home\/?$/)) {
-            var id = CogWiki.config.home_page_id;
+            var id = Cog.config.home_page_id;
             this.render_page(id);
         }
         else if (this.path.match(/^\/tags\/?$/)) {
@@ -119,4 +119,4 @@
 
 })(jQuery); // End of Wrapper
 
-jQuery(function() {(new CogWiki()).dispatch()});
+jQuery(function() {(new Cog()).dispatch()});

@@ -1,4 +1,4 @@
-package CogWiki::Page;
+package Cog::Page;
 use Mouse;
 use Time::Duration;
 

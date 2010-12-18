@@ -1,1 +1,1 @@
-CogWiki.config = [% json %];
+Cog.config = [% json %];

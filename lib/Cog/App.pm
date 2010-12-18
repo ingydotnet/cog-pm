@@ -1,17 +1,17 @@
-package CogWiki::App;
+package Cog::App;
 use Mouse;
 use IO::All;
 use Class::Throwable qw(Error);
 
 has config => (is => 'ro', 'required' => 1);
 has store => (is => 'ro', builder => sub {
-    require CogWiki::Store;
-    CogWiki::Store->new();
+    require Cog::Store;
+    Cog::Store->new();
 });
 has maker => (is => 'ro', builder => sub {
     my $self = shift;
-    require CogWiki::Maker;
-    CogWiki::Maker->new(
+    require Cog::Maker;
+    Cog::Maker->new(
         config => $self->config,
         store => $self->store,
     );
@@ -26,17 +26,17 @@ sub handle_init {
 
     $self->_copy_assets();
 
-    CogWiki::Store->new(root => "$root/cog")->create;
+    Cog::Store->new(root => "$root/cog")->create;
 
     print <<"...";
-CogWiki was successfully initialized in the $root/ subdirectory. The
+Cog was successfully initialized in the $root/ subdirectory. The
 next step is to:
 
     cp $root/config.yaml.example $root/config.yaml
 
 Edit the config.yaml file, then run:
 
-    cogwiki make
+    cog make
 
 ...
 }
@@ -48,11 +48,11 @@ sub handle_update {
     $self->_copy_assets();
 
     print <<"...";
-CogWiki was successfully updated in the $root/ subdirectory.
+Cog was successfully updated in the $root/ subdirectory.
 
 Now run:
 
-    cogwiki make
+    cog make
 
 ...
 }
@@ -65,7 +65,7 @@ sub _copy_assets {
     for my $file (keys %$files) {
         my $target = "$root/$file";
         unlink $target;
-        if ($ENV{COGWIKI_SYMLINK_INSTALL}) {
+        if ($ENV{COG_SYMLINK_INSTALL}) {
             io($target)->assert->symlink($files->{$file});
         }
         else {
@@ -78,23 +78,23 @@ sub handle_make {
     my $self = shift;
     $self->maker->make;
     print <<'...';
-CogWiki is up to date and ready to use. To start the wiki web server,
-run this command:
+Cog is up to date and ready to use. To start the web server, run
+this command:
 
-    cogwiki start
+    cog start
 
 ...
     
 }
 
 sub handle_start {
-    require CogWiki::WebApp;
+    require Cog::WebApp;
     my $self = shift;
     $self->config->chdir_root();
-    my $webapp = CogWiki::WebApp->new(config => $self->config);
+    my $webapp = Cog::WebApp->new(config => $self->config);
     my $app = $webapp->app;
     print <<'...';
-CogWiki web server is starting up...
+Cog web server is starting up...
 
 ...
     my @args = @_;
@@ -110,13 +110,13 @@ sub handle_edit {
     die "Too many args" if @_;
 
     my $oldtext = -e $filename ? io( $filename )->all : '';
-    my $oldpage = CogWiki::Page->from_text($oldtext);
+    my $oldpage = Cog::Page->from_text($oldtext);
     my $rev = $oldpage->rev;
 
     system("vim $filename") == 0 or die;
 
     my $newtext = -e $filename ? io( $filename )->all : '';
-#     my $newpage = CogWiki::Page->from_text($newtext);
+#     my $newpage = Cog::Page->from_text($newtext);
     $rev++;
     $newtext =~ s/^Rev: +.*\n/Rev: $rev\n/m or die;
     my $time = $self->time;
@@ -126,11 +126,11 @@ sub handle_edit {
     system("generate_pages") == 0 or die;
 }
 
-# TODO Move most of this method to CogWiki::Page
+# TODO Move most of this method to Cog::Page
 sub handle_bless {
     my $self = shift;
     $self->config->chdir_root();
-    die "Run 'cogwiki init' first\n"
+    die "Run 'cog init' first\n"
         unless $self->store->exists;
     my $dir = '..';
     for my $title (@_) {
@@ -142,8 +142,8 @@ sub handle_bless {
         my ($head, $body) = $self->_read_page($file);
         my $original = $head . (($head and $body) ? "\n" : '') . $body;
         my $heading = '';
-        $heading .= ($head =~ s/^(Wiki: .*\n)//m) ? $1 :
-            "Wiki: cog 0.0.1\n";
+        $heading .= ($head =~ s/^(Cog: .*\n)//m) ? $1 :
+            "Cog: 0.0.1\n";
         $heading .= ($head =~ s/^(Id: +[A-Z2-7]{4}-[A-Z2-7]{22}\n)//m) ? $1 :
             "Id: " . $self->store->new_cog_id() . "\n";
         $heading .= ($head =~ s/^(Rev: [0-9]+\n)//m) ? $1 :
@@ -182,7 +182,7 @@ sub handle_bless {
 }
 
 sub handle_clean {
-    # TODO - Remove .wiki files except config.yaml (if present)
+    # TODO - Remove .cog files except config.yaml (if present)
 }
 
 # TODO - Make real
@@ -192,13 +192,13 @@ sub _find_share_files {
 
     my $hash = {};
 
-    my @plugins = ('CogWiki', @{$self->config->plugins});
+    my @plugins = ('Cog', @{$self->config->plugins});
 
     for my $plugin (@plugins) {
         my $module = $plugin;
         eval "use $plugin; 1" or die;
         my $object = $module->new;
-        next unless $plugin eq 'CogWiki' or $object->layout;
+        next unless $plugin eq 'Cog' or $object->layout;
 
         (my $path = "$plugin.pm") =~ s!::!/!g;
         $path = $INC{$path} or die;

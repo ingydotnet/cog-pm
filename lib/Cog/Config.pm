@@ -1,10 +1,10 @@
-package CogWiki::Config;
+package Cog::Config;
 use Mouse;
 use YAML::XS;
 
 # use XXX;
 
-my $root_dir = ($ENV{COGWIKI_ROOT} || '.wiki');
+my $root_dir = ($ENV{COG_ROOT_DIR} || '.cog');
 has root_dir => (is => 'ro', default => $root_dir);
 
 has site_name => (is => 'ro');

@@ -1,10 +1,10 @@
-package CogWiki::Store;
+package Cog::Store;
 use Mouse;
 use IO::All;
 use Git::Wrapper;
 use Convert::Base32 ();
 
-use XXX;
+# use XXX;
 
 has root => (is => 'ro', default => 'cog');
 

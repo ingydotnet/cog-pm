@@ -1,4 +1,4 @@
-package CogWiki::Plugin;
+package Cog::Plugin;
 use Mouse;
 
 use constant layout => 1;

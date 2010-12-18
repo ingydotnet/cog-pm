@@ -1,4 +1,4 @@
-package CogWiki::WebApp;
+package Cog::WebApp;
 use Mouse;
 use Plack::Middleware::Static;
 use Plack::Runner;
