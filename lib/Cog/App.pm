@@ -3,6 +3,8 @@ use Mouse;
 use IO::All;
 use Class::Throwable qw(Error);
 
+use XXX;
+
 has config => (is => 'ro', 'required' => 1);
 has store => (is => 'ro', builder => sub {
     require Cog::Store;
@@ -59,7 +61,7 @@ Now run:
 
 sub _copy_assets {
     my $self = shift;
-    my $files = $self->_find_share_files;
+    my $files = $self->config->files_map;
     my $root = $self->config->root_dir;
 
     for my $file (keys %$files) {
@@ -183,46 +185,6 @@ sub handle_bless {
 
 sub handle_clean {
     # TODO - Remove .cog files except config.yaml (if present)
-}
-
-# TODO - Make real
-sub _find_share_files {
-    require File::ShareDir;
-    my $self = shift;
-
-    my $hash = {};
-
-    my @plugins = ('Cog', @{$self->config->plugins});
-
-    for my $plugin (@plugins) {
-        my $module = $plugin;
-        eval "use $plugin; 1" or die;
-        my $object = $module->new;
-        next unless $plugin eq 'Cog' or $object->layout;
-
-        (my $path = "$plugin.pm") =~ s!::!/!g;
-        $path = $INC{$path} or die;
-        $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
-        my $dir = -e $path
-            ? $path
-            : do {
-                (my $dist = $plugin) =~ s/::/-/g;
-                eval { File::ShareDir::dist_dir($dist) } || do {
-                    $_ = $@ or die;
-                    /.* at (.*\/\.\.)/s or die;
-                    "$1/share/";
-                };
-            };
-
-        for (io->dir($dir)->All_Files) {
-            my $full = $_->pathname;
-            my $short = $full;
-            $short =~ s!^\Q$dir\E/?!! or die;
-            $hash->{$short} = $full;
-        }
-    }
-
-    return $hash;
 }
 
 sub _read_page {

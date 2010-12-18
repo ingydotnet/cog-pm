@@ -3,6 +3,59 @@ use 5.008003;
 use Mouse;
 our $VERSION = '0.02';
 
+sub url_map {
+    [
+#         ['/' => 'cog_welcome']
+    ];
+}
+
+sub js_files {
+    [qw(
+        jquery-1.4.4.min.js
+        separator.js
+        jemplate.js
+        separator.js
+        cog.js
+        config.js
+        url-map.js
+        start.js
+
+        sidepanel.js
+        tag-cloud.js
+    )]
+}
+
+sub css_files {
+    [qw(
+        layout.css
+        page-list.css
+        story.css
+        postit.css
+        tag-cloud.css
+    )];
+}
+
+sub image_files {
+    [qw(
+        tile.gif
+    )];
+}
+
+sub template_files {
+    [qw(
+        config.js.tt
+        js-mf.mk.tt
+        css-mf.mk.tt
+        layout.html.tt
+        page-list.html.tt
+        postit.html.tt
+        sidepanel.html.tt
+        story.html.tt
+        tag-cloud.html.tt
+        404.html.tt
+    )];
+}
+
 1;
 
 =encoding utf8

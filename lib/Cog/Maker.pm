@@ -33,15 +33,8 @@ sub make {
         ->render('layout.html.tt');
     io('cache/layout.html')->print($html);
 
-    $data = {
-        json => $self->json->encode(YAML::XS::LoadFile("config.yaml")),
-    };
-    my $javascript = tt()
-        ->path(['template/'])
-        ->data($data)
-        ->post_chomp
-        ->render('config.js.tt');
-    io('cache/config.js')->print($javascript);
+    $self->make_config_js();
+    $self->make_url_map_js();
 
     my $time = time;
     my $news = [];
@@ -90,6 +83,32 @@ sub make {
     $self->make_css();
 }
 
+sub make_config_js {
+    my $self = shift;
+    my $data = {
+        json => $self->json->encode(YAML::XS::LoadFile("config.yaml")),
+    };
+    my $javascript = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('config.js.tt');
+    io('cache/config.js')->print($javascript);
+}
+
+sub make_url_map_js {
+    my $self = shift;
+    my $data = {
+        json => $self->json->encode($self->config->url_map),
+    };
+    my $javascript = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('url-map.js.tt');
+    io('cache/url-map.js')->print($javascript);
+}
+
 sub make_tag_cloud {
     my $self = shift;
     my $blobs = shift;
@@ -128,18 +147,32 @@ sub make_js {
     my $self = shift;
     my $root = $self->config->root_dir;
     my $js = "$root/static/js";
-    if (-e "$js/Makefile") {
-        system("(cd $js; make)") == 0 or die;
-    }
+
+    my $data = {list => join(' ', @{$self->config->js_files})};
+    my $makefile = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('js-mf.mk.tt');
+    io("$js/Makefile")->print($makefile);
+
+    system("(cd $js; make)") == 0 or die;
 }
 
 sub make_css {
     my $self = shift;
     my $root = $self->config->root_dir;
     my $css = "$root/static/css";
-    if (-e "$css/Makefile") {
-        system("(cd $css; make)") == 0 or die;
-    }
+
+    my $data = {list => join(' ', @{$self->config->css_files})};
+    my $makefile = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('css-mf.mk.tt');
+    io("$css/Makefile")->print($makefile);
+
+    system("(cd $css; make)") == 0 or die;
 }
 
 1;

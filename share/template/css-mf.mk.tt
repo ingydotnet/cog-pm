@@ -1,0 +1,8 @@
+ALL_CSS=[% list %]
+
+all: all.css
+
+all.css: force
+	cat $(ALL_CSS) > $@
+
+force:

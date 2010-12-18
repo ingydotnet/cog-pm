@@ -2,40 +2,38 @@
 
 (Cog = function() {}).prototype = {
     path: location.pathname,
+    url_map: {},
 
     dispatch: function() {
-        if (this.path == '/') {
-            location = '/story/board'
+        var map = this.url_map;
+        for (var i = 0, il = map.length; i < il; i++) {
+            var re = map[i][0];
+            var regex = new RegExp('^' + re + '$');
+            var method = map[i][1];
+            var args = map[i].splice(2);
+            var m = this.path.match(regex);
+            if (m) {
+                for (var j = 0, jl = args.length; j < jl; j++) {
+                    args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
+                }
+                this[method].apply(this, args);
+                return;
+            }
         }
-        else if (this.path.match(/^\/story\/name\/([^\/]+)\/?/)) {
-            this.page_by_name(RegExp.$1);
-        }
-        else if (this.path.match(/^\/story\/([A-Z2-7]{4})/)) {
-            this.render_page(RegExp.$1);
-        }
-        else if (this.path.match(/^\/news\/?$/)) {
-            this.render_news();
-        }
-        else if (this.path.match(/^\/home\/?$/)) {
-            var id = Cog.config.home_page_id;
-            this.render_page(id);
-        }
-        else if (this.path.match(/^\/tags\/?$/)) {
-            this.tag_cloud();
-        }
-        else if (this.path.match(/^\/tag\/([^\/]+)\/?/)) {
-            this.render_tag_list(RegExp.$1);
-        }
-        else if (this.path.match(/^\/story\/board\/([^\/]+)\/?/)) {
-            this.story_board(RegExp.$1);
-        }
-        else if (this.path.match(/^\/story\/board\/?/)) {
-            this.story_board(null);
-        }
-        else {
-            Jemplate.process('404.html.tt', null, $('div.content')[0]);
-        }
+        Jemplate.process('404.html.tt', null, $('div.content')[0]);
+        return;
     },
+
+    redirect: function(url) {
+        location = url;
+    },
+
+    home_page: function() {
+        var id = this.config.home_page_id;
+        console.log(this.config);
+        this.render_page(id);
+    },
+
     render_page: function(id) {
         var self = this;
         $.getJSON('/cache/' + id + '.json', function(data) {
@@ -48,6 +46,7 @@
             }, 500);
         });
     },
+
     story_board: function(status) {
         $.getJSON('/cache/news.json', function(data) {
             var $content = $('div.content'); //.addClass('wide');
@@ -60,12 +59,14 @@
             }
         });
     },
-    render_news: function() {
+
+    news_list: function() {
         $.getJSON('/cache/news.json', function(data) {
             data = {pages: data};
             Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
         });
     },
+
     tag_cloud: function() {
         Jemplate.process('tag-cloud.html.tt', {}, $('div.content')[0]);
         $.getJSON('/cache/tag-cloud.json', function(data) {
@@ -86,12 +87,14 @@
             tc.setup('mytagcloud');
         });
     },
-    render_tag_list: function(tag) {
+
+    tag_list: function(tag) {
         $.getJSON('/cache/tag/' + tag + '.json', function(data) {
             data = {pages: data};
             Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
         });
     },
+
     page_by_name: function(name) {
         var self = this;
         var name = name
@@ -104,6 +107,7 @@
             self.render_page(id);
         });
     },
+
     setup_links: function() {
         var $links = $('.content .sectionbody a')
             .each(function() {
@@ -114,9 +118,8 @@
                 }
             });
     },
+
     THE: 'END'
 };
 
 })(jQuery); // End of Wrapper
-
-jQuery(function() {(new Cog()).dispatch()});

@@ -1,0 +1,19 @@
+ROOT=../..
+
+ALL_JS=[% list %]
+
+all: all.js
+
+all.js: $(ALL_JS) force
+	cat $(ALL_JS) > $@
+
+jemplate.js: force
+	jemplate --runtime --compile $(ROOT)/template/ > $@
+
+config.js: $(ROOT)/cache/config.js
+	cp $< $@
+
+url-map.js: $(ROOT)/cache/url-map.js
+	cp $< $@
+
+force:
