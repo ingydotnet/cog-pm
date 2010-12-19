@@ -55,13 +55,63 @@ sub BUILD {
 
     my $plugins = $self->plugins;
     unshift @$plugins, 'Cog';
-    my $url_map = $self->url_map;
-    my $js_files = $self->js_files;
-    my $css_files = $self->css_files;
-    my $image_files = $self->image_files;
-    my $template_files = $self->template_files;
-    my $class_share_map = $self->class_share_map;
 
+    $self->build_class_share_map();
+
+    $self->build_list('url_map', 'lol');
+
+    $self->build_list('js_files');
+    $self->build_list('css_files');
+    $self->build_list('image_files');
+    $self->build_list('template_files');
+
+    return $self;
+}
+
+sub build_list {
+    my $self = shift;
+    my $name = shift;
+    my $list_list = shift || 0;
+    my $finals = $self->$name;
+    my $list = [];
+    my $plugins = $self->plugins;
+    my $method = $list_list ? 'add_to_list_list' : 'add_to_list';
+    for my $plugin (@$plugins) {
+        $self->$method($list, $plugin->$name);
+    }
+    $self->$method($list, $finals);
+    $self->{$name} = $list;
+}
+
+sub add_to_list {
+    my ($self, $list, $adds) = @_;
+    my $point = scalar(@$list);
+    for my $add (@$adds) {
+        if ($add eq 'xxx') {
+            @$list = ();
+            $point = 0;
+        }
+        elsif ($add eq '===') {
+            $point = 0;
+        }
+        else {
+            splice(@$list, $point++, 0, $add); 
+        }
+    }
+}
+
+sub add_to_list_list {
+    my ($self, $list, $adds) = @_;
+    my $point = scalar(@$list);
+    for my $add (@$adds) {
+        splice(@$list, $point++, 0, $add); 
+    }
+}
+
+sub build_class_share_map {
+    my $self = shift;
+    my $plugins = $self->plugins;
+    my $class_share_map = $self->class_share_map;
     for my $plugin (@$plugins) {
         my $module = $plugin;
         eval "use $plugin; 1" or die;
@@ -81,15 +131,8 @@ sub BUILD {
                 };
             };
         $class_share_map->{$module} = $dir;
-        push @$js_files, @{$object->js_files};
-        push @$css_files, @{$object->css_files};
-        push @$image_files, @{$object->image_files};
-        push @$template_files, @{$object->template_files};
-        push @$url_map, @{$object->url_map};
     }
-    return $self;
 }
-
 sub _build_files_map {
     require File::ShareDir;
     my $self = shift;

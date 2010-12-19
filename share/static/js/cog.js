@@ -30,7 +30,6 @@
 
     home_page: function() {
         var id = this.config.home_page_id;
-        console.log(this.config);
         this.render_page(id);
     },
 
