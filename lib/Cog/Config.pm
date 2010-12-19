@@ -85,14 +85,34 @@ sub build_list {
 
 sub add_to_list {
     my ($self, $list, $adds) = @_;
-    my $point = scalar(@$list);
+    my $point = @$list;
     for my $add (@$adds) {
-        if ($add eq 'xxx') {
-            @$list = ();
+        if ($add eq '()') {
+            $point = @$list = ();
+        }
+        elsif ($add eq '^^') {
             $point = 0;
         }
-        elsif ($add eq '===') {
-            $point = 0;
+        elsif ($add eq '$$') {
+            $point = @$list;
+        }
+        elsif ($add eq '++') {
+            $point++ if $point < @$list;
+        }
+        elsif ($add eq '--') {
+            $point-- if $point > 0;
+        }
+        elsif ($add =~ s/^(\-\-|\+\+) *//) {
+            my $indicator = $1;
+            for ($point = 0; $point < @$list; $point++) {
+                if ($add eq $list->[$point]) {
+                    splice(@$list, $point, 1)
+                        if $indicator eq '--';
+                    $point++
+                        if $indicator eq '++';
+                    last;
+                }
+            }
         }
         else {
             splice(@$list, $point++, 0, $add); 
@@ -102,7 +122,7 @@ sub add_to_list {
 
 sub add_to_list_list {
     my ($self, $list, $adds) = @_;
-    my $point = scalar(@$list);
+    my $point = @$list;
     for my $add (@$adds) {
         splice(@$list, $point++, 0, $add); 
     }
