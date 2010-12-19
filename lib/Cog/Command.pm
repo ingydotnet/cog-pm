@@ -55,6 +55,8 @@ Usage: cog command
 
 Commands:
     init   - Make current directory into a Cog app
+    init Cog::Class
+           - Make a Cog::Class app specifically
     update - Update the app with the latest assets
     make   - Prepare the app content for the web
     start  - Start the local app server

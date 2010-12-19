@@ -1,5 +1,0 @@
-<a href="/story/[% page.id %]/" title="[% page.title %]">
-<div class="[% page.color || 'none' %] postit ui-draggable">
-<span class="tiny">[% page.title %]</span>
-</div>
-</a>

@@ -3,9 +3,20 @@ use 5.008003;
 use Mouse;
 our $VERSION = '0.02';
 
+sub navigation {
+    [
+        ['Home' => '/home/'],
+        ['Files' => '/files/'],
+        ['Tags' => '/tags/'],
+    ]
+}
+
 sub url_map {
     [
-#         ['/' => 'cog_welcome']
+        ['/' => 'redirect', ('/home/')],
+        ['/home/' => 'about_cog'],
+        ['/files/' => 'files_list'],
+        ['/tags/' => 'tags_list'],
     ];
 }
 
@@ -19,9 +30,6 @@ sub js_files {
         config.js
         url-map.js
         start.js
-
-        sidepanel.js
-        tag-cloud.js
     )]
 }
 
@@ -30,8 +38,6 @@ sub css_files {
         layout.css
         page-list.css
         story.css
-        postit.css
-        tag-cloud.css
     )];
 }
 
@@ -46,12 +52,11 @@ sub template_files {
         config.js.tt
         js-mf.mk.tt
         css-mf.mk.tt
+
         layout.html.tt
         page-list.html.tt
-        postit.html.tt
         sidepanel.html.tt
         story.html.tt
-        tag-cloud.html.tt
         404.html.tt
     )];
 }

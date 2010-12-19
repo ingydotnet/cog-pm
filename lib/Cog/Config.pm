@@ -28,6 +28,7 @@ has js_files => (is => 'ro', default => sub{[]});
 has css_files => (is => 'ro', default => sub{[]});
 has image_files => (is => 'ro', default => sub{[]});
 has template_files => (is => 'ro', default => sub{[]});
+has navigation => (is => 'ro', default => sub{[]});
 
 has class_share_map => (is => 'ro', default => sub{{}});
 
@@ -59,6 +60,7 @@ sub BUILD {
     $self->build_class_share_map();
 
     $self->build_list('url_map', 'lol');
+    $self->build_list('navigation', 'lol');
 
     $self->build_list('js_files');
     $self->build_list('css_files');
@@ -124,7 +126,12 @@ sub add_to_list_list {
     my ($self, $list, $adds) = @_;
     my $point = @$list;
     for my $add (@$adds) {
-        splice(@$list, $point++, 0, $add); 
+        if (not ref $add and $add eq '()') {
+            $point = @$list = ();
+        }
+        else {
+            splice(@$list, $point++, 0, $add); 
+        }
     }
 }
 
