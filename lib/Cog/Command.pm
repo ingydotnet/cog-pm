@@ -5,7 +5,7 @@ use Class::Throwable qw(Error);
 use Cog::Config;
 use IO::All;
 
-use XXX;
+# use XXX;
 
 has config => (is => 'ro', builder => sub {Cog::Config->new()});
 has app => (is => 'ro', builder => '_app_builder');

@@ -3,7 +3,7 @@ use Mouse;
 use YAML::XS;
 use IO::All;
 
-use XXX;
+# use XXX;
 
 my $root_dir = ($ENV{COG_ROOT_DIR} || '.cog');
 has root_dir => (is => 'ro', default => $root_dir);
