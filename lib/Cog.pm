@@ -1,7 +1,12 @@
 package Cog;
 use 5.008003;
 use Mouse;
+
 our $VERSION = '0.02';
+
+extends 'Cog::Plugin';
+
+use constant index_file => 'layout.html';
 
 sub navigation {
     [
@@ -44,6 +49,7 @@ sub css_files {
 sub image_files {
     [qw(
         tile.gif
+        cog.png
     )];
 }
 
@@ -67,23 +73,26 @@ sub template_files {
 
 =head1 NAME
 
-Cog - The Cog Information Access Framework
+Cog - The Cog Information Application Framework
 
 =head1 SYNOPSIS
 
     > cd content/dir
     > cog init
-    > edit .cog/config.yaml
     > cog make
     > cog start
+
+=head1 STATUS
+
+This software is pre-alpha. Don't use it for anything serious yet.
 
 =head1 DESCRIPTION
 
 Cog lets you turn any directory on your computer into an interactive
-appication, like a website or a wiki.
+application, like a website or a wiki.
 
-Cog installs a command line utility called C<cog>. This command can be
-used to create and update your application.
+This module installs a command line utility called C<cog>. This command
+can be used to create and update your application.
 
 =head1 DOCUMENTATION
 

@@ -1,6 +1,10 @@
 package Cog::Plugin;
 use Mouse;
 
+use constant plugin_type => '';
+
+sub plugins { [] }
+
 sub url_map { [] }
 sub navigation { [] }
 

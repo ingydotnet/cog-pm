@@ -22,23 +22,33 @@ has time => (is => 'ro', builder => sub { time() });
 
 sub handle_init {
     my $self = shift;
+    my $plugin = shift || 'Cog';
     my $root = $self->config->root_dir;
-    throw Error "Can't init. '$root/' already exists."
+    throw Error "Can't init. Cog environment already exists."
         if $self->config->is_init;
 
     $self->_copy_assets();
+
+    my $config_file = "$root/config.yaml";
+    if (not -e $config_file) {
+        require Template::Toolkit::Simple;
+        my $data = +{%$self};
+        $data->{plugin} = $plugin;
+        my $config = Template::Toolkit::Simple::tt()
+            ->path(["$root/template/"])
+            ->data($data)
+            ->post_chomp
+            ->render('config.yaml.tt');
+        io($config_file)->print($config);
+    }
 
     Cog::Store->new(root => "$root/cog")->create;
 
     print <<"...";
 Cog was successfully initialized in the $root/ subdirectory. The
-next step is to:
+next step is to edit the config.yaml file. Then run:
 
-    cp $root/config.yaml.example $root/config.yaml
-
-Edit the config.yaml file, then run:
-
-    cog make
+    cog update
 
 ...
 }

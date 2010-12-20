@@ -1,19 +1,21 @@
 NAME
-    Cog - The Cog Information Access Framework
+    Cog - The Cog Information Application Framework
 
 SYNOPSIS
         > cd content/dir
         > cog init
-        > edit .cog/config.yaml
         > cog make
         > cog start
 
+STATUS
+    This software is pre-alpha. Don't use it for anything serious yet.
+
 DESCRIPTION
     Cog lets you turn any directory on your computer into an interactive
-    appication, like a website or a wiki.
+    application, like a website or a wiki.
 
-    Cog installs a command line utility called "cog". This command can be
-    used to create and update your application.
+    This module installs a command line utility called "cog". This command
+    can be used to create and update your application.
 
 DOCUMENTATION
     See Cog::Manual for more information.

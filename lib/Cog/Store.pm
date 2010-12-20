@@ -64,8 +64,9 @@ sub index_tag {
 
 sub all_tags {
     my $self = shift;
-    my $root = $self->root;
-    return [map $_->filename, io("$root/index/tag/")->all];
+    my $tag_root = $self->root . '/index/tag/';
+    return [] unless -e $tag_root;
+    return [map $_->filename, io($tag_root)->all];
 }
 
 sub indexed_tag {

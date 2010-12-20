@@ -54,8 +54,7 @@ sub BUILD {
     $self->{is_ready} = 1
         if -d "$root/static";
 
-    my $plugins = $self->plugins;
-    unshift @$plugins, 'Cog';
+    $self->build_plugin_list();
 
     $self->build_class_share_map();
 
@@ -68,6 +67,42 @@ sub BUILD {
     $self->build_list('template_files');
 
     return $self;
+}
+
+sub build_plugin_list {
+    my $self = shift;
+    my $list = $self->plugins;
+    my @plugins = @$list;
+    my $expanded = {};
+    for my $plugin (@plugins) {
+        $self->expand_list($list, $plugin, $expanded);
+    }
+    if (not grep {$_ eq 'Cog'} @$list) {
+        require Cog;
+        unshift @$list, 'Cog';
+    }
+        
+    $self->{plugins} = $list;
+}
+
+sub expand_list {
+    my ($self, $list, $plugin, $expanded) = @_;
+    return if $expanded->{$plugin};
+    $expanded->{$plugin} = 1;
+    eval "use $plugin; 1" or die;
+    my $adds = $plugin->plugins;
+    push @$adds, $plugin
+        unless grep {$_ eq $plugin} @$adds;
+    for (my $i = 0; $i < @$list; $i++) {
+        if ($list->[$i] eq $plugin) {
+            splice(@$list, $i, 1, @$adds);
+            last;
+        }
+    }
+    my @plugins = @$list;
+    for $plugin (@plugins) {
+        $self->expand_list($list, $plugin, $expanded);
+    }
 }
 
 sub build_list {
@@ -140,12 +175,9 @@ sub build_class_share_map {
     my $plugins = $self->plugins;
     my $class_share_map = $self->class_share_map;
     for my $plugin (@$plugins) {
-        my $module = $plugin;
-        eval "use $plugin; 1" or die;
-        my $object = $module->new;
-
         (my $path = "$plugin.pm") =~ s!::!/!g;
         $path = $INC{$path} or die;
+        # NOTE: $path is for dev testing.
         $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
         my $dir = -e $path
             ? $path
@@ -157,9 +189,10 @@ sub build_class_share_map {
                     "$1/share/";
                 };
             };
-        $class_share_map->{$module} = $dir;
+        $class_share_map->{$plugin} = $dir;
     }
 }
+
 sub _build_files_map {
     require File::ShareDir;
     my $self = shift;
