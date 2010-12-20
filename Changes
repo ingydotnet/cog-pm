@@ -1,5 +1,10 @@
 ---
+version: 0.03
+date:    Mon Dec 20 22:26:56 EST 2010
+changes:
+- Left a console.log in js
+---
 version: 0.02
-date:    Thu Dec  2 17:11:39 EST 2010
+date:    Mon Dec 20 22:16:59 EST 2010
 changes:
 - First Release

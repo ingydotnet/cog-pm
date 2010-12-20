@@ -14,7 +14,6 @@
             var args = map[i].splice(2);
             var m = this.path.match(regex);
             if (m) {
-            console.log(method);
                 for (var j = 0, jl = args.length; j < jl; j++) {
                     args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
                 }

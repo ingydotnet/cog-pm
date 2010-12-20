@@ -2,7 +2,7 @@ package Cog;
 use 5.008003;
 use Mouse;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 extends 'Cog::Plugin';
 
