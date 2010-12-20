@@ -1,9 +1,5 @@
-#!/usr/bin/env perl
 #!/usr/bin/perl
-
-# For development:
-# use FindBin; use lib "$FindBin::RealBin/../lib";
 
 use Cog::Command;
 
-exit Cog::Command->new($0, @ARGV)->run;
+exit Cog::Command->new($0, @ARGV)->run();
