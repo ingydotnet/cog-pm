@@ -28,7 +28,7 @@ has js_files => (is => 'ro', default => sub{[]});
 has css_files => (is => 'ro', default => sub{[]});
 has image_files => (is => 'ro', default => sub{[]});
 has template_files => (is => 'ro', default => sub{[]});
-has navigation => (is => 'ro', default => sub{[]});
+has site_navigation => (is => 'ro', default => sub{[]});
 
 has class_share_map => (is => 'ro', default => sub{{}});
 
@@ -59,7 +59,7 @@ sub BUILD {
     $self->build_class_share_map();
 
     $self->build_list('url_map', 'lol');
-    $self->build_list('navigation', 'lol');
+    $self->build_list('site_navigation', 'lol');
 
     $self->build_list('js_files');
     $self->build_list('css_files');

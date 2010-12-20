@@ -37,7 +37,7 @@ html, body {
     /*min-height: 400px;*/
 }
 
-.sidepanel {
+.site-navigation {
     background-color: #444;
     color: #fff;
     width: 200px;
@@ -50,18 +50,18 @@ html, body {
     list-style-type: none;
 }
 
-.sidepanel ul {
+.site-navigation ul {
     list-style-type: none;
     padding: 0px;
     margin: 0px;
 }
 
-.sidepanel ul ul {
+.site-navigation ul ul {
     display: none;
     padding-left: 20px;
 }
 
-.sidepanel a, .sidepanel a:visited {
+.site-navigation a, .site-navigation a:visited {
     color: #fff;
     text-decoration: none;
 }

@@ -37,7 +37,7 @@ sub make {
     $self->make_url_map_js();
 
     my $time = time;
-    my $news = [];
+    my $page_list = [];
     my $blobs = {};
 
     $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
@@ -68,7 +68,7 @@ sub make {
             duration => $page->duration,
             $status ? (status => $status) : (),
         };
-        push @$news, $blob;
+        push @$page_list, $blob;
         $blobs->{$id} = $blob;
 
         $self->make_page_html($page, $page_file);
@@ -76,7 +76,7 @@ sub make {
         delete $page->{content};
         io("cache/$id.json")->print($self->json->encode({%$page}));
     }
-    io("cache/news.json")->print($self->json->encode($news));
+    io("cache/page-list.json")->print($self->json->encode($page_list));
 
     $self->make_tag_cloud($blobs);
     $self->make_js();
@@ -113,15 +113,17 @@ sub make_tag_cloud {
     my $self = shift;
     my $blobs = shift;
     my $list = [];
-    my $index = {};
+    my $tags = {};
     for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
         my $ids = $self->store->indexed_tag($tag);
         my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{time}) > $t) { $t = $t1 } }
         push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];
         io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
+        $tags->{$tag} = 1;
     }
     io("cache/tag-cloud.json")->print($self->json->encode($list));
+    io("cache/tag-list.json")->print($self->json->encode([sort keys %$tags]));
 }
 
 sub make_page_html {

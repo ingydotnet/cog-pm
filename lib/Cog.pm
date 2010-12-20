@@ -8,7 +8,7 @@ extends 'Cog::Plugin';
 
 use constant index_file => 'layout.html';
 
-sub navigation {
+sub site_navigation {
     [
         ['Home' => '/home/'],
         ['Files' => '/files/'],
@@ -28,7 +28,6 @@ sub url_map {
 sub js_files {
     [qw(
         jquery-1.4.4.min.js
-        separator.js
         jemplate.js
         separator.js
         cog.js
@@ -42,7 +41,7 @@ sub css_files {
     [qw(
         layout.css
         page-list.css
-        story.css
+        page-display.css
     )];
 }
 
@@ -60,9 +59,10 @@ sub template_files {
         css-mf.mk.tt
 
         layout.html.tt
+        site-navigation.html.tt
         page-list.html.tt
-        sidepanel.html.tt
-        story.html.tt
+        page-display.html.tt
+        tag-list.html.tt
         404.html.tt
     )];
 }
@@ -97,6 +97,11 @@ can be used to create and update your application.
 =head1 DOCUMENTATION
 
 See L<Cog::Manual> for more information.
+
+=head1 KUDOS
+
+Many thanks to the good people of Strategic Data in Melbourne Victoria
+Australia, for supporting me and this project. \o/
 
 =head1 AUTHOR
 

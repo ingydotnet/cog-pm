@@ -1,5 +1,5 @@
-<div class="navigation">
-[% INCLUDE nav_list nav=navigation %]
+<div class="site-navigation">
+[% INCLUDE nav_list nav=site_navigation %]
 </div>
 
 [% BLOCK nav_list %]

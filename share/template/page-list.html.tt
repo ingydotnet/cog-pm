@@ -1,5 +1,5 @@
 <div class="page-list">
-<h1>Recent Changes</h1>
+<h1>[% title %]</h1>
 <hr />
 <table>
 <tr>
@@ -13,7 +13,7 @@
 <tr>
 <td class="id"><tt><b>[% page.id %]</b>0[% page.rev %]</tt></td>
 <td class="duration"><tt>[% page.duration %] ago</tt></td>
-<td class="name"><a href="/story/[% page.id %]">[% page.title %]</a></td>
+<td class="name"><a href="/page/[% page.id %]">[% page.title %]</a></td>
 <td class="user">[% page.user %]</td>
 <td class="size">[% page.size %]</td>
 </tr>

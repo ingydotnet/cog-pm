@@ -1,4 +1,4 @@
-h1.story-title {
+h1.page-title {
     text-align: center;
     color: blue;
 }
@@ -26,14 +26,14 @@ ul.url-list {
     margin: 0;
 }
 
-/* Story Navigation */
-ul.story-nav {
+/* Page Navigation */
+ul.page-navigation {
     display: inline;
     margin: 0;
     padding: 0;
 }
 
-ul.story-nav li {
+ul.page-navigation li {
     list-style: none;
     display: inline;
     margin-right: 10px;
@@ -41,7 +41,7 @@ ul.story-nav li {
     color: white;
     background-color: brown;
 }
-ul.story-nav a, ul.story-nav a:visited {
+ul.page-navigation a, ul.page-navigation a:visited {
     color: white;
 }
 

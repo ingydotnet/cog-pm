@@ -3,6 +3,7 @@
 (Cog = function() {}).prototype = {
     path: location.pathname,
     url_map: {},
+    page_name: 'page',
 
     dispatch: function() {
         var map = this.url_map;
@@ -13,6 +14,7 @@
             var args = map[i].splice(2);
             var m = this.path.match(regex);
             if (m) {
+            console.log(method);
                 for (var j = 0, jl = args.length; j < jl; j++) {
                     args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
                 }
@@ -36,9 +38,9 @@
     page_display: function(id) {
         var self = this;
         $.getJSON('/cache/' + id + '.json', function(data) {
-            Jemplate.process('story.html.tt', data, $('div.content')[0]);
+            Jemplate.process('page-display.html.tt', data, $('div.content')[0]);
             $.get('/cache/' + id + '.html', function(data) {
-                $('div.story').html(data);
+                $('div.page').html(data);
             });
             setTimeout(function() {
                 self.setup_links();
@@ -47,15 +49,24 @@
     },
 
     page_list: function() {
-        $.getJSON('/cache/news.json', function(data) {
+        $.getJSON('/cache/page-list.json', function(data) {
             data = {pages: data};
+            data.title = 'Recent Changes';
             Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+        });
+    },
+
+    tag_list: function() {
+        $.getJSON('/cache/tag-list.json', function(data) {
+            data = {tags: data};
+            Jemplate.process('tag-list.html.tt', data, $('div.content')[0]);
         });
     },
 
     tag_page_list: function(tag) {
         $.getJSON('/cache/tag/' + tag + '.json', function(data) {
             data = {pages: data};
+            data.title = 'Tag: ' + tag.replace(/%20/g, ' ');
             Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
         });
     },
@@ -74,12 +85,13 @@
     },
 
     setup_links: function() {
+        var page_name = this.page_name;
         var $links = $('.content .sectionbody a')
             .each(function() {
                 var $link = $(this);
                 Q = $link;
-                if ($link.attr('href') == 'story') {
-                    $link.attr('href', '/story/name/' + $link.text());
+                if ($link.attr('href') == 'page') {
+                    $link.attr('href', '/' + page_name + '/name/' + $link.text());
                 }
             });
     },

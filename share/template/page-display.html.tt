@@ -1,9 +1,8 @@
-<ul class="story-nav">
+<ul class="page-navigation">
   <li><a href="#">Edit</a></li>
-  <li><a href="#">Tag</a></li>
 </ul>
 
-<h1 class="story-title">[% title %]</h1>
+<h1 class="page-title">[% title %]</h1>
 <hr />
 
 [% IF tag.size %]
@@ -26,4 +25,4 @@
 <hr />
 [% END %]
 
-<div class="story">[% content %]</div>
+<div class="page">[% content %]</div>
