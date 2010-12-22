@@ -2,7 +2,8 @@ package Cog;
 use 5.008003;
 use Mouse;
 
-our $VERSION = '0.03';
+# !!! Change $Cog::Cog::VERSION too. 0.05.
+our $VERSION = '0.05';
 
 extends 'Cog::Plugin';
 
@@ -84,7 +85,7 @@ Cog - The Cog Information Application Framework
 
 =head1 STATUS
 
-This software is pre-alpha. Don't use it for anything serious yet.
+This software is pre-alpha. Don't use it yet.
 
 =head1 DESCRIPTION
 
