@@ -7,18 +7,20 @@ version_check;
 ack_xxx;
 repository 'git://github.com/ingydotnet/cog-pm.git';
 
-requires 'Plack';
-requires 'Mouse';
-requires 'YAML::XS';
-requires 'IO::All';
-requires 'Try::Tiny';
 requires 'Class::Throwable';
-requires 'Time::Duration';
-requires 'Git::Wrapper';
 requires 'Convert::Base32';
-requires 'Template::Toolkit::Simple';
+requires 'File::ShareDir';
+requires 'Git::Wrapper';
+requires 'IO::All';
 requires 'IPC::Run';
 requires 'Jemplate';
+requires 'JSON';
+requires 'Mouse';
+requires 'Plack';
+requires 'Template::Toolkit::Simple';
+requires 'Time::Duration';
+requires 'Try::Tiny';
+requires 'YAML::XS';
 
 install_script 'bin/cog';
 
