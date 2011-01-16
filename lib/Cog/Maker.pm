@@ -1,8 +1,6 @@
 package Cog::Maker;
 use Mouse;
 
-use Cog::Page;
-
 # NOTE This module should generate a Makefile to do all this work.
 
 use Template::Toolkit::Simple;
@@ -10,6 +8,8 @@ use IO::All;
 use IPC::Run;
 use JSON;
 use Time::Duration;
+
+use XXX;
 
 has config => ('is' => 'ro', required => 1);
 has store => ('is' => 'ro', required => 1);
@@ -20,10 +20,12 @@ has json => ('is' => 'ro', builder => sub {
     return $json;
 });
 
+# XXX Move this to CogWiki
 sub make {
     my $self = shift;
     $self->config->chdir_root();
 
+    # Crea
     io('cache')->mkdir;
     my $data = +{%{$self->config}};
     my $html = tt()
@@ -42,39 +44,36 @@ sub make {
 
     $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
     for my $page_file (io($self->config->content_root)->all_files) {
-        next if $page_file->filename =~ /^\./;
-        my $page = Cog::Page->from_text($page_file->all);
-        my $id = $page->short or next;
+        next unless $page_file->filename =~ /\.cog$/;
+        my $page = $self->config->classes->{page}->from_text($page_file->all);
+        my $id = $page->Short or next;
 
-        for my $Name (@{$page->name}) {
+        for my $Name (@{$page->Name}) {
             my $name = $self->store->index_name($Name, $id);
             io->file("cache/name/$name.txt")->assert->print($id);
         }
 
         $self->store->index_tag($_, $id)
-            for @{$page->tag};
-
-        my ($status) = grep {/^(Decide|Doing|Done)$/} @{$page->tag};
+            for @{$page->Tag};
 
         my $blob = {
-            id => $id,
-            rev => $page->rev,
-            title => $page->title,
-            time => $page->time,
-            user => $page->user,
-            size => length($page->content),
-            color => $page->color,
-            # XXX Needs to be client side
+            %$page,
+            Id => $id,
+            Type => $page->Type,
+            Title => $page->Title,
+            Time => $page->Time,
+            size => length($page->Content),
             duration => $page->duration,
-            $status ? (status => $status) : (),
         };
+        delete $blob->{Content};
+        delete $blob->{Name};
         push @$page_list, $blob;
         $blobs->{$id} = $blob;
 
         $self->make_page_html($page, $page_file);
 
         delete $page->{content};
-        io("cache/$id.json")->print($self->json->encode({%$page}));
+        io("cache/$id.json")->print($self->json->encode($blob));
     }
     io("cache/page-list.json")->print($self->json->encode($page_list));
 
@@ -116,7 +115,7 @@ sub make_tag_cloud {
     my $tags = {};
     for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
         my $ids = $self->store->indexed_tag($tag);
-        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{time}) > $t) { $t = $t1 } }
+        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time}) > $t) { $t = $t1 } }
         push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];
         io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
@@ -130,12 +129,12 @@ sub make_page_html {
     my $self = shift;
     my $page = shift;
     my $page_file = shift;
-    my $id = $page->short;
+    my $id = $page->Short;
     my $html_filename = "cache/$id.html";
 
     return if -e $html_filename and -M $html_filename < -M $page_file->name;
 
-    my ($in, $out, $err) = ($page->content, '', '');
+    my ($in, $out, $err) = ($page->Content, '', '');
 
     my @cmd = qw(asciidoc -s -);
     

@@ -33,6 +33,7 @@ has site_navigation => (is => 'ro', default => sub{[]});
 has class_share_map => (is => 'ro', default => sub{{}});
 
 has files_map => (is => 'ro', builder => '_build_files_map', lazy => 1);
+has classes => (is => 'rw');
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;
@@ -66,7 +67,18 @@ sub BUILD {
     $self->build_list('image_files');
     $self->build_list('template_files');
 
+    $self->find_classes();
+
     return $self;
+}
+
+sub find_classes {
+    my $self = shift;
+    my $classes = {};
+    for my $plugin (@{$self->plugins}) {
+        $classes = +{ %$classes, %{$plugin->cog_classes} };
+    }
+    $self->classes($classes);
 }
 
 sub build_plugin_list {

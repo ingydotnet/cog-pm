@@ -1,72 +1,92 @@
 package Cog::Page;
 use Mouse;
-use Time::Duration;
+use Time::Duration ();
 
-has id => (is => 'rw');
-has rev => (is => 'rw');
-has time => (is => 'rw');
-has user => (is => 'rw');
-has name => (is => 'rw', default => sub {[]} );
-has tag => (is => 'rw', default => sub {[]} );
-has url => (is => 'rw', default => sub {[]} );
-has content => (is => 'rw');
-has title => (is => 'rw');
-has short => (is => 'rw');
-has size => (is => 'rw');
-has color => (is => 'rw');
+use XXX;
 
-has short => (is => 'rw', builder => sub {
-    $_[0]->id =~ m!^(\w{4,})-! or return;
-    return $1;
-});
-
-my $time = time;
-has duration => (is => 'rw', builder => sub {
-    return Time::Duration::duration($time - $_[0]->time, 1);
-});
-
-sub from_file {
-    my $self = shift;
+sub SCHEMA {
+    return (
+        'Id',
+        'Type',
+        'Name+',
+        'Tag*',
+        'Url*',
+    )
 }
 
-sub to_file {
+my $time = time;
+has Id => (is => 'rw');
+has Type => (is => 'rw');
+# XXX default is just a temporary workaround
+has Rev => (is => 'rw', default => 1, lazy => 1);
+# XXX default is just a temporary workaround
+has Time => (is => 'rw', default => $time - 3600, lazy => 1);
+has User => (is => 'rw');
+has Name => (is => 'rw', default => sub {[]} );
+has Tag => (is => 'rw', default => sub {[]}, lazy => 1 );
+has Url => (is => 'rw', default => sub {[]}, lazy => 1 );
+has Content => (is => 'rw');
+
+has duration => (is => 'rw', builder => sub {
+    return Time::Duration::duration($time - $_[0]->Time, 1);
+});
+
+# sub from_file {
+#     my $self = shift;
+# }
+
+# sub to_file {
+#     my $self = shift;
+# }
+
+sub Title {
     my $self = shift;
+    return $self->Name->[0] or '---';
+}
+
+sub Short {
+    my $self = shift;
+    $self->Id =~ m!^(\w{4,})-! or return;
+    return $1;
 }
 
 sub from_text {
     my $class = shift;
     my $text = shift;
 
-    my %hash;
     my $head = ($text =~ s/\A((?:[\w\-]+:\ .*\n)+)(\n|\z)//) ? $1 : '';
-    while ($head =~ s/\A(\w+): +(.*)\n//) {
-        my $key = lc $1;
-        my $value = $2;
-        $value =~ s/^\s*(.*?)\s*$/$1/;
-        if ($key =~ /^(?:name|tag|url)$/) {
-            $hash{$key} ||= [];
-            push @{$hash{$key}}, $value;
-        }
-        else {
-            $hash{$key} = $value;
+
+    my %hash;
+
+    my @schema = $class->SCHEMA;
+    for my $field (@schema) {
+        $field =~ s/([\?\+\*]?)$//;
+        my $mod = $1 || '';
+        my $list = ($mod =~ /[\+\*]/);
+        my $optional = ($mod =~ /[\*\?]/);
+        while ($head =~ s/^($field): +(.*)\n//m) {
+            my $value = $2;
+            $value =~ s/^\s*(.*?)\s*$/$1/;
+            if ($list) {
+                $hash{$field} ||= [];
+                push @{$hash{$field}}, $value;
+            }
+            else {
+                $hash{$field} = $value;
+            }
         }
     }
-    throw Error "Can't parse:\n$head" if $head;
+    # throw Error "Can't parse:\n$head" if $head;
 
-    $hash{content} = $text;
+    $hash{Content} = $text;
     my $self = $class->new(%hash);
-    $self->title($self->name->[0] || '???');
-    my $short = $self->id;
-    $short =~ s/-.*//;
-    $self->short($short);
-    $self->size(length $text);
-    $self->duration(Time::Duration::duration(time - $self->time, 1));
+    $self->duration(Time::Duration::duration(time - $self->Time, 1));
     return $self;
 }
 
-sub to_text {
-    my $self = shift;
-    my %keys = map ($_, 1), keys %$self;
-}
+# sub to_text {
+#     my $self = shift;
+#     my %keys = map ($_, 1), keys %$self;
+# }
 
 1;

@@ -2,7 +2,7 @@ package Cog::Store;
 use Mouse;
 use IO::All;
 use Git::Wrapper;
-use Convert::Base32 ();
+use Convert::Base32::Crockford ();
 
 # use XXX;
 
@@ -32,10 +32,12 @@ sub new_cog_id {
         my $id = uc Convert::Base32::encode_base32(
             join "", map { pack "S", int(rand(65536)) } 1..8
         ); 
-        next unless $id =~ /^((?:[A-Z][2-7]|[2-7][A-Z])..)(.*)/;
+        $id =~ s/(....)(.*)/$1-$2/ or die;
         $short = $1;
-        $full = "$1-$2";
+        next unless
+            ($short =~/[2-9]/ and $short =~ /[A-Z]/ and $short !~ /[01]/);
         next if -e "$path/$short";
+        $full = $id;
         last;
     }
     io("$path/$short")->touch();
