@@ -156,7 +156,7 @@ sub handle_bless {
         my $heading = '';
         $heading .= ($head =~ s/^(Cog: .*\n)//m) ? $1 :
             "Cog: 0.0.1\n";
-        $heading .= ($head =~ s/^(Id: +[A-Z2-7]{4}-[A-Z2-7]{22}\n)//m) ? $1 :
+        $heading .= ($head =~ s/^(Id: +[A-Z2-9]{4}-[A-Z0-9]{22}\n)//m) ? $1 :
             "Id: " . $self->store->new_cog_id() . "\n";
         $heading .= ($head =~ s/^(Rev: [0-9]+\n)//m) ? $1 :
             "Rev: 1\n";

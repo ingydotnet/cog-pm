@@ -29,7 +29,7 @@ sub new_cog_id {
     my ($full, $short);
     while (1) {
         # Upper cased base32 128bit random number.
-        my $id = uc Convert::Base32::encode_base32(
+        my $id = uc Convert::Base32::Crockford::encode_base32(
             join "", map { pack "S", int(rand(65536)) } 1..8
         ); 
         $id =~ s/(....)(.*)/$1-$2/ or die;
