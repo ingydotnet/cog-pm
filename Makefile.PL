@@ -8,7 +8,7 @@ ack_xxx;
 repository 'git://github.com/ingydotnet/cog-pm.git';
 
 requires 'Class::Throwable';
-requires 'Convert::Base32';
+requires 'Convert::Base32::Crockford';
 requires 'File::ShareDir';
 requires 'Git::Wrapper';
 requires 'IO::All';
