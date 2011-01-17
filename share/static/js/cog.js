@@ -47,10 +47,10 @@
         });
     },
 
-    page_list: function() {
+    page_list: function(title) {
         $.getJSON('/cache/page-list.json', function(data) {
             data = {pages: data};
-            data.title = 'Recent Changes';
+            data.title = title,
             Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
         });
     },
