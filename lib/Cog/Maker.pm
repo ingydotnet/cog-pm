@@ -8,6 +8,7 @@ use IO::All;
 use IPC::Run;
 use JSON;
 use Time::Duration;
+use Pod::Simple::HTML;
 
 use XXX;
 
@@ -134,14 +135,40 @@ sub make_page_html {
 
     return if -e $html_filename and -M $html_filename < -M $page_file->name;
 
-    my ($in, $out, $err) = ($page->Content, '', '');
+    my $markup = $page->markup;
 
-    my @cmd = qw(asciidoc -s -);
-    
+    my $method = $markup eq 'pod' ? 'make_pod_html' : 'make_asc_html';
+
+    my $html = $self->$method($page);
+
     print $page_file->filename . " -> $html_filename\n";
+    io($html_filename)->assert->print($html);
+}
+
+sub make_asc_html {
+    my $self = shift;
+    my $page = shift;
+
+    my ($in, $out, $err) = ($page->Content, '', '');
+    my @cmd = qw(asciidoc -s -);
     IPC::Run::run(\@cmd, \$in, \$out, \$err, IPC::Run::timeout(30));
 
-    io($html_filename)->assert->print($out);
+    return $out;
+}
+
+sub make_pod_html {
+    my $self = shift;
+    my $page = shift;
+
+    my $html;
+    my $pod = $page->Content;
+    my $p = Pod::Simple::HTML->new;
+    $p->output_string(\$html);
+    $p->parse_string_document($pod);
+
+    $html =~ s/.*!-- start doc -->(.*?)<!-- end doc --.*/$1/s or die;
+
+    return $html;
 }
 
 sub make_js {
