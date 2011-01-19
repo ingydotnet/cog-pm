@@ -17,6 +17,7 @@ requires 'Jemplate';
 requires 'JSON';
 requires 'Mouse';
 requires 'Plack';
+requires 'Plack::Middleware::ETag';
 requires 'Template::Toolkit::Simple';
 requires 'Time::Duration';
 requires 'Try::Tiny';

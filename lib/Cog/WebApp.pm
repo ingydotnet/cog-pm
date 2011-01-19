@@ -1,6 +1,8 @@
 package Cog::WebApp;
 use Mouse;
 use Plack::Middleware::Static;
+use Plack::Middleware::ConditionalGET;
+use Plack::Middleware::ETag;
 use Plack::Runner;
 
 has config => (is => 'ro', required => 1);
@@ -14,14 +16,22 @@ sub app {
     my $layout = do {local $/; <LAYOUT>};
     close LAYOUT or die;
 
+    my $time = scalar(gmtime);
+    $time .= ' GMT' unless $time =~ /GMT/;
+
     my $app = sub {
-        return [ 200, [ 'Content-Type' => 'text/html' ], [ $layout ] ];
+        return [ 200, [
+            'Content-Type' => 'text/html',
+            'Last-Modified' => $time,
+        ], [ $layout ] ];
     };
     if ($self->config->plack_debug) {
         require Plack::Middleware::Debug;
         $app = Plack::Middleware::Debug->wrap($app);
     }
     $app = Plack::Middleware::Static->wrap($app, path => qr{^/(static|cache)/}, root => './');
+    $app = Plack::Middleware::ConditionalGET->wrap($app);
+    $app = Plack::Middleware::ETag->wrap($app, file_etag => [qw/inode mtime size/]);
     return $app;
 }
 
