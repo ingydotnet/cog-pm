@@ -55,8 +55,8 @@ sub make {
         }
 
         $self->store->index_tag($_, $id)
-            for @{$page->Tag};
-
+            for $self->all_tags($page);
+            
         my $blob = {
             %$page,
             Id => $id,
@@ -81,6 +81,11 @@ sub make {
     $self->make_tag_cloud($blobs);
     $self->make_js();
     $self->make_css();
+}
+
+sub all_tags {
+    my ($self, $page) = @_;
+    return @{$page->Tag};
 }
 
 sub make_config_js {

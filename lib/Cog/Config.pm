@@ -34,6 +34,7 @@ has class_share_map => (is => 'ro', default => sub{{}});
 
 has files_map => (is => 'ro', builder => '_build_files_map', lazy => 1);
 has classes => (is => 'rw');
+has html_title => (is => 'rw');
 
 around BUILDARGS => sub {
     my ($orig, $class) = splice @_, 0, 2;

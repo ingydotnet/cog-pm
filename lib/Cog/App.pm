@@ -12,8 +12,7 @@ has store => (is => 'ro', builder => sub {
 });
 has maker => (is => 'ro', builder => sub {
     my $self = shift;
-    require Cog::Maker;
-    Cog::Maker->new(
+    $self->config->classes->{maker}->new(
         config => $self->config,
         store => $self->store,
     );

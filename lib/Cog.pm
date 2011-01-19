@@ -72,6 +72,7 @@ sub template_files {
 sub cog_classes {
     +{
         page => 'Cog::Page',
+        maker => 'Cog::Maker',
     }
 }
 
