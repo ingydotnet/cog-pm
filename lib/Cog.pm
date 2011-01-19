@@ -29,6 +29,7 @@ sub url_map {
 sub js_files {
     [qw(
         jquery-1.4.4.min.js
+        jquery-cookie.js
         jemplate.js
         separator.js
         cog.js
