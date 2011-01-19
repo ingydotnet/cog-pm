@@ -18,6 +18,9 @@
                     args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
                 }
                 this[method].apply(this, args);
+                if (this.path.length > 1) {
+                    $.cookie("last_url", this.path, {path:'/'});
+                }
                 return;
             }
         }
