@@ -16,7 +16,6 @@ sub app {
     open LAYOUT, $layout_file or die "Can't open '$layout_file'";
     my $layout = do {local $/; <LAYOUT>};
     close LAYOUT or die;
-    print "calling app\n";
 
     my $time = scalar(gmtime);
     $time .= ' GMT' unless $time =~ /GMT/;
