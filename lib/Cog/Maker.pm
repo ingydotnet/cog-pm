@@ -142,12 +142,30 @@ sub make_page_html {
 
     my $markup = $page->markup;
 
-    my $method = $markup eq 'pod' ? 'make_pod_html' : 'make_asc_html';
+    my $method =
+        $markup eq 'pod' ? 'make_pod_html' :
+        $markup eq 'asc' ? 'make_asc_html' :
+        $markup eq 'txt' ? 'make_txt_html' :
+        'make_txt_html';
 
     my $html = $self->$method($page);
 
     print $page_file->filename . " -> $html_filename\n";
     io($html_filename)->assert->print($html);
+}
+
+sub make_txt_html {
+    my $self = shift;
+    my $page = shift;
+    my $html = $page->Content;
+
+    $html =~ s/&/&amp;/g;
+    $html =~ s/</&lt;/g;
+    $html =~ s/>/&gt;/g;
+
+    $html = "<pre>$html</pre>\n";
+
+    return $html;
 }
 
 sub make_asc_html {
