@@ -147,8 +147,9 @@ sub _parse_args {
     elsif ($script ne 'cog') {
         throw Error "unexpected script name '$script'\n";
     }
-    elsif (@argv and $argv[0] =~ /^\w+$/) {
+    elsif (@argv and $argv[0] =~ /^[\w\-]+$/) {
         $args->{action} = shift @argv;
+        $args->{action} =~ s/-/_/g;
         $args->{argv} = [@argv];
     }
     elsif (not @argv) {
