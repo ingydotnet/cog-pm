@@ -91,8 +91,7 @@ sub config_file {
     my $argument = shift || '';
     my $config_file = 
         $ENV{COG_APP_CONFIG_FILE} ||
-        -e('config.yaml') && 'config.yaml' ||
-        -e('.cog/config.yaml') && '.cog/config.yaml' ||
+        -e('cog.config.yaml') && 'cog.config.yaml' ||
         '';
     return $config_file;
 }
@@ -220,7 +219,7 @@ sub _copy_assets {
     for my $file (keys %$files) {
         my $target = "$root/$file";
         unlink $target;
-        if ($ENV{COG_SYMLINK_INSTALL}) {
+        if ($ENV{COG_APP_SYMLINK_INSTALL}) {
             io($target)->assert->symlink($files->{$file});
         }
         else {

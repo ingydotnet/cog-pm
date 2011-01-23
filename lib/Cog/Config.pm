@@ -1,9 +1,7 @@
 package Cog::Config;
 use Mouse;
 
-use YAML::XS;
 use IO::All;
-use Carp;
 
 # use XXX;
 
@@ -16,7 +14,7 @@ has html_title => (is => 'ro');
 
 # Server options
 has server_port => (is => 'ro', default => '');
-has content_root => (is => 'ro', default => '..');
+has content_root => (is => 'ro', default => '.');
 has plack_debug => (is => 'ro', default => 0);
 
 
@@ -24,7 +22,7 @@ has plack_debug => (is => 'ro', default => 0);
 
 # Bootstrapping config values
 has app_class => ( is => 'ro' );
-my $root_dir = ($ENV{COG_ROOT_DIR} || '.cog');
+my $root_dir = ($ENV{COG_APP_ROOT_DIR} || '.');
 has root_dir => (is => 'ro', default => $root_dir);
 
 # Cog singleton object references
@@ -56,7 +54,7 @@ sub object_builder {
     my ($self, $type, $base) = @_;
     my $class = $self->classes->{$type};
     unless (UNIVERSAL::isa($class, $base)) {
-        eval "require $class; 1" or confess $@;
+        eval "require $class; 1" or die $@;
     }
     return $class->new();
 }
@@ -91,7 +89,7 @@ sub BUILD {
     $self->{is_init} = 1
         if -d "$root/static";
     $self->{is_config} = 1
-        if -e "$root/config.yaml";
+        if -e "$root/cog.config.yaml";
     $self->{is_ready} = 1
         if -d "$root/static";
 

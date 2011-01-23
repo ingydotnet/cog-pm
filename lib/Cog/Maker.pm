@@ -56,7 +56,7 @@ sub all_tags {
 sub make_config_js {
     my $self = shift;
     my $data = {
-        json => $self->json->encode(YAML::XS::LoadFile("config.yaml")),
+        json => $self->json->encode(YAML::XS::LoadFile("cog.config.yaml")),
     };
     my $javascript = tt()
         ->path(['template/'])
