@@ -1,5 +1,6 @@
 package Cog::Maker;
 use Mouse;
+extends 'Cog::Base';
 
 # NOTE This module should generate a Makefile to do all this work.
 
@@ -10,9 +11,8 @@ use JSON;
 use Time::Duration;
 use Pod::Simple::HTML;
 
-use XXX;
+# use XXX;
 
-has config => ('is' => 'ro', required => 1);
 has json => ('is' => 'ro', builder => sub {
     my $json = JSON->new;
     $json->allow_blessed;

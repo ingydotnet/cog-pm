@@ -1,10 +1,11 @@
 package Cog::Config;
 use Mouse;
+
 use YAML::XS;
 use IO::All;
 use Carp;
 
-use XXX;
+# use XXX;
 
 ### These options are set by user in config file:
 
@@ -57,7 +58,7 @@ sub object_builder {
     unless (UNIVERSAL::isa($class, $base)) {
         eval "require $class; 1" or confess $@;
     }
-    return $class->new(config => $self);
+    return $class->new();
 }
 
 # App & WebApp definitions
@@ -136,11 +137,11 @@ sub expand_list {
             push @$adds, $plugin->webapp_class;
         }
         push @$adds, $parent
-            unless $parent =~ /^(Mouse::Object|Cog::Plugin)$/;
+            unless $parent =~ /^(Cog::Base|Cog::Plugin)$/;
     }
     elsif ($plugin->isa('Cog::WebApp')) {
         push @$adds, $parent
-            unless $parent =~ /^(Mouse::Object|Cog::Plugin)$/;
+            unless $parent =~ /^(Cog::Base|Cog::Plugin)$/;
     }
     push @$adds, @{$plugin->plugins};
 

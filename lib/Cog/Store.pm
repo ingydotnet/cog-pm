@@ -1,5 +1,7 @@
 package Cog::Store;
 use Mouse;
+extends 'Cog::Base';
+
 use IO::All;
 use Git::Wrapper;
 use Convert::Base32::Crockford ();

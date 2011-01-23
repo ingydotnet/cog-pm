@@ -2,7 +2,7 @@ package Cog::Page;
 use Mouse;
 use Time::Duration ();
 
-use XXX;
+# use XXX;
 
 sub SCHEMA {
     return (

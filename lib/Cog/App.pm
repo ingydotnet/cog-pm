@@ -1,12 +1,14 @@
 package Cog::App;
 use Mouse;
+extends 'Cog::Base';
+
 use Class::Throwable qw(Error);
 use Cog::Config;
 use IO::All;
 use Getopt::Long();
 use YAML::XS;
 
-use XXX;
+# use XXX;
 
 use constant config_class => 'Cog::Config';
 use constant webapp_class => '';
@@ -25,7 +27,6 @@ sub cog_classes {
     }
 }
 
-has config => ( is => 'ro', required => 1 );
 has action => ( is => 'ro' );
 has argv => ( is => 'ro', default => sub {[]} );
 has time => ( is => 'ro', builder => sub { time() } );
@@ -80,8 +81,9 @@ around BUILDARGS => sub {
     $hash->{store_class} = $class->store_class;
 
     my $config = $config_class->new($hash);
+    Cog::Base->set_global_config_singleton_object($config);
 
-    return $class->$orig({config => $config, @_});
+    return $class->$orig(@_);
 };
 
 sub config_file {

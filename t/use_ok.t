@@ -1,7 +1,8 @@
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 use_ok 'Cog';
 use_ok 'Cog::App';
+use_ok 'Cog::Base';
 use_ok 'Cog::Command';  # XXX Deprecated
 use_ok 'Cog::Config';
 use_ok 'Cog::FileBrowser';
