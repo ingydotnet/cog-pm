@@ -1,4 +1,4 @@
-package Cog::Page;
+package Cog::Node;
 use Mouse;
 use Time::Duration ();
 
@@ -7,18 +7,22 @@ use Time::Duration ();
 sub SCHEMA {
     return (
         'Id',
+        'Rev',
         'Type',
-        'Name+',
+        'Time',
+        'User',
+        'Name*',
         'Tag*',
         'Url*',
+        'Content?',
     )
 }
 
 my $time = time;
 has Id => (is => 'rw');
-has Type => (is => 'rw');
 # XXX default is just a temporary workaround
 has Rev => (is => 'rw', default => 1, lazy => 1);
+has Type => (is => 'rw');
 # XXX default is just a temporary workaround
 has Time => (is => 'rw', default => $time - 3600, lazy => 1);
 has User => (is => 'rw');
@@ -31,17 +35,17 @@ has duration => (is => 'rw', builder => sub {
     return Time::Duration::duration($time - $_[0]->Time, 1);
 });
 
-# sub from_file {
+# sub from_cog_file {
 #     my $self = shift;
 # }
 
-# sub to_file {
+# sub to_cog_file {
 #     my $self = shift;
 # }
 
 sub Title {
     my $self = shift;
-    return $self->Name->[0] or '---';
+    return $self->Name->[0] || '';
 }
 
 sub Short {
