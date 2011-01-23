@@ -1,23 +1,165 @@
 package Cog::App;
 use Mouse;
-use IO::All;
 use Class::Throwable qw(Error);
+use Cog::Config;
+use IO::All;
+use Getopt::Long();
+use YAML::XS;
 
-# use XXX;
+use XXX;
 
-has config => (is => 'ro', 'required' => 1);
-has store => (is => 'ro', builder => sub {
-    require Cog::Store;
-    Cog::Store->new();
-});
-has maker => (is => 'ro', builder => sub {
+use constant config_class => 'Cog::Config';
+use constant webapp_class => '';
+use constant store_class => 'Cog::Store';
+use constant maker_class => 'Cog::Maker';
+use constant page_class => 'Cog::Maker';
+sub plugins { [] };
+sub cog_classes {
     my $self = shift;
-    $self->config->classes->{maker}->new(
-        config => $self->config,
-        store => $self->store,
-    );
-});
-has time => (is => 'ro', builder => sub { time() });
+    return +{
+        webapp => $self->webapp_class,
+        config => $self->config_class,
+        store => $self->store_class,
+        maker => $self->maker_class,
+        page => $self->page_class,
+    }
+}
+
+has config => ( is => 'ro', required => 1 );
+has action => ( is => 'ro' );
+has argv => ( is => 'ro', default => sub {[]} );
+has time => ( is => 'ro', builder => sub { time() } );
+
+sub new_app_object {
+    my ($class, $script, @argv) = @_;
+    my ($file, $app_class, $server);
+    {
+        local @ARGV = @argv;
+        Getopt::Long::GetOptions(
+            'file=s' => \$file,
+            'app=s' => \$app_class,
+            'server=s' => \$server,
+        );
+        @argv = (@ARGV, ($server ? ('-s' => $server) : ()));
+    }
+    my $config_file = $class->config_file($file);
+    my $hash = {};
+    if ($config_file) {
+        $hash = YAML::XS::LoadFile($config_file);
+    }
+    $app_class ||= $hash->{app_class};
+    die "Can't find the Cog::App class to use"
+        unless $app_class;
+    eval "require $app_class; 1" or die $@;
+
+    my $app = $app_class->new(%{$class->_parse_args($script, @argv)});
+
+    return $app;
+}
+
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+    my $config_class = $class->config_class;
+    my $config_file = $class->config_file
+        or die "Can't determine config file";
+
+    my $root_dir = '.';
+
+    if ($config_file =~ /(.*)\/(.*)/) {
+        ($root_dir, $config_file) = ($1, $2);
+    }
+
+    my $config_path = "$root_dir/$config_file";
+    my $hash = -e $config_path
+        ? YAML::XS::LoadFile($config_path)
+        : {};
+    $hash->{root_dir} = $root_dir;
+    $hash->{config_file} = $config_file;
+    $hash->{maker_class} = $class->maker_class;
+    $hash->{store_class} = $class->store_class;
+
+    my $config = $config_class->new($hash);
+
+    return $class->$orig({config => $config, @_});
+};
+
+sub config_file {
+    my $class = shift;
+    my $argument = shift || '';
+    my $config_file = 
+        $ENV{COG_APP_CONFIG_FILE} ||
+        -e('config.yaml') && 'config.yaml' ||
+        -e('.cog/config.yaml') && '.cog/config.yaml' ||
+        '';
+    return $config_file;
+}
+
+sub run {
+    my $self = shift;
+    my $action = $self->action;
+    my $method = "handle_$action";
+    my ($object, $function);
+
+    $function = ($object = $self)->can($method)
+        or throw Error "'$action' is an invalid action\n";
+    $function->($object, @{$self->argv});
+    return 0;
+}
+
+sub handle_help {
+    my $self = shift;
+    print $self->usage;
+}
+
+sub usage {
+    my $self = shift;
+    return <<'...';
+Usage: cog command
+
+Commands:
+    init   - Make current directory into a Cog app
+    init Cog::Class
+           - Make a Cog::Class app specifically
+    update - Update the app with the latest assets
+    make   - Prepare the app content for the web
+    start  - Start the local app server
+    stop   - Stop the server
+
+    bless file-name - Turn a text file into a cog file
+    edit name|id - Start an editor with the contents of the cog page
+
+See:
+    `perldoc cog` - Documentation on this command.
+    `perldoc Cog::Manual` - Complete Cog documentation.
+...
+}
+
+sub _parse_args {
+    my $class = shift;
+    my ($script, @argv) = @_;
+    my $args = {};
+    $script =~ s!.*/!!;
+    if ($script =~ /^(pre-commit|post-commit)$/) {
+        ($args->{action} = $script) =~ s/-/_/;
+    }
+    elsif ($script ne 'cog') {
+        throw Error "unexpected script name '$script'\n";
+    }
+    elsif (@argv and $argv[0] =~ /^\w+$/) {
+        $args->{action} = shift @argv;
+        $args->{argv} = [@argv];
+    }
+    elsif (not @argv) {
+        $args->{action} = 'help';
+    }
+    else {
+        require XXX;
+        warn "\nInvalid cog command. Can't parse these arguments:\n";
+        XXX::XXX(@_);
+    }
+    return $args;
+}
 
 sub handle_init {
     my $self = shift;
@@ -87,7 +229,7 @@ sub _copy_assets {
 
 sub handle_make {
     my $self = shift;
-    $self->maker->make;
+    $self->config->maker->make;
     print <<'...';
 Cog is up to date and ready to use. To start the web server, run
 this command:
@@ -99,11 +241,8 @@ this command:
 }
 
 sub handle_start {
-    require Cog::WebApp;
     my $self = shift;
     $self->config->chdir_root();
-    my $webapp = Cog::WebApp->new(config => $self->config);
-    my $app = $webapp->app;
     print <<'...';
 Cog web server is starting up...
 
@@ -111,7 +250,7 @@ Cog web server is starting up...
     my @args = @_;
     unshift @args, ('-p' => $self->config->server_port)
         if $self->config->server_port;
-    $webapp->run($app, @args);
+    $self->config->runner->run(@args);
 }
 
 sub handle_edit {

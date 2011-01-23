@@ -1,81 +1,7 @@
 package Cog;
 use 5.008003;
-use Mouse;
 
 our $VERSION = '0.06';
-
-extends 'Cog::Plugin';
-
-use constant index_file => 'layout.html';
-
-sub site_navigation {
-    [
-        ['Home' => '/home/'],
-        ['Files' => '/files/'],
-        ['Tags' => '/tags/'],
-    ]
-}
-
-sub url_map {
-    [
-        ['/' => 'redirect', ('/home/')],
-        ['/home/' => 'about_cog'],
-        ['/files/' => 'files_list'],
-        ['/tags/' => 'tags_list'],
-    ];
-}
-
-sub js_files {
-    [qw(
-        jquery-1.4.4.min.js
-        jquery.cookie.js
-        jemplate.js
-        separator.js
-        cog.js
-        config.js
-        url-map.js
-        start.js
-    )]
-}
-
-sub css_files {
-    [qw(
-        layout.css
-        page-list.css
-        page-display.css
-    )];
-}
-
-sub image_files {
-    [qw(
-        tile.gif
-        cog.png
-    )];
-}
-
-sub template_files {
-    [qw(
-        config.js.tt
-        js-mf.mk.tt
-        css-mf.mk.tt
-
-        layout.html.tt
-        site-navigation.html.tt
-        page-list.html.tt
-        page-display.html.tt
-        tag-list.html.tt
-        404.html.tt
-    )];
-}
-
-sub cog_classes {
-    +{
-        page => 'Cog::Page',
-        maker => 'Cog::Maker',
-    }
-}
-
-1;
 
 =encoding utf8
 
@@ -117,7 +43,7 @@ Ingy döt Net <ingy@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010. Ingy döt Net.
+Copyright (c) 2010, 2011. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

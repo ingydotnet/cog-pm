@@ -13,7 +13,6 @@ use Pod::Simple::HTML;
 use XXX;
 
 has config => ('is' => 'ro', required => 1);
-has store => ('is' => 'ro', required => 1);
 has json => ('is' => 'ro', builder => sub {
     my $json = JSON->new;
     $json->allow_blessed;
@@ -43,18 +42,18 @@ sub make {
     my $page_list = [];
     my $blobs = {};
 
-    $self->store->delete_tag_index; # XXX Temporary solution until can do smarter
+    $self->config->store->delete_tag_index; # XXX Temporary solution until can do smarter
     for my $page_file (io($self->config->content_root)->all_files) {
         next unless $page_file->filename =~ /\.cog$/;
         my $page = $self->config->classes->{page}->from_text($page_file->all);
         my $id = $page->Short or next;
 
         for my $Name (@{$page->Name}) {
-            my $name = $self->store->index_name($Name, $id);
+            my $name = $self->config->store->index_name($Name, $id);
             io->file("cache/name/$name.txt")->assert->print($id);
         }
 
-        $self->store->index_tag($_, $id)
+        $self->config->store->index_tag($_, $id)
             for $self->all_tags($page);
             
         my $blob = {
@@ -119,8 +118,8 @@ sub make_tag_cloud {
     my $blobs = shift;
     my $list = [];
     my $tags = {};
-    for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
-        my $ids = $self->store->indexed_tag($tag);
+    for my $tag (sort {lc($a) cmp lc($b)} @{$self->config->store->all_tags}) {
+        my $ids = $self->config->store->indexed_tag($tag);
         my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time}) > $t) { $t = $t1 } }
         push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];

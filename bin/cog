@@ -1,5 +1,5 @@
 #!/usr/bin/perl
 
-use Cog::Command;
+use Cog::App;
 
-exit Cog::Command->new($0, @ARGV)->run();
+exit Cog::App->new_app_object($0, @ARGV)->run();
