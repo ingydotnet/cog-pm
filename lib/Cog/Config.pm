@@ -14,16 +14,32 @@ has html_title => (is => 'ro');
 
 # Server options
 has server_port => (is => 'ro', default => '');
-has content_root => (is => 'ro', default => '.');
 has plack_debug => (is => 'ro', default => 0);
+has proxy_map => (is => 'ro', default => '');
 
 
 ### These fields are part of the Cog framework:
 
-# Bootstrapping config values
-has app_class => ( is => 'ro' );
-my $root_dir = ($ENV{COG_APP_ROOT_DIR} || '.');
-has root_dir => (is => 'ro', default => $root_dir);
+# Bootstrapping config values (root directories)
+has app_class => (
+    is => 'ro',
+    required => 1,
+);
+has app_root => (
+    is => 'ro',
+    lazy => 1,
+    default => ($ENV{COG_APP_ROOT_DIR} || 'cog'),
+);
+has store_root => (
+    is => 'ro',
+    lazy => 1,
+    default => '.',
+);
+has content_root => (
+    is => 'ro',
+    lazy => 1,
+    default => '..',
+);
 
 # Cog singleton object references
 has webapp => (
@@ -85,11 +101,11 @@ has _class_share_map => (is => 'ro', default => sub{{}});
 # This is the hard part...
 sub BUILD {
     my $self = shift;
-    my $root = $self->root_dir;
+    my $root = $self->app_root;
     $self->{is_init} = 1
         if -d "$root/static";
     $self->{is_config} = 1
-        if -e "$root/cog.config.yaml";
+        if -e "$root/config.yaml";
     $self->{is_ready} = 1
         if -d "$root/static";
 
@@ -273,8 +289,8 @@ sub _build_files_map {
 # Put the App in the context of its defined root directory.
 sub chdir_root {
     my $self = shift;
-    chdir $self->root_dir;
-    $self->{root_dir} = '.';
+    chdir $self->app_root;
+    $self->{app_root} = '.';
 }
 
 1;

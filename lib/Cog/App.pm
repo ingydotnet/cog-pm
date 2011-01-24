@@ -8,7 +8,7 @@ use IO::All;
 use Getopt::Long();
 use YAML::XS;
 
-# use XXX;
+use XXX;
 
 use constant config_class => 'Cog::Config';
 use constant webapp_class => '';
@@ -43,13 +43,17 @@ sub new_app_object {
         );
         @argv = (@ARGV, ($server ? ('-s' => $server) : ()));
     }
+    $app_class = $argv[1]
+        if @argv >= 2 and
+            $argv[0] eq 'init' and
+            $argv[1] =~ /^[\w\:]+$/;
     my $config_file = $class->config_file($file);
     my $hash = {};
     if ($config_file) {
         $hash = YAML::XS::LoadFile($config_file);
     }
     $app_class ||= $hash->{app_class};
-    die "Can't find the Cog::App class to use"
+    die "Can't determine the Cog::App class to use"
         unless $app_class;
     eval "require $app_class; 1" or die $@;
 
@@ -65,17 +69,17 @@ around BUILDARGS => sub {
     my $config_file = $class->config_file
         or die "Can't determine config file";
 
-    my $root_dir = '.';
+    my $app_root = '.';
 
     if ($config_file =~ /(.*)\/(.*)/) {
-        ($root_dir, $config_file) = ($1, $2);
+        ($app_root, $config_file) = ($1, $2);
     }
 
-    my $config_path = "$root_dir/$config_file";
+    my $config_path = "$app_root/$config_file";
     my $hash = -e $config_path
         ? YAML::XS::LoadFile($config_path)
         : {};
-    $hash->{root_dir} = $root_dir;
+    $hash->{app_root} = $app_root;
     $hash->{config_file} = $config_file;
     $hash->{maker_class} = $class->maker_class;
     $hash->{store_class} = $class->store_class;
@@ -91,7 +95,8 @@ sub config_file {
     my $argument = shift || '';
     my $config_file = 
         $ENV{COG_APP_CONFIG_FILE} ||
-        -e('cog.config.yaml') && 'cog.config.yaml' ||
+        -e('.cog/config.yaml') && '.cog/config.yaml' ||
+        -e('cog/config.yaml') && 'cog/config.yaml' ||
         '';
     return $config_file;
 }
@@ -166,7 +171,7 @@ sub _parse_args {
 sub handle_init {
     my $self = shift;
     my $plugin = shift || 'Cog';
-    my $root = $self->config->root_dir;
+    my $root = $self->config->app_root;
     throw Error "Can't init. Cog environment already exists."
         if $self->config->is_init;
 
@@ -185,7 +190,7 @@ sub handle_init {
         io($config_file)->print($config);
     }
 
-    Cog::Store->new(root => "$root/cog")->create;
+    $self->config->store->create;
 
     print <<"...";
 Cog was successfully initialized in the $root/ subdirectory. The
@@ -198,7 +203,7 @@ next step is to edit the config.yaml file. Then run:
 
 sub handle_update {
     my $self = shift;
-    my $root = $self->config->root_dir;
+    my $root = $self->config->app_root;
 
     $self->_copy_assets();
 
@@ -215,7 +220,7 @@ Now run:
 sub _copy_assets {
     my $self = shift;
     my $files = $self->config->files_map;
-    my $root = $self->config->root_dir;
+    my $root = $self->config->app_root;
 
     for my $file (keys %$files) {
         my $target = "$root/$file";

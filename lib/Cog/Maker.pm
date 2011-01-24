@@ -55,8 +55,9 @@ sub all_tags {
 
 sub make_config_js {
     my $self = shift;
+    my $config_path = $self->config->app_root . '/config.yaml';
     my $data = {
-        json => $self->json->encode(YAML::XS::LoadFile("cog.config.yaml")),
+        json => $self->json->encode(YAML::XS::LoadFile($config_path)),
     };
     my $javascript = tt()
         ->path(['template/'])
@@ -98,7 +99,7 @@ sub make_tag_cloud {
 
 sub make_all_js {
     my $self = shift;
-    my $root = $self->config->root_dir;
+    my $root = $self->config->app_root;
     my $js = "$root/static/js";
 
     my $data = {list => join(' ', @{$self->config->js_files})};
@@ -114,7 +115,7 @@ sub make_all_js {
 
 sub make_css {
     my $self = shift;
-    my $root = $self->config->root_dir;
+    my $root = $self->config->app_root;
     my $css = "$root/static/css";
 
     my $data = {list => join(' ', @{$self->config->css_files})};
