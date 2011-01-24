@@ -50,7 +50,7 @@ sub Title {
 
 sub Short {
     my $self = shift;
-    $self->Id =~ m!^(\w{4,})-! or return;
+    $self->Id =~ m!^(\w{4,})-! or return '';
     return $1;
 }
 
