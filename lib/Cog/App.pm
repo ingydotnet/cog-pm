@@ -105,11 +105,13 @@ sub run {
     my $self = shift;
     my $action = $self->action;
     my $method = "handle_$action";
-    my ($object, $function);
 
-    $function = ($object = $self)->can($method)
+    my $function = $self->can($method)
         or throw Error "'$action' is an invalid action\n";
-    $function->($object, @{$self->argv});
+
+    $self->config->chdir_root();
+
+    $function->($self, @{$self->argv});
     return 0;
 }
 
@@ -249,7 +251,6 @@ this command:
 
 sub handle_start {
     my $self = shift;
-    $self->config->chdir_root();
     print <<'...';
 Cog web server is starting up...
 
@@ -286,7 +287,6 @@ sub handle_edit {
 # TODO Move most of this method to Cog::Page
 sub handle_bless {
     my $self = shift;
-    $self->config->chdir_root();
     die "Run 'cog init' first\n"
         unless $self->store->exists;
     my $dir = '..';

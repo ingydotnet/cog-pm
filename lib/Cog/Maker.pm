@@ -23,7 +23,6 @@ has json => ('is' => 'ro', builder => sub {
 # XXX Move this to CogWiki
 sub make {
     my $self = shift;
-    $self->config->chdir_root();
     $self->make_cache;
     $self->make_layout;
     $self->make_config_js();
