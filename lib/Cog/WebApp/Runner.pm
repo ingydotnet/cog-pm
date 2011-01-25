@@ -56,23 +56,24 @@ use parent 'Plack::Middleware';
 
 use Plack::App::Proxy;
 
-use XXX -with => 'YAML::XS';
+# use XXX -with => 'YAML::XS';
 
 sub call {
     my $self = shift;
     my $env = shift;
     my $map = $self->{proxy_map};
     for my $type (keys %$map) {
-        my ($path_prefix, $remote, $headers) =
-            @{$map->{$type}}{qw(path_prefix remote headers)};
-        $headers ||= [];
+        my ($path_prefix, $remote, $override) =
+            @{$map->{$type}}{qw(path_prefix remote override)};
+        $override ||= {};
         my $path = $env->{PATH_INFO};
         if ($path =~ s/^\Q$path_prefix\E//) {
             my $url = "$remote$path";
+            warn $url;
             return Plack::App::Proxy->new(
                 remote => $url,
                 preserve_host_header => 1,
-            )->(+{%$env, %$headers});
+            )->(+{%$env, %$override});
         }
     }
     return $self->app->($env);
