@@ -6,7 +6,10 @@ use Plack::Middleware::Static;
 use Plack::Middleware::ConditionalGET;
 use Plack::Middleware::ETag;
 use Plack::Middleware::Header;
+use Plack::Middleware::ProxyMap;
 use Plack::Runner;
+
+# use XXX;
 
 my $layout_file = 'cache/layout.html';
 
@@ -34,10 +37,10 @@ sub app {
     $app = Plack::Middleware::ConditionalGET->wrap($app);
     $app = Plack::Middleware::ETag->wrap($app, file_etag => [qw/inode mtime size/]);
     $app = Plack::Middleware::Header->wrap($app, set => ['Cache-Control' => 'no-cache']);
-    if ($self->config->proxy_map) {
-        $app = Cog::WebApp::Middleware->wrap(
+    if ($self->config->proxymap) {
+        $app = Plack::Middleware::ProxyMap->wrap(
             $app,
-            proxy_map => $self->config->proxy_map,
+            proxymap => $self->config->proxymap,
         );
     }
     return $app;
@@ -49,35 +52,6 @@ sub run {
     my $runner = Plack::Runner->new;
     $runner->parse_options(@args);
     $runner->run($self->app);
-}
-
-package Cog::WebApp::Middleware;
-use parent 'Plack::Middleware';
-
-use Plack::App::Proxy;
-
-use XXX -with => 'YAML::XS';
-
-sub call {
-    my $self = shift;
-    my $env = shift;
-    my $map = $self->{proxy_map};
-    for my $type (keys %$map) {
-        my ($path_prefix, $remote, $override, $preserve) =
-            @{$map->{$type}}{qw(path_prefix remote override preserve)};
-        $override ||= {};
-        $preserve = 1 unless defined $preserve;
-        my $path = $env->{PATH_INFO};
-        if ($path =~ s/^\Q$path_prefix\E//) {
-            my $url = "$remote$path";
-            warn $url;
-            return Plack::App::Proxy->new(
-                remote => $url,
-                preserve_host_header => $preserve,
-            )->(WWW +{%$env, %$override});
-        }
-    }
-    return $self->app->($env);
 }
 
 1;

@@ -41,7 +41,7 @@ Australia, for supporting me and this project. \o/
 
 Ingy döt Net <ingy@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2010, 2011. Ingy döt Net.
 
