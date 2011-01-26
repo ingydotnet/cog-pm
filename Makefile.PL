@@ -18,6 +18,7 @@ requires 'JSON';
 requires 'Mouse';
 requires 'Plack';
 requires 'Plack::Middleware::ETag';
+requires 'Plack::Middleware::ProxyMap';
 requires 'Template::Toolkit::Simple';
 requires 'Time::Duration';
 requires 'YAML::XS';
