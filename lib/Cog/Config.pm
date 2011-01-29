@@ -1,9 +1,10 @@
 package Cog::Config;
 use Mouse;
+use File::ShareDir;
 
 use IO::All;
 
-# use XXX;
+use XXX;
 
 ### These options are set by user in config file:
 
@@ -16,7 +17,6 @@ has html_title => (is => 'ro');
 has server_port => (is => 'ro', default => '');
 has plack_debug => (is => 'ro', default => 0);
 has proxymap => (is => 'ro', default => '');
-
 
 ### These fields are part of the Cog framework:
 
@@ -74,6 +74,10 @@ sub object_builder {
     }
     return $class->new();
 }
+
+# App Command Values
+has command_script => (is => 'rw');
+has command_args => (is => 'rw', default => sub{[]});
 
 # App & WebApp definitions
 has url_map => (is => 'ro', default => sub{[]});
@@ -237,22 +241,35 @@ sub build_class_share_map {
     my $plugins = $self->_plugins;
     my $class_share_map = $self->_class_share_map;
     for my $plugin (@$plugins) {
-        (my $path = "$plugin.pm") =~ s!::!/!g;
-        $path = $INC{$path} or next;
-        # NOTE: $path is for dev testing.
-        $path =~ s!^(\Q$ENV{HOME}\E.*)/lib/.*!$1/share!;
-        my $dir = -e $path
-            ? $path
-            : do {
-                (my $dist = $plugin) =~ s/::/-/g;
-                eval { File::ShareDir::dist_dir($dist) } || do {
-                    $_ = $@ or die;
-                    /.* at (.*\/\.\.)/s or die;
-                    "$1/share/";
-                };
-            };
-        $class_share_map->{$plugin} = $dir;
+        my $dir = $self->find_share_dir($plugin)
+            or die "Can't find share dir for $plugin";
+        $class_share_map->{$plugin} = $dir
+            if $dir;
     }
+}
+
+sub find_share_dir {
+    my $self = shift;
+    my $plugin = shift;
+    (my $dist = $plugin) =~ s/::/-/g;
+    my $dir = eval { File::ShareDir::dist_dir($dist) };
+    return $dir if $dir;
+    my $module = "$plugin.pm";
+    $module =~ s!::!/!g;
+    while (1) {
+        $dir = $INC{$module} or last;
+        $dir =~ s!(blib/?)lib/\Q$module\E$!! or last;
+        $dir .= "share";
+        return $dir if -e $dir;
+        last;
+    }
+    my $func = "${plugin}::SHARE_DIST";
+    no strict 'refs';
+    return '' unless defined &$func;
+    $dist = &$func();
+    $dir = eval { File::ShareDir::dist_dir($dist) };
+    return $dir if $dir;
+    return '';
 }
 
 sub find_classes {
@@ -266,7 +283,6 @@ sub find_classes {
 }
 
 sub _build_files_map {
-    require File::ShareDir;
     my $self = shift;
 
     my $hash = {};
@@ -290,7 +306,6 @@ sub _build_files_map {
 sub chdir_root {
     my $self = shift;
     chdir $self->app_root;
-    $self->{app_root} = '.';
 }
 
 1;

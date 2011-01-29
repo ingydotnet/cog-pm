@@ -2,4 +2,8 @@
 
 use Cog::App;
 
-exit Cog::App->new_app_object($0, @ARGV)->run();
+my ($app_class, @argv) = Cog::App->get_app_class(@ARGV);
+my $app = $app_class->new();
+$app->config->command_script($0);
+$app->config->command_args([@argv]);
+exit $app->run();

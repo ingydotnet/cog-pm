@@ -15,6 +15,7 @@ our @EXPORT = qw(
     cd
     run_pass
     files_exist
+    file_has_line
     $PERL
     $CWD
     $STDOUT
@@ -97,6 +98,22 @@ sub files_exist {
     for my $file (@_) {
         Test::More::ok -e $file, "$file exists";
     }
+}
+
+sub slurp {
+    my $file = shift;
+    local $/;
+    open FILE, $file or die "Can't open $file for input";
+    return <FILE>;
+}
+
+sub file_has_line {
+    my ($file, $line) = @_;
+    my $text = slurp $file;
+    chomp $line;
+
+    Test::More::ok $text =~ /^\Q$line\E$/m,
+        "$file contains $line";
 }
 
 1;

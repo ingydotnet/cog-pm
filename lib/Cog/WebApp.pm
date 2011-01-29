@@ -2,6 +2,7 @@ package Cog::WebApp;
 use Mouse;
 extends 'Cog::Plugin';
 
+use constant SHARE_DIST => 'Cog';
 use constant index_file => '';
 use constant plugins => [];
 use constant site_navigation => [];

@@ -1,4 +1,4 @@
-use Test::More tests => 28;
+use Test::More tests => 29;
 use t::Tests;
 
 my $PATH = 't/cog1';
@@ -46,5 +46,10 @@ files_exist qw(
     cog/template/site-navigation.html.tt
     cog/template/404.html.tt
 );
+
+file_has_line
+    'cog/config.yaml',
+    'app_class: Cog::App::Test';
+
 cd;
 rmpath $PATH;

@@ -1,1 +1,1 @@
-Cog.prototype.config = [% json %];
+$Cog.config = [% json %];

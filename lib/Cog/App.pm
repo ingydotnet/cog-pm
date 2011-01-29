@@ -7,8 +7,13 @@ use Cog::Config;
 use IO::All;
 use Getopt::Long();
 use YAML::XS;
+use Cwd 'abs_path';
 
 use XXX;
+
+use constant SHARE_DIST => 'Cog';
+use constant app_root => ((-e '.cog') ? '.cog' : 'cog');
+use constant command_script => 'cog';
 
 use constant config_class => 'Cog::Config';
 use constant webapp_class => '';
@@ -27,39 +32,41 @@ sub cog_classes {
     }
 }
 
-has action => ( is => 'ro' );
-has argv => ( is => 'ro', default => sub {[]} );
+has action => ( is => 'rw' );
 has time => ( is => 'ro', builder => sub { time() } );
 
-sub new_app_object {
-    my ($class, $script, @argv) = @_;
-    my ($file, $app_class, $server);
+sub get_app_class {
+    my ($class, @argv) = @_;
+    my $app_class;
     {
         local @ARGV = @argv;
         Getopt::Long::GetOptions(
-            'file=s' => \$file,
             'app=s' => \$app_class,
-            'server=s' => \$server,
         );
-        @argv = (@ARGV, ($server ? ('-s' => $server) : ()));
+        @argv = @ARGV;
     }
-    $app_class = $argv[1]
-        if @argv >= 2 and
-            $argv[0] eq 'init' and
-            $argv[1] =~ /^[\w\:]+$/;
-    my $config_file = $class->config_file($file);
-    my $hash = {};
-    if ($config_file) {
-        $hash = YAML::XS::LoadFile($config_file);
+    $app_class ||=
+        $ENV{COG_APP_CLASS} ||
+        $class->app_from('.cog/config.yaml') ||
+        $class->app_from('cog/config.yaml') ||
+        die "Can't determine Cog App class";
+    unless ($app_class->can('new')) {
+        eval "use $app_class; 1"
+            or die $@;
     }
-    $app_class ||= $hash->{app_class};
-    die "Can't determine the Cog::App class to use"
-        unless $app_class;
-    eval "require $app_class; 1" or die $@;
+    die "$app_class is not a Cog::App application"
+        unless $app_class->isa('Cog::App') and
+            $app_class ne 'Cog::App';
+    return ($app_class, @argv);
+}
 
-    my $app = $app_class->new(%{$class->_parse_args($script, @argv)});
-
-    return $app;
+sub app_from {
+    my $class = shift;
+    my $config_path = shift;
+    return unless -e $config_path;
+    my $hash = YAML::XS::LoadFile($config_path);
+    my $app_class = $hash->{app_class}
+        or die "'app_class' is not defined in $config_path";
 }
 
 around BUILDARGS => sub {
@@ -75,10 +82,14 @@ around BUILDARGS => sub {
         ($app_root, $config_file) = ($1, $2);
     }
 
-    my $config_path = "$app_root/$config_file";
-    my $hash = -e $config_path
+    $app_root = abs_path($app_root) || $app_root;
+    my $config_path = abs_path("$app_root/$config_file") || '';
+    my $hash = $config_path
         ? YAML::XS::LoadFile($config_path)
         : {};
+    die "'app_class' must be defined in '$config_path'"
+        if -e $config_path and not $hash->{app_class};
+    $hash->{app_class} ||= $class;
     $hash->{app_root} = $app_root;
     $hash->{config_file} = $config_file;
     $hash->{maker_class} = $class->maker_class;
@@ -92,17 +103,14 @@ around BUILDARGS => sub {
 
 sub config_file {
     my $class = shift;
-    my $argument = shift || '';
-    my $config_file = 
-        $ENV{COG_APP_CONFIG_FILE} ||
-        -e('.cog/config.yaml') && '.cog/config.yaml' ||
-        -e('cog/config.yaml') && 'cog/config.yaml' ||
-        '';
-    return $config_file;
+    return $class->app_root . "/config.yaml";
 }
 
 sub run {
     my $self = shift;
+
+    $self->parse_command_args;
+
     my $action = $self->action;
     my $method = "handle_$action";
 
@@ -111,10 +119,40 @@ sub run {
 
     $self->config->chdir_root();
 
-    $function->($self, @{$self->argv});
+    $function->($self);
     return 0;
 }
 
+sub parse_command_args {
+    my $self = shift;
+    my $argv = $self->config->command_args;
+    my $script = $self->config->command_script;
+    $script =~ s!.*/!!;
+    my $action = '';
+    if ($script =~ /^(pre-commit|post-commit)$/) {
+        $script =~ s/-/_/;
+        $self->action($script);
+    }
+    elsif ($script ne $self->command_script) {
+        throw Error "unexpected script name '$script'\n";
+    }
+    elsif (@$argv and $argv->[0] =~ /^[\w\-]+$/) {
+        $action = shift @$argv;
+        $action =~ s/-/_/g;
+    }
+    elsif (not @$argv) {
+        $action = 'help';
+    }
+    else {
+        require XXX;
+        warn "\nInvalid cog command. Can't parse these arguments:\n";
+        XXX::XXX(@_);
+    }
+    $self->action($action);
+    $self->config->command_args($argv);
+}
+
+#-----------------------------------------------------------------------------
 sub handle_help {
     my $self = shift;
     print $self->usage;
@@ -143,36 +181,8 @@ See:
 ...
 }
 
-sub _parse_args {
-    my $class = shift;
-    my ($script, @argv) = @_;
-    my $args = {};
-    $script =~ s!.*/!!;
-    if ($script =~ /^(pre-commit|post-commit)$/) {
-        ($args->{action} = $script) =~ s/-/_/;
-    }
-    elsif ($script ne 'cog') {
-        throw Error "unexpected script name '$script'\n";
-    }
-    elsif (@argv and $argv[0] =~ /^[\w\-]+$/) {
-        $args->{action} = shift @argv;
-        $args->{action} =~ s/-/_/g;
-        $args->{argv} = [@argv];
-    }
-    elsif (not @argv) {
-        $args->{action} = 'help';
-    }
-    else {
-        require XXX;
-        warn "\nInvalid cog command. Can't parse these arguments:\n";
-        XXX::XXX(@_);
-    }
-    return $args;
-}
-
 sub handle_init {
     my $self = shift;
-    my $plugin = shift || 'Cog';
     my $root = $self->config->app_root;
     throw Error "Can't init. Cog environment already exists."
         if $self->config->is_init;
@@ -183,7 +193,7 @@ sub handle_init {
     if (not -e $config_file) {
         require Template::Toolkit::Simple;
         my $data = +{%$self};
-        $data->{plugin} = $plugin;
+        $data->{app_class} = ref($self);
         my $config = Template::Toolkit::Simple::tt()
             ->path(["$root/template/"])
             ->data($data)
@@ -192,13 +202,24 @@ sub handle_init {
         io($config_file)->print($config);
     }
 
+    $self->config->chdir_root;
+
     $self->config->store->create;
 
-    print <<"...";
-Cog was successfully initialized in the $root/ subdirectory. The
-next step is to edit the config.yaml file. Then run:
+    my $script = $self->config->command_script;
 
-    cog update
+    print <<"...";
+Cog was successfully initialized in:
+
+    $root
+
+The next step is to edit:
+
+    $config_file
+    
+Then run:
+
+    $script update
 
 ...
 }
