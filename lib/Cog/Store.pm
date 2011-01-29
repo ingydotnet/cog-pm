@@ -25,16 +25,24 @@ sub create {
     mkdir "$root/index" or die;
 }
 
+# 2 - 352
+# 3 - 15840
+# 4 - 571648
+# 5 - 19113600
+# 6 - 615357952
+# 7 - 19373544960
+# 8 - 601207349248
 sub new_cog_id {
     my $self = shift;
     my $path = $self->root . '/node';
     my ($full, $short);
     while (1) {
-        # Upper cased base32 128bit random number.
+        # Base32 125bit random number.
         my $id = uc Convert::Base32::Crockford::encode_base32(
             join "", map { pack "S", int(rand(65536)) } 1..8
         ); 
-        $id =~ s/(....)(.*)/$1-$2/ or die;
+        chop $id;
+        $id =~ s/(...)(.*)/$1-$2/ or die;
         $short = $1;
         next unless
             ($short =~/[2-9]/ and $short =~ /[A-Z]/ and $short !~ /[01]/);

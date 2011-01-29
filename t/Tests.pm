@@ -116,4 +116,21 @@ sub file_has_line {
         "$file contains $line";
 }
 
+use Cog::Store;
+package Cog::Store;
+no warnings 'redefine';
+
+sub new_cog_id {
+    my $self = shift;
+    my $path = $self->root . '/node';
+    my $last = "$path/last";
+    my $short = readlink($last) || "AA1";
+    $short++;
+    my $full = "$short-" . "X" x 22;
+    unlink $last;
+    symlink $short, $last;
+    io("$path/$short")->touch();
+    return $full;
+}
+
 1;
