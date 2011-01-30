@@ -251,24 +251,35 @@ sub build_class_share_map {
 sub find_share_dir {
     my $self = shift;
     my $plugin = shift;
-    (my $dist = $plugin) =~ s/::/-/g;
-    my $dir = eval { File::ShareDir::dist_dir($dist) };
-    return $dir if $dir;
+
     my $module = "$plugin.pm";
     $module =~ s!::!/!g;
     while (1) {
-        $dir = $INC{$module} or last;
-        $dir =~ s!(blib/?)lib/\Q$module\E$!! or last;
+        my $dir = $INC{$module} or last;
+        $dir =~ s!(blib/)?lib/\Q$module\E$!! or last;
         $dir .= "share";
         return $dir if -e $dir;
         last;
     }
+
+    (my $dist = $plugin) =~ s/::/-/g;
+    my $dir = eval { File::ShareDir::dist_dir($dist) };
+    return $dir if $dir;
+
     my $func = "${plugin}::SHARE_DIST";
     no strict 'refs';
     return '' unless defined &$func;
     $dist = &$func();
     $dir = eval { File::ShareDir::dist_dir($dist) };
     return $dir if $dir;
+
+    $dist =~ s!-!/!g;
+    $dist .= '.pm';
+    $dir = $INC{$dist} or return '';
+    $dir =~ s!(blib/)?lib/\Q$dist\E$!! or return '';
+    $dir .= "share";
+    return $dir if -e $dir;
+
     return '';
 }
 

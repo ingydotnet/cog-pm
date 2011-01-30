@@ -11,6 +11,7 @@ use Cwd 'abs_path';
 
 use XXX;
 
+use constant Name => 'Cog';
 use constant SHARE_DIST => 'Cog';
 use constant app_root => ((-e '.cog') ? '.cog' : 'cog');
 use constant command_script => 'cog';
@@ -206,10 +207,12 @@ sub handle_init {
 
     $self->config->store->create;
 
-    my $script = $self->config->command_script;
+    my $Name = $self->Name;
+    my $name = $self->config->command_script;
+    $name =~ s!.*/!!;
 
     print <<"...";
-Cog was successfully initialized in:
+$Name was successfully initialized in:
 
     $root
 
@@ -219,7 +222,7 @@ The next step is to edit:
     
 Then run:
 
-    $script update
+    $name update
 
 ...
 }
@@ -230,12 +233,16 @@ sub handle_update {
 
     $self->_copy_assets();
 
+    my $Name = $self->Name;
+    my $name = $self->config->command_script;
+    $name =~ s!.*/!!;
+
     print <<"...";
-Cog was successfully updated in the $root/ subdirectory.
+$Name was successfully updated in the $root/ subdirectory.
 
 Now run:
 
-    cog make
+    $name make
 
 ...
 }
@@ -246,13 +253,21 @@ sub _copy_assets {
     my $root = $self->config->app_root;
 
     for my $file (keys %$files) {
+        my $source = $files->{$file};
         my $target = "$root/$file";
-        unlink $target;
         if ($ENV{COG_APP_SYMLINK_INSTALL}) {
-            io($target)->assert->symlink($files->{$file});
+            unless (-l $target and readlink($target) eq $source) {
+                unlink $target;
+                io($target)->assert->symlink($source);
+                print "link $source => $target\n";
+            }
         }
         else {
-            io($target)->assert->print(io($files->{$file})->all);
+            unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
+                unlink $target;
+                io($target)->assert->print(io($source)->all);
+                print "copy $source => $target\n";
+            }
         }
     }
 }
@@ -276,7 +291,7 @@ sub handle_start {
 Cog web server is starting up...
 
 ...
-    my @args = @_;
+    my @args = @{$self->config->command_args};
     unshift @args, ('-p' => $self->config->server_port)
         if $self->config->server_port;
     $self->config->runner->run(@args);
