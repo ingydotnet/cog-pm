@@ -251,34 +251,53 @@ sub build_class_share_map {
 sub find_share_dir {
     my $self = shift;
     my $plugin = shift;
+    my ($module, $dir, $dist, $func);
 
-    my $module = "$plugin.pm";
-    $module =~ s!::!/!g;
-    while (1) {
-        my $dir = $INC{$module} or last;
-        $dir =~ s!(blib/)?lib/\Q$module\E$!! or last;
-        $dir .= "share";
-        return $dir if -e $dir;
-        last;
+# TODO Refactor:
+# - Look up module in %INC
+# - If blib?/lib/$module
+#   - If Makefile.PL (or Build.PL) at this level
+#     - Use share from here
+# - Determine DIST from module
+#   - Look for $class->DISTNAME
+#   - or peel back back nodes until $VERSION
+#   - or die
+#     - return File::ShareDir::dist_dir($dist)
+    {
+        my $module = "$plugin.pm";
+        $module =~ s!::!/!g;
+        while (1) {
+            $dir = $INC{$module} or last;
+            $dir =~ s!(blib/)?lib/\Q$module\E$!! or last;
+            $dir .= "share";
+            return $dir if -e $dir;
+            last;
+        }
     }
 
-    (my $dist = $plugin) =~ s/::/-/g;
-    my $dir = eval { File::ShareDir::dist_dir($dist) };
-    return $dir if $dir;
+    {
+        ($dist = $plugin) =~ s/::/-/g;
+        $dir = eval { File::ShareDir::dist_dir($dist) };
+        return $dir if $dir;
+    }
 
-    my $func = "${plugin}::SHARE_DIST";
-    no strict 'refs';
-    return '' unless defined &$func;
-    $dist = &$func();
-    $dir = eval { File::ShareDir::dist_dir($dist) };
-    return $dir if $dir;
+    {
+        $func = "${plugin}::SHARE_DIST";
+        no strict 'refs';
+        return '' unless defined &$func;
+        $dist = &$func();
+        my $dir = eval { File::ShareDir::dist_dir($dist) };
+        return $dir if $dir;
+    }
 
-    $dist =~ s!-!/!g;
-    $dist .= '.pm';
-    $dir = $INC{$dist} or return '';
-    $dir =~ s!(blib/)?lib/\Q$dist\E$!! or return '';
-    $dir .= "share";
-    return $dir if -e $dir;
+    {
+        $dist =~ s!-!/!g;
+        $dist .= '.pm';
+        $dir = $INC{$dist} or return '';
+        $dir =~ s!(blib/)?lib/\Q$dist\E$!! or return '';
+        $dir .= "share";
+        return $dir if -e $dir;
+    }
 
     return '';
 }
@@ -316,7 +335,9 @@ sub _build_files_map {
 # Put the App in the context of its defined root directory.
 sub chdir_root {
     my $self = shift;
-    chdir $self->app_root;
+    my $app_root = $self->app_root;
+    chdir $app_root
+      or die "Can't chdir into $app_root";
 }
 
 1;

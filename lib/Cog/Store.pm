@@ -14,7 +14,7 @@ srand();
 
 sub exists {
     my $self = shift;
-    return -e $self->root;
+    return -e "$self->root/node";
 }
 
 sub create {
@@ -42,7 +42,7 @@ sub new_cog_id {
             join "", map { pack "S", int(rand(65536)) } 1..8
         ); 
         chop $id;
-        $id =~ s/(...)(.*)/$1-$2/ or die;
+        $id =~ s/(....)(.*)/$1-$2/ or die;
         $short = $1;
         next unless
             ($short =~/[2-9]/ and $short =~ /[A-Z]/ and $short !~ /[01]/);

@@ -118,7 +118,8 @@ sub run {
     my $function = $self->can($method)
         or throw Error "'$action' is an invalid action\n";
 
-    $self->config->chdir_root();
+    $self->config->chdir_root()
+        unless $action eq 'init';
 
     $function->($self);
     return 0;
@@ -259,14 +260,14 @@ sub _copy_assets {
             unless (-l $target and readlink($target) eq $source) {
                 unlink $target;
                 io($target)->assert->symlink($source);
-                print "link $source => $target\n";
+                print "> link $source => $target\n";
             }
         }
         else {
             unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
                 unlink $target;
                 io($target)->assert->print(io($source)->all);
-                print "copy $source => $target\n";
+                print "> copy $source => $target\n";
             }
         }
     }
