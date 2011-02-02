@@ -5,7 +5,7 @@ extends 'Cog::Base';
 use Class::Throwable qw(Error);
 use Cog::Config;
 use IO::All;
-use Getopt::Long();
+use Getopt::Long qw(:config pass_through);
 use YAML::XS;
 use Cwd 'abs_path';
 
