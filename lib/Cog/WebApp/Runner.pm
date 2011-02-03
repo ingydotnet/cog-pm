@@ -1,3 +1,7 @@
+# TODO
+# - Add logging
+# - Support 'cog stop'
+#
 package Cog::WebApp::Runner;
 use Mouse;
 extends 'Cog::Base';
@@ -9,7 +13,7 @@ use Plack::Middleware::Header;
 use Plack::Middleware::ProxyMap;
 use Plack::Runner;
 
-# use XXX;
+use XXX;
 
 my $layout_file = 'cache/layout.html';
 
@@ -48,10 +52,37 @@ sub app {
 
 sub run {
     my $self = shift;
-    my @args = @_;
+    my @args = $self->get_args(@_);
     my $runner = Plack::Runner->new;
     $runner->parse_options(@args);
     $runner->run($self->app);
+}
+
+sub get_args {
+    my $self = shift;
+    my %args = @_;
+    if ($ENV{COG_APP_HOST}) {
+        delete @args{qw(--host -h)};
+        $args{'--host'} = $ENV{COG_APP_HOST};
+    }
+    if ($ENV{COG_APP_PORT}) {
+        delete @args{qw(--port -p)};
+        $args{'--port'} = $ENV{COG_APP_PORT};
+    }
+    if ($ENV{COG_APP_SERVER}) {
+        delete @args{qw(--server -s)};
+        $args{'--server'} = $ENV{COG_APP_SERVER};
+    }
+    if ($ENV{COG_APP_DAEMONIZE}) {
+        delete @args{qw(--daemonize -D)};
+        $args{'--daemonize'} = $ENV{COG_APP_DAEMONIZE};
+        $args{'--pid'} = 'cog.pid';
+    }
+    if ($ENV{COG_APP_LOG}) {
+        delete @args{qw(--access-log)};
+        $args{'--access-log'} = $ENV{COG_APP_LOG};
+    }
+    return %args;
 }
 
 1;
