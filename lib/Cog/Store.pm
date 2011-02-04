@@ -1,3 +1,8 @@
+# TODO:
+# - Move to Cog::Store::CogFiles
+# - Make Cog::Store be base class for Cog::Store::*
+# - Make cogbase indexes
+#   - title to id
 package Cog::Store;
 use Mouse;
 extends 'Cog::Base';

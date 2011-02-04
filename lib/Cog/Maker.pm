@@ -1,3 +1,6 @@
+# TODO:
+# - Generate a Makefile to bring everything up to date
+#   - Use tt with Makefile.tt template
 package Cog::Maker;
 use Mouse;
 extends 'Cog::Base';

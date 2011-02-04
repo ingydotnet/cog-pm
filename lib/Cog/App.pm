@@ -1,3 +1,8 @@
+# TODO:
+# - handle_new($type)
+# - handle_stop
+# - Customize App messages like the 'up' msg
+# - pQuery plugins - cache based on html
 package Cog::App;
 use Mouse;
 extends 'Cog::Base';

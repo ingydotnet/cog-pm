@@ -1,3 +1,6 @@
+// TODO:
+// - Add a url decoder/encoder
+
 // $Cog is the Cog prototype object. You can use it anywhere to extend Cog.
 
 $Cog = (Cog = function() {this.init()}).prototype = {

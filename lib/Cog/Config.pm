@@ -1,3 +1,10 @@
+# TODO:
+# - Support uri_base
+# - Support uri_port
+# - Support uri_path
+# - Support daemon, logfile and pid
+# - plugins can update config to map urls to code
+# - Make all config options 'foo' respect $COG_APP_FOO
 package Cog::Config;
 use Mouse;
 use File::ShareDir;

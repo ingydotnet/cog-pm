@@ -1,6 +1,7 @@
 # TODO
 # - Add logging
 # - Support 'cog stop'
+# - Switch to Plack::Builder
 #
 package Cog::WebApp::Runner;
 use Mouse;

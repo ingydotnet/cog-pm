@@ -1,3 +1,8 @@
+# TODO:
+# - from_cog
+# - to_cog
+# - as_html
+# - add validation to setters
 package Cog::Node;
 use Mouse;
 use Time::Duration ();
