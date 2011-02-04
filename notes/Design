@@ -1,0 +1,25 @@
+== Use Cases
+- An in-place wiki for any repository
+  - All the source files are pages
+- A wiki from a directory of texts
+- XLog blogging
+
+== Players/Roles
+- Content - this is a set of files.
+  - any directory
+  - a project repository
+  - a set of cogwiki serializations
+- CogBase - this is the canonical data.
+  - It is built from the files and from their repo, if any.
+  - You can rebuild a CogBase from Content later.
+- CogWiki - Web/CLI/REST UI for static views of CogBase
+  - Talks to the CogBase
+  - Updates the Content.
+
+== Rules/Priciples
+- Each wiki has one canonical cogbase
+  - Possibly upstream
+- All web content is statically cached
+
+== Actions/Features
+
