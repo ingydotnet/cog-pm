@@ -109,9 +109,9 @@ $Cog.setup_links = function() {
 };
 
 $Cog.bind = function(method) {
-    var self = this;
+    var cog = this;
     var args = Array.slice(arguments, 1, Infinity);
     return function() {
-        self[method].apply(self, args.concat(Array.slice(arguments)));
+        cog[method].apply(cog, args.concat(this, Array.slice(arguments)));
     };
 };
