@@ -1,0 +1,5 @@
+<div class="header">
+ <img src="[% base_url %]/static/image/logo.png">
+ <h1 id="site-name"><a href="[% base_url %]/">[% site_name %]</a></h1>
+[% INCLUDE 'login-navigation.html.tt' %]
+</div>

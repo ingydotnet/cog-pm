@@ -5,10 +5,17 @@
 [% BLOCK nav_list %]
 <ul>
 [% FOR elem = nav %]
-  <li><a href="[% base_url %][% elem.1 %]">[% elem.0 %]</a>
-[% IF elem.2 %]
-[% INCLUDE nav_list nav=elem.2 %]
+
+[% SET label = elem.0 %]
+[% SET url = elem.1 %]
+[% SET sublist = elem.2 %]
+
+  <li><a href="[% base_url %][% url %]" class="[% label | lower %]">[% label %]</a>
+
+[% IF sublist %]
+[% INCLUDE nav_list nav=sublist %]
 [% END %]
+
   </li>
 [% END %]
  </ul>
