@@ -1,6 +1,6 @@
 h1.page-title {
-    text-align: center;
     color: blue;
+    text-align: center;
 }
 
 .content li p {
@@ -13,8 +13,8 @@ ul.tag-list {
 }
 
 ul.tag-list li {
-    list-style: none;
     display: inline;
+    list-style: none;
 }
 
 ul.tag-list li:before {
@@ -34,13 +34,14 @@ ul.page-navigation {
 }
 
 ul.page-navigation li {
-    list-style: none;
-    display: inline;
-    margin-right: 10px;
-    padding:0 10px;
-    color: white;
     background-color: brown;
+    color: white;
+    display: inline;
+    list-style: none;
+    margin-right: 10px;
+    padding: 0 10px;
 }
+
 ul.page-navigation a, ul.page-navigation a:visited {
     color: white;
 }

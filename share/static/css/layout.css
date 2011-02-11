@@ -1,13 +1,11 @@
 body {
-    margin: 0;
+    background: url("/static/image/tile.gif") repeat scroll 0 0 #84856A;
     border: 0;
-    padding: 0;
-
-    font-size: 100%;
     font-family: Helvetica;
-
-    background:url("/static/image/tile.gif") repeat scroll 0 0 #84856A;
+    font-size: 100%;
+    margin: 0;
     min-width: 960px;
+    padding: 0;
 }
 
 html, body {
@@ -15,11 +13,11 @@ html, body {
 }
 
 .header {
+    background: #8f8;
     background-color: #8f8;
-    padding: 10px;
     border-bottom: 20px solid #888;
     height: auto;
-    background: #8f8;
+    padding: 10px;
 }
 
 .logo {
@@ -40,20 +38,20 @@ html, body {
 .site-navigation {
     background-color: #444;
     color: #fff;
-    width: 200px;
     float: left;
     height: 100%;
-    margin:0;
-    padding-top:20px;
-    padding-left:20px;
-    padding-bottom: 10px;
     list-style-type: none;
+    margin: 0;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-top: 20px;
+    width: 200px;
 }
 
 .site-navigation ul {
     list-style-type: none;
-    padding: 0px;
     margin: 0px;
+    padding: 0px;
 }
 
 .site-navigation ul ul {
@@ -67,11 +65,11 @@ html, body {
 }
 
 .content {
-    width: 700px;
-    min-height: 100%;
-    float: left;
-    padding: 15px;
     background-color: #fff;
+    float: left;
+    min-height: 100%;
+    padding: 15px;
+    width: 700px;
 }
 
 .wide {
@@ -103,24 +101,27 @@ html, body {
         text-shadow: 0 0 20px #000;
     }
 }
+
 a:hover {
-    -webkit-animation-name: shiny;
+    -webkit-animation-direction: alternate;
     -webkit-animation-duration: 1s;
     -webkit-animation-iteration-count: infinite;
-    -webkit-animation-direction: alternate;
+    -webkit-animation-name: shiny;
     -webkit-animation-timing-function: ease-in-out;
 }
 
 #site-name {
-    font-size: 400%;
     font-family: Courier, "Courier New";
+    font-size: 400%;
+    padding-left: 220px;
     text-shadow: 1px 1px 5px #999;
-    padding-left:220px;
 }
+
 #site-name a {
     color: #000;
     text-decoration: none;
 }
+
 #site-name a span {
     padding-right: 15px;
 }
