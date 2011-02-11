@@ -112,6 +112,6 @@ $Cog.bind = function(method) {
     var cog = this;
     var args = Array.slice(arguments, 1, Infinity);
     return function() {
-        cog[method].apply(cog, args.concat(this, Array.slice(arguments)));
+        return cog[method].apply(cog, args.concat(this, Array.slice(arguments)));
     };
 };
