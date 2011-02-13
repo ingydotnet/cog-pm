@@ -31,7 +31,7 @@ sub make {
     $self->make_config_js();
     $self->make_url_map_js();
     $self->make_all_js();
-    $self->make_css();
+    $self->make_all_css();
 }
 
 sub make_cache {
@@ -115,7 +115,7 @@ sub make_all_js {
     system("(cd $js; make all.js)") == 0 or die;
 }
 
-sub make_css {
+sub make_all_css {
     my $self = shift;
     my $root = $self->config->app_root;
     my $css = "$root/static/css";

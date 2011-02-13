@@ -260,7 +260,9 @@ sub _copy_assets {
 
     for my $file (keys %$files) {
         my $source = $files->{$file};
-        my $target = "$root/$file";
+        my $target = $file =~ m!^(js|css|image)/!
+            ? "$root/static/$file"
+            : "$root/$file";
         if ($ENV{COG_APP_SYMLINK_INSTALL}) {
             unless (-l $target and readlink($target) eq $source) {
                 unlink $target;
