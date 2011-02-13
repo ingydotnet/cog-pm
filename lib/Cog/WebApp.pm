@@ -1,17 +1,22 @@
 package Cog::WebApp;
 use Mouse;
-extends 'Cog::Plugin';
+extends 'Cog::Base';
+
+use JSON;
+
+has env => ( is => 'rw' );
 
 use constant SHARE_DIST => 'Cog';
 use constant index_file => '';
 use constant plugins => [];
 use constant site_navigation => [];
 use constant url_map => [];
+use constant post_map => [];
 use constant js_files => [qw(
     jquery-1.4.4.min.js
+    jquery.json-2.2.js
     jquery.cookie.js
     jemplate.js
-    separator.js
     cog.js
     config.js
     url-map.js
@@ -25,5 +30,43 @@ use constant css_files => [qw(
 use constant image_files => [];
 use constant template_files => [];
 use constant runner_class => 'Cog::WebApp::Runner';
+
+use XXX;
+sub handle_post {
+    # Call handler based on url
+    # Return results or OK
+    my $self = shift;
+    $self->env(shift);
+    $self->read_json;
+    my $path = $self->env->{PATH_INFO};
+    my $post_map = $self->config->post_map;
+    my ($regexp, $action, @args, @captures);
+    for my $entry (@$post_map) {
+        ($regexp, $action, @args) = @$entry;
+        if ($path =~ /^$regexp$/) {
+            @captures = ('', $1, $2, $3, $4, $5);
+            last;
+        }
+        undef $action;
+    }
+    return [501, [], ["Invalid POST request: '$path'"]] unless $action;
+    @args = map {s/\$(\d+)/$captures[$1]/ge; ($_)} @args;
+    my $method = "handle_$action";
+    my $result = eval { $self->$method(@args) };
+    return [500, [], [ $@ ]] if $@;
+    $result = 'OK' unless defined $result;
+    return $result if ref($result) eq 'ARRAY';
+    return [ 200, [ 'Content-Type' => 'text/plain' ], [ $result ] ];
+}
+
+sub read_json {
+    my $self = shift;
+    my $env = $self->env;
+    return unless
+        $env->{CONTENT_TYPE} =~ m!application/json! and
+        $env->{CONTENT_LENGTH};
+    my $json = do { my $io = $env->{'psgi.input'}; local $/; <$io> };
+    $env->{post_data} = JSON::decode_json($json);
+}
 
 1;

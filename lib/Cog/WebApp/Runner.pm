@@ -14,25 +14,28 @@ use Plack::Middleware::Header;
 use Plack::Middleware::ProxyMap;
 use Plack::Runner;
 
-use XXX;
+use XXX -with => 'YAML::XS';
 
 my $layout_file = 'cache/layout.html';
+open LAYOUT, $layout_file or die "Can't open '$layout_file'";
+my $html = do {local $/; <LAYOUT>};
+close LAYOUT or die;
+
+my $time = scalar(gmtime);
+$time .= ' GMT' unless $time =~ /GMT/;
+my $html_headers = [
+    'Content-Type' => 'text/html',
+    'Last-Modified' => $time,
+];
 
 sub app {
     my $self = shift;
 
-    open LAYOUT, $layout_file or die "Can't open '$layout_file'";
-    my $layout = do {local $/; <LAYOUT>};
-    close LAYOUT or die;
-
-    my $time = scalar(gmtime);
-    $time .= ' GMT' unless $time =~ /GMT/;
-
     my $app = sub {
-        return [ 200, [
-            'Content-Type' => 'text/html',
-            'Last-Modified' => $time,
-        ], [ $layout ] ];
+        my $env = shift;
+        return $self->config->webapp->handle_post($env)
+            if $env->{REQUEST_METHOD} eq 'POST';
+        return [ 200, $html_headers, [$html] ];
     };
     if ($self->config->plack_debug) {
         require Plack::Middleware::Debug;
