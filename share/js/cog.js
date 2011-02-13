@@ -4,7 +4,6 @@
 // $Cog is the Cog prototype object. You can use it anywhere to extend Cog.
 
 $Cog = (Cog = function() {this.init()}).prototype = {
-    path: location.pathname,
     url_map: {},
     setup_functions: [],
     busy: false
@@ -17,21 +16,21 @@ $Cog.init = function() {
     }
 };
 
-$Cog.dispatch = function() {
+$Cog.dispatch = function(path) {
     var map = this.url_map;
     for (var i = 0, il = map.length; i < il; i++) {
         var re = map[i][0];
         var regex = new RegExp('^' + re + '$');
         var method = map[i][1];
         var args = map[i].splice(2);
-        var m = this.path.match(regex);
+        var m = path.match(regex);
         if (m) {
             for (var j = 0, jl = args.length; j < jl; j++) {
                 args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
             }
             this[method].apply(this, args);
-            if (this.path.length > 1) {
-                $.cookie("last_url", this.path, {path:'/'});
+            if (path.length > 1) {
+                $.cookie("last_url", path, {path:'/'});
             }
             return;
         }

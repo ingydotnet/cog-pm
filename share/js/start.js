@@ -1,1 +1,1 @@
-jQuery(function() {(new Cog()).dispatch()});
+jQuery(function() {(new Cog()).dispatch(location.pathname)});
