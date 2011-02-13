@@ -13,5 +13,8 @@
 [% INCLUDE 'header.html.tt' %]
 [% INCLUDE 'site-navigation.html.tt' %]
 [% INCLUDE 'content.html.tt' %]
+<script>
+[% INCLUDE 'start.js.tt' %]
+</script>
 </body>
 </html>

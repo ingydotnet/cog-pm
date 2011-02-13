@@ -20,7 +20,6 @@ use constant js_files => [qw(
     cog.js
     config.js
     url-map.js
-    start.js
 )];
 use constant css_files => [qw(
     layout.css
@@ -31,7 +30,6 @@ use constant image_files => [];
 use constant template_files => [];
 use constant runner_class => 'Cog::WebApp::Runner';
 
-use XXX;
 sub handle_post {
     # Call handler based on url
     # Return results or OK
