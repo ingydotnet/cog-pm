@@ -67,8 +67,7 @@ sub from_text {
 
     my %hash;
 
-    my @schema = $class->SCHEMA;
-    for my $field (@schema) {
+    for my $field ($class->SCHEMA) {
         $field =~ s/([\?\+\*]?)$//;
         my $mod = $1 || '';
         my $list = ($mod =~ /[\+\*]/);
@@ -91,6 +90,38 @@ sub from_text {
     my $self = $class->new(%hash);
     $self->duration(Time::Duration::duration(time - $self->Time, 1));
     return $self;
+}
+
+sub to_text {
+    my $self = shift;
+    my $text = '';
+
+    for my $field ($self->SCHEMA) {
+        $field =~ s/([\?\+\*]?)$//;
+        next if $field eq 'Content';
+        my $mod = $1 || '';
+        my $list = ($mod =~ /[\+\*]/);
+        my $optional = ($mod =~ /[\*\?]/);
+        next unless defined $self->{$field};
+        my $value = $self->{$field};
+        if ($list) {
+            for my $elem (@$value) {
+                $text .= "${field}: $elem\n";
+            }
+        }
+        else {
+            $text .= "${field}: $value\n";
+        }
+    }
+    if (defined $self->{Content}) {
+        my $Content = $self->{Content};
+        chomp $Content;
+        if (length $Content) {
+            $text .= "\n$Content\n";
+        }
+    }
+
+    return $text;
 }
 
 # sub to_text {

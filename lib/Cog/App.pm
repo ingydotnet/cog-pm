@@ -25,7 +25,7 @@ use constant config_class => 'Cog::Config';
 use constant webapp_class => '';
 use constant store_class => 'Cog::Store';
 use constant maker_class => 'Cog::Maker';
-use constant page_class => 'Cog::Maker';
+use constant node_class => 'Cog::Node';
 sub plugins { [] };
 sub cog_classes {
     my $self = shift;
@@ -34,7 +34,7 @@ sub cog_classes {
         config => $self->config_class,
         store => $self->store_class,
         maker => $self->maker_class,
-        page => $self->page_class,
+        node => $self->node_class,
     }
 }
 
@@ -306,99 +306,11 @@ Cog web server is starting up...
 }
 
 sub handle_edit {
-    my $self = shift;
-    my $filename = shift or die "No filename supplied";
-    die "Bad filename" if $filename =~ m/[\n\\]/;
-    die "Too many args" if @_;
-
-    my $oldtext = -e $filename ? io( $filename )->all : '';
-    my $oldpage = Cog::Page->from_text($oldtext);
-    my $rev = $oldpage->rev;
-
-    system("vim $filename") == 0 or die;
-
-    my $newtext = -e $filename ? io( $filename )->all : '';
-#     my $newpage = Cog::Page->from_text($newtext);
-    $rev++;
-    $newtext =~ s/^Rev: +.*\n/Rev: $rev\n/m or die;
-    my $time = $self->time;
-    $newtext =~ s/^Time: +.*\n/Time: $time\n/m or die;
-    io($filename)->print($newtext);
-
-    system("generate_pages") == 0 or die;
-}
-
-# TODO Move most of this method to Cog::Page
-sub handle_bless {
-    my $self = shift;
-    die "Run 'cog init' first\n"
-        unless $self->store->exists;
-    my $dir = '..';
-    for my $title (@_) {
-        my $file = "$dir/$title";
-        if (not -e $file) {
-            warn "Can't bless '$title'. No such file.\n";
-            next;
-        }
-        my ($head, $body) = $self->_read_page($file);
-        my $original = $head . (($head and $body) ? "\n" : '') . $body;
-        my $heading = '';
-        $heading .= ($head =~ s/^(Cog: .*\n)//m) ? $1 :
-            "Cog: 0.0.1\n";
-        $heading .= ($head =~ s/^(Id: +[A-Z2-9]{4}-[A-Z0-9]{22}\n)//m) ? $1 :
-            "Id: " . $self->store->new_cog_id() . "\n";
-        $heading .= ($head =~ s/^(Rev: [0-9]+\n)//m) ? $1 :
-            "Rev: 1\n";
-        $heading .= ($head =~ s/^(Time: [0-9]+\n)//m) ? $1 :
-            "Time: ${\ $self->time}\n";
-        $heading .= ($head =~ s/^(User: .*\n)//m) ? $1 :
-            "User: $ENV{USER}\n";
-        $heading .= ($head =~ s/^(Name: .*\n)//m) ? $1 :
-            "Name: $title\n";
-        while ($head =~ s/^(Name: .*\n)//m) {
-            $heading .= $1;
-        }
-        while ($head =~ s/^(Tag: .*\n)//m) {
-            $heading .= $1;
-        }
-        while ($head =~ s/^(Url: .*\n)//m) {
-            $heading .= $1;
-        }
-        $head =~ s/^[A-Z].*\n//mg;
-        $heading .= $head;
-
-        my $text = $heading . ($body ? "\n" : '') . $body;
-        if ($text eq $original) {
-            print "No change to $title\n";
-        }
-        else {
-            $heading =~ /^Id: +([A-Z2-7]{4})-/m
-                or throw Error "No cog id for '$title':\n$heading";
-            $heading =~ /^Time: +(\d+)$/m
-                or throw Error "No time for '$title'";
-            print "Updating $title\n";
-            io($file)->print($text);
-        }
-    }
+    # TODO
 }
 
 sub handle_clean {
     # TODO - Remove .cog files except config.yaml (if present)
-}
-
-sub _read_page {
-    my $self = shift;
-    my $file = shift;
-    my ($head, $body) = ('', '');
-    my $page = io($file);
-    if ($page->exists) {
-        my $text = $page->all;
-        if ($text =~ s/\A((?:[\w\-]+:\ .*\n)+)(\n|\z)//) {
-            $head = $1;
-        }
-        $body = $text;
-    }
-    return ($head, $body);
 }
 
 1;
