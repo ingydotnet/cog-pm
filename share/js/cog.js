@@ -28,6 +28,8 @@ $Cog.dispatch = function(path) {
             for (var j = 0, jl = args.length; j < jl; j++) {
                 args[j] = args[j].replace(/^\$(\d)$/, function(x, d) { return m[Number(d)] });
             }
+            if (typeof this[method] == 'undefined')
+                throw "'" + method + "' method not found";
             this[method].apply(this, args);
             if (path.length > 1) {
                 $.cookie("last_url", path, {path:'/'});
@@ -109,8 +111,10 @@ $Cog.setup_links = function() {
 
 $Cog.bind = function(method) {
     var cog = this;
-    var args = Array.slice(arguments, 1, Infinity);
+    var args = Array.prototype.slice.call(arguments, 1);
     return function() {
-        return cog[method].apply(cog, args.concat(this, Array.slice(arguments)));
+        return cog[method].apply(
+            cog, args.concat(this, Array.prototype.slice.call(arguments))
+        );
     };
 };
