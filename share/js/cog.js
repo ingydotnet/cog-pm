@@ -46,8 +46,7 @@ $Cog.redirect = function(url) {
 };
 
 $Cog.home_page = function() {
-    var id = this.config.home_page_id;
-    this.page_display(id);
+    this.redirect('/page/' + this.config.home_page_id);
 };
 
 $Cog.page_display = function(id) {
@@ -107,6 +106,27 @@ $Cog.setup_links = function() {
                 $link.attr('href', '/page/name/' + $link.text());
             }
         });
+};
+
+$Cog.post_data = function(post_url, post_data, post_callback) {
+    $.ajax({
+        type: 'POST',
+        url: post_url,
+        data: post_data,
+        dataType: "html",
+        complete: this.bind(post_callback, post_data),
+    });
+};
+
+$Cog.post_json = function(post_url, post_data, post_callback) {
+    $.ajax({
+        type: 'POST',
+        url: post_url,
+        data: $.toJSON(post_data),
+        processData: false,
+        contentType: "application/json; charset=utf-8",
+        complete: this.bind(post_callback),
+    });
 };
 
 $Cog.bind = function(method) {

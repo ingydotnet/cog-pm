@@ -53,8 +53,19 @@ sub handle_post {
     my $result = eval { $self->$method(@args) };
     return [500, [], [ $@ ]] if $@;
     $result = 'OK' unless defined $result;
-    return $result if ref($result) eq 'ARRAY';
-    return [ 200, [ 'Content-Type' => 'text/plain' ], [ $result ] ];
+    if (ref($result) eq 'ARRAY') {
+        return $result;
+    }
+    elsif (ref($result) eq 'HASH') {
+        return [
+            200,
+            [ 'Content-Type' => 'application/json' ],
+            [ JSON::encode($result) ]
+        ];
+    }
+    else {
+        return [ 200, [ 'Content-Type' => 'text/plain' ], [ $result ] ];
+    }
 }
 
 sub read_json {
