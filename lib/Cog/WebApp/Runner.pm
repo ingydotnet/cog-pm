@@ -45,6 +45,10 @@ sub app {
     $app = Plack::Middleware::ConditionalGET->wrap($app);
     $app = Plack::Middleware::ETag->wrap($app, file_etag => [qw/inode mtime size/]);
     $app = Plack::Middleware::Header->wrap($app, set => ['Cache-Control' => 'no-cache']);
+    $app = sub {
+        my $env = shift;
+        return &$app($env);
+    };
     if ($self->config->proxymap) {
         $app = Plack::Middleware::ProxyMap->wrap(
             $app,
