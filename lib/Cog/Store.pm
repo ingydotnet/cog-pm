@@ -11,7 +11,7 @@ use IO::All;
 use Git::Wrapper;
 use Convert::Base32::Crockford ();
 
-use XXX;
+# use XXX;
 
 has root => (is => 'ro', default => 'cog');
 

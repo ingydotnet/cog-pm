@@ -1,3 +1,6 @@
+# TODO:
+# - Eliminate SHARE_DIST
+# - Review all code
 package Cog;
 use 5.008003;
 

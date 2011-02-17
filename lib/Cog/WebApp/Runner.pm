@@ -7,6 +7,7 @@ package Cog::WebApp::Runner;
 use Mouse;
 extends 'Cog::Base';
 
+use Plack::Builder;
 use Plack::Middleware::Static;
 use Plack::Middleware::ConditionalGET;
 use Plack::Middleware::ETag;
@@ -14,7 +15,7 @@ use Plack::Middleware::Header;
 use Plack::Middleware::ProxyMap;
 use Plack::Runner;
 
-use XXX -with => 'YAML::XS';
+# use XXX -with => 'YAML::XS';
 
 my $layout_file = 'cache/layout.html';
 open LAYOUT, $layout_file or die "Can't open '$layout_file'";
@@ -33,7 +34,7 @@ sub app {
 
     my $app = sub {
         my $env = shift;
-        return $self->config->webapp->handle_post($env)
+        return $self->webapp->handle_post($env)
             if $env->{REQUEST_METHOD} eq 'POST';
         return [ 200, $html_headers, [$html] ];
     };
@@ -45,10 +46,6 @@ sub app {
     $app = Plack::Middleware::ConditionalGET->wrap($app);
     $app = Plack::Middleware::ETag->wrap($app, file_etag => [qw/inode mtime size/]);
     $app = Plack::Middleware::Header->wrap($app, set => ['Cache-Control' => 'no-cache']);
-    $app = sub {
-        my $env = shift;
-        return &$app($env);
-    };
     if ($self->config->proxymap) {
         $app = Plack::Middleware::ProxyMap->wrap(
             $app,

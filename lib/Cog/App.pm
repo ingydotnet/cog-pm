@@ -1,8 +1,5 @@
 # TODO:
-# - handle_new($type)
 # - handle_stop
-# - Customize App messages like the 'up' msg
-# - pQuery plugins - cache based on html
 package Cog::App;
 use Mouse;
 extends 'Cog::Base';
@@ -14,7 +11,7 @@ use Getopt::Long qw(:config pass_through);
 use YAML::XS;
 use Cwd 'abs_path';
 
-use XXX;
+# use XXX;
 
 use constant Name => 'Cog';
 use constant SHARE_DIST => 'Cog';
@@ -101,8 +98,7 @@ around BUILDARGS => sub {
     $hash->{maker_class} = $class->maker_class;
     $hash->{store_class} = $class->store_class;
 
-    my $config = $config_class->new($hash);
-    Cog::Base->set_global_config_singleton_object($config);
+    Cog::Base->initialize($config_class->new($hash));
 
     return $class->$orig(@_);
 };
@@ -211,7 +207,7 @@ sub handle_init {
 
     $self->config->chdir_root;
 
-    $self->config->store->create;
+    $self->store->create;
 
     my $Name = $self->Name;
     my $name = $self->config->command_script;
@@ -282,7 +278,7 @@ sub _copy_assets {
 
 sub handle_make {
     my $self = shift;
-    $self->config->maker->make;
+    $self->maker->make;
     print <<'...';
 Cog is up to date and ready to use. To start the web server, run
 this command:
@@ -302,7 +298,7 @@ Cog web server is starting up...
     my @args = @{$self->config->command_args};
     unshift @args, ('-p' => $self->config->server_port)
         if $self->config->server_port;
-    $self->config->runner->run(@args);
+    $self->runner->run(@args);
 }
 
 sub handle_edit {

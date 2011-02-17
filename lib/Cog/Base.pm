@@ -1,17 +1,18 @@
 package Cog::Base;
 use Mouse;
 
-use Carp;
+my $config;
+my $maker;
+my $runner;
+my $store;
+my $webapp;
 
-my $config_object;
+sub initialize { $config ||= $_[1] }
 
-sub set_global_config_singleton_object {
-    $config_object ||= $_[1];
-}
-
-sub config {
-    Carp::confess("The config method has no setter") if @_ > 1;
-    return $config_object;
-}
+sub config { $config }
+sub maker { $maker || ($maker = $config->maker) }
+sub runner { $runner || ($maker = $config->runner) }
+sub store { $store || ($maker = $config->store) }
+sub webapp { $webapp || ($maker = $config->maker) }
 
 1;

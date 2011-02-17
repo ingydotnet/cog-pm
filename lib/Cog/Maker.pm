@@ -87,8 +87,8 @@ sub make_tag_cloud {
     my $blobs = shift;
     my $list = [];
     my $tags = {};
-    for my $tag (sort {lc($a) cmp lc($b)} @{$self->config->store->all_tags}) {
-        my $ids = $self->config->store->indexed_tag($tag);
+    for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
+        my $ids = $self->store->indexed_tag($tag);
         my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time}) > $t) { $t = $t1 } }
         push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];
