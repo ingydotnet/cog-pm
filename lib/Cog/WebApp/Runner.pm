@@ -17,27 +17,10 @@ use Plack::Runner;
 
 # use XXX -with => 'YAML::XS';
 
-my $layout_file = 'cache/layout.html';
-open LAYOUT, $layout_file or die "Can't open '$layout_file'";
-my $html = do {local $/; <LAYOUT>};
-close LAYOUT or die;
-
-my $time = scalar(gmtime);
-$time .= ' GMT' unless $time =~ /GMT/;
-my $html_headers = [
-    'Content-Type' => 'text/html',
-    'Last-Modified' => $time,
-];
-
 sub app {
     my $self = shift;
 
-    my $app = sub {
-        my $env = shift;
-        return $self->webapp->handle_post($env)
-            if $env->{REQUEST_METHOD} eq 'POST';
-        return [ 200, $html_headers, [$html] ];
-    };
+    my $app = $self->webapp->index_app;
     if ($self->config->plack_debug) {
         require Plack::Middleware::Debug;
         $app = Plack::Middleware::Debug->wrap($app);

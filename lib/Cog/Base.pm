@@ -13,6 +13,6 @@ sub config { $config }
 sub maker { $maker || ($maker = $config->maker) }
 sub runner { $runner || ($maker = $config->runner) }
 sub store { $store || ($maker = $config->store) }
-sub webapp { $webapp || ($maker = $config->maker) }
+sub webapp { $webapp || ($maker = $config->webapp) }
 
 1;
