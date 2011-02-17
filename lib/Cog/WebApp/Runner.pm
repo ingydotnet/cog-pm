@@ -1,41 +1,37 @@
-# TODO
-# - Add logging
-# - Support 'cog stop'
-# - Switch to Plack::Builder
+# TODO:
 #
 package Cog::WebApp::Runner;
 use Mouse;
 extends 'Cog::Base';
 
 use Plack::Builder;
-use Plack::Middleware::Static;
-use Plack::Middleware::ConditionalGET;
-use Plack::Middleware::ETag;
-use Plack::Middleware::Header;
-use Plack::Middleware::ProxyMap;
 use Plack::Runner;
 
-# use XXX -with => 'YAML::XS';
+sub fingerprinted { $_[0]->{PATH_INFO} =~ /[0-9a-f]{32}/ }
+use constant MAX_DATE => 'Sun, 17-Jan-2038 19:14:07 GMT';
 
 sub app {
     my $self = shift;
-
-    my $app = $self->webapp->index_app;
-    if ($self->config->plack_debug) {
-        require Plack::Middleware::Debug;
-        $app = Plack::Middleware::Debug->wrap($app);
+    return builder {
+        # If this is a proxy url, just serve that.
+        enable 'ProxyMap', proxymap => $self->config->proxymap
+            if $self->config->proxymap;
+        # Fingerprinted files live forever
+        enable_if sub { fingerprinted(@_) },
+            'Header', set => ['Expires' => MAX_DATE];
+        # All other files get ETagged
+        enable_if sub {! fingerprinted(@_) },
+            'Header', set => ['Cache-Control' => 'no-cache'];
+        enable 'ETag', file_etag => [qw/inode mtime size/];
+        enable 'ConditionalGET';
+        # Serve static files from disk
+        enable 'Static', path => qr{^/(static|cache)/}, root => './';
+        # XXX I think there is a more generic way to turn on debugging
+        enable 'Debug'
+            if $self->config->plack_debug;
+        # Everything else is from the web app.
+        $self->webapp->web_app;
     }
-    $app = Plack::Middleware::Static->wrap($app, path => qr{^/(static|cache)/}, root => './');
-    $app = Plack::Middleware::ConditionalGET->wrap($app);
-    $app = Plack::Middleware::ETag->wrap($app, file_etag => [qw/inode mtime size/]);
-    $app = Plack::Middleware::Header->wrap($app, set => ['Cache-Control' => 'no-cache']);
-    if ($self->config->proxymap) {
-        $app = Plack::Middleware::ProxyMap->wrap(
-            $app,
-            proxymap => $self->config->proxymap,
-        );
-    }
-    return $app;
 }
 
 sub run {

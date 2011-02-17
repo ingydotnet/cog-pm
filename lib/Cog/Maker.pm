@@ -14,7 +14,7 @@ use JSON;
 use Time::Duration;
 use Pod::Simple::HTML;
 
-# use XXX;
+use XXX;
 
 has json => ('is' => 'ro', builder => sub {
     my $json = JSON->new;
@@ -27,11 +27,11 @@ has json => ('is' => 'ro', builder => sub {
 sub make {
     my $self = shift;
     $self->make_cache;
-    $self->make_layout;
     $self->make_config_js();
     $self->make_url_map_js();
     $self->make_all_js();
     $self->make_all_css();
+    $self->make_layout;
 }
 
 sub make_cache {
@@ -112,7 +112,10 @@ sub make_all_js {
         ->render('js-mf.mk.tt');
     io("$js/Makefile")->print($makefile);
 
-    system("(cd $js; make all.js)") == 0 or die;
+    system("(cd $js; make)") == 0 or die;
+    my ($file) = glob("$js/all-*.js") or die;
+    $file =~ s!.*/!!;
+    $self->config->all_js_file($file);
 }
 
 sub make_all_css {
@@ -129,6 +132,9 @@ sub make_all_css {
     io("$css/Makefile")->print($makefile);
 
     system("(cd $css; make)") == 0 or die;
+    my ($file) = glob("$css/all-*.css") or die;
+    $file =~ s!.*/!!;
+    $self->config->all_css_file($file);
 }
 
 1;

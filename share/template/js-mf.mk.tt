@@ -2,12 +2,15 @@ ROOT=../..
 
 ALL_JS=[% list %]
 
-all: all.js
+all: clean all_file
 
-all.js: $(ALL_JS) force
+all_file: all.js
+	(FILENAME=`cat $< | perl -MDigest::MD5 -e 'my $$d = Digest::MD5->new; $$d->addfile(*STDIN); print $$d->hexdigest'`;mv $< all-$$FILENAME.js)
+
+all.js: $(ALL_JS)
 	cat $(ALL_JS) > $@
 
-jemplate.js: force
+jemplate.js:
 	jemplate --runtime --compile $(ROOT)/template/ > $@
 
 config.js: $(ROOT)/cache/config.js
@@ -16,4 +19,5 @@ config.js: $(ROOT)/cache/config.js
 url-map.js: $(ROOT)/cache/url-map.js
 	cp $< $@
 
-force:
+clean:
+	rm -f all*.js jemplate.js

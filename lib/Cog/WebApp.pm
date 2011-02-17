@@ -30,7 +30,7 @@ use constant image_files => [];
 use constant template_files => [];
 use constant runner_class => 'Cog::WebApp::Runner';
 
-sub index_app {
+sub web_app {
     my $self = shift;
     my $layout_file = 'cache/layout.html';
     open LAYOUT, $layout_file or die "Can't open '$layout_file'";
@@ -39,15 +39,17 @@ sub index_app {
 
     my $time = scalar(gmtime);
     $time .= ' GMT' unless $time =~ /GMT/;
-    my $html_headers = [
-        'Content-Type' => 'text/html',
-        'Last-Modified' => $time,
+    my $layout = [
+        200, [
+            'Content-Type' => 'text/html',
+            'Last-Modified' => $time,
+        ], [$html]
     ];
     return sub {
         my $env = shift;
-        return $self->handle_post($env)
-            if $env->{REQUEST_METHOD} eq 'POST';
-        return [ 200, $html_headers, [$html] ];
+        return $env->{REQUEST_METHOD} eq 'POST'
+            ? $self->handle_post($env)
+            : $layout;
     };
 }
 

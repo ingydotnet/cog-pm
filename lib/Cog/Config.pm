@@ -96,6 +96,8 @@ has template_files => (is => 'ro', default => sub{[]});
 has site_navigation => (is => 'ro', default => sub{[]});
 has files_map => (is => 'ro', builder => '_build_files_map', lazy => 1);
 has classes => (is => 'rw');
+has all_js_file => (is => 'rw');
+has all_css_file => (is => 'rw');
 
 # App readiness
 has is_init => (is => 'ro', default => 0);
