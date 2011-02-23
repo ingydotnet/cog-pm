@@ -55,7 +55,7 @@ sub new_cog_id {
         $full = $id;
         last;
     }
-    io("$path/$short")->touch();
+    io("$path/$short")->print($full);
     return $full;
 }
 
