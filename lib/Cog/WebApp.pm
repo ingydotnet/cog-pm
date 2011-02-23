@@ -83,7 +83,7 @@ sub handle_post {
         return [
             200,
             [ 'Content-Type' => 'application/json' ],
-            [ JSON::encode($result) ]
+            [ $self->maker->json->encode($result) ]
         ];
     }
     else {
