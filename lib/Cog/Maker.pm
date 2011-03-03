@@ -11,7 +11,6 @@ use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
 use JSON;
-use Time::Duration;
 use Pod::Simple::HTML;
 
 use XXX;

@@ -5,7 +5,6 @@
 # - add validation to setters
 package Cog::Node;
 use Mouse;
-use Time::Duration ();
 
 # use XXX;
 
@@ -35,10 +34,6 @@ has Name => (is => 'rw', default => sub {[]} );
 has Tag => (is => 'rw', default => sub {[]}, lazy => 1 );
 has Url => (is => 'rw', default => sub {[]}, lazy => 1 );
 has Content => (is => 'rw');
-
-has duration => (is => 'rw', builder => sub {
-    return Time::Duration::duration($time - $_[0]->Time, 1);
-});
 
 # sub from_cog_file {
 #     my $self = shift;
@@ -88,7 +83,6 @@ sub from_text {
 
     $hash{Content} = $text;
     my $self = $class->new(%hash);
-    $self->duration(Time::Duration::duration(time - $self->Time, 1));
     return $self;
 }
 
