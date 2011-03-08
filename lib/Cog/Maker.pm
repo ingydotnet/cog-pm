@@ -88,7 +88,7 @@ sub make_tag_cloud {
     my $tags = {};
     for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
         my $ids = $self->store->indexed_tag($tag);
-        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time}) > $t) { $t = $t1 } }
+        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time} || 0) > $t) { $t = $t1 } }
         push @$list, [$tag, scalar(@$ids), "${t}000"];
         my $tagged = [ map $blobs->{$_}, @$ids ];
         io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
