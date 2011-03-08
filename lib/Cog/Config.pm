@@ -4,7 +4,7 @@
 # - Support uri_path
 # - Support daemon, logfile and pid
 # - plugins can update config to map urls to code
-# - Make all config options 'foo' respect $COG_APP_FOO
+# - Make all config options 'foo' respect $COG_FOO
 package Cog::Config;
 use Mouse;
 use File::ShareDir;
@@ -35,7 +35,7 @@ has app_class => (
 has app_root => (
     is => 'ro',
     lazy => 1,
-    default => ($ENV{COG_APP_ROOT_DIR} || 'cog'),
+    default => ($ENV{COG_ROOT_DIR} || 'cog'),
 );
 has store_root => (
     is => 'ro',

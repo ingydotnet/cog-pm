@@ -38,7 +38,7 @@ sub cog_classes {
 has action => ( is => 'rw' );
 has time => ( is => 'ro', builder => sub { time() } );
 
-sub get_app_class {
+sub get_app {
     my ($class, @argv) = @_;
     my $app_class;
     {
@@ -49,7 +49,7 @@ sub get_app_class {
         @argv = @ARGV;
     }
     $app_class ||=
-        $ENV{COG_APP_CLASS} ||
+        $ENV{COG_APP} ||
         $class->app_from('.cog/config.yaml') ||
         $class->app_from('cog/config.yaml') ||
         die "Can't determine Cog App class";
@@ -259,7 +259,7 @@ sub _copy_assets {
         my $target = $file =~ m!^(js|css|image)/!
             ? "$root/static/$file"
             : "$root/$file";
-        if ($ENV{COG_APP_SYMLINK_INSTALL}) {
+        if ($ENV{COG_SYMLINK_INSTALL}) {
             unless (-l $target and readlink($target) eq $source) {
                 unlink $target;
                 io($target)->assert->symlink($source);

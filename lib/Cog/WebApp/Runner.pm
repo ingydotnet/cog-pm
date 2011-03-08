@@ -45,26 +45,26 @@ sub run {
 sub get_args {
     my $self = shift;
     my %args = @_;
-    if ($ENV{COG_APP_HOST}) {
+    if ($ENV{COG_HOST}) {
         delete @args{qw(--host -h)};
-        $args{'--host'} = $ENV{COG_APP_HOST};
+        $args{'--host'} = $ENV{COG_HOST};
     }
-    if ($ENV{COG_APP_PORT}) {
+    if ($ENV{COG_PORT}) {
         delete @args{qw(--port -p)};
-        $args{'--port'} = $ENV{COG_APP_PORT};
+        $args{'--port'} = $ENV{COG_PORT};
     }
-    if ($ENV{COG_APP_SERVER}) {
+    if ($ENV{COG_SERVER}) {
         delete @args{qw(--server -s)};
-        $args{'--server'} = $ENV{COG_APP_SERVER};
+        $args{'--server'} = $ENV{COG_SERVER};
     }
-    if ($ENV{COG_APP_DAEMONIZE}) {
+    if ($ENV{COG_DAEMONIZE}) {
         delete @args{qw(--daemonize -D)};
-        $args{'--daemonize'} = $ENV{COG_APP_DAEMONIZE};
+        $args{'--daemonize'} = $ENV{COG_DAEMONIZE};
         $args{'--pid'} = 'cog.pid';
     }
-    if ($ENV{COG_APP_LOG}) {
+    if ($ENV{COG_LOG}) {
         delete @args{qw(--access-log)};
-        $args{'--access-log'} = $ENV{COG_APP_LOG};
+        $args{'--access-log'} = $ENV{COG_LOG};
     }
     return %args;
 }
