@@ -6,7 +6,6 @@ use JSON;
 
 has env => ( is => 'rw' );
 
-use constant SHARE_DIST => 'Cog';
 use constant index_file => '';
 use constant plugins => [];
 use constant site_navigation => [];

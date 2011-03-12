@@ -112,6 +112,7 @@ sub make_all_js {
     io("$js/Makefile")->print($makefile);
 
     system("(cd $js; make)") == 0 or die;
+    # TODO - Make fingerprint file here instead of Makefile
     my ($file) = glob("$js/all-*.js") or die;
     $file =~ s!.*/!!;
     $self->config->all_js_file($file);

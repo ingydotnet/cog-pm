@@ -1,5 +1,6 @@
 # TODO:
 #
+# Redo fingerprinting
 package Cog::WebApp::Runner;
 use Mouse;
 extends 'Cog::Base';
@@ -26,9 +27,6 @@ sub app {
         enable 'ConditionalGET';
         # Serve static files from disk
         enable 'Static', path => qr{^/(static|cache)/}, root => './';
-        # XXX I think there is a more generic way to turn on debugging
-        enable 'Debug'
-            if $self->config->plack_debug;
         # Everything else is from the web app.
         $self->webapp->web_app;
     }
@@ -42,6 +40,7 @@ sub run {
     $runner->run($self->app);
 }
 
+# TODO integrate these into config
 sub get_args {
     my $self = shift;
     my %args = @_;

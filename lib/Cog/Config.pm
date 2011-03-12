@@ -22,7 +22,6 @@ has html_title => (is => 'ro');
 
 # Server options
 has server_port => (is => 'ro', default => '');
-has plack_debug => (is => 'ro', default => 0);
 has proxymap => (is => 'ro', default => '');
 
 ### These fields are part of the Cog framework:
@@ -262,55 +261,23 @@ sub build_class_share_map {
 sub find_share_dir {
     my $self = shift;
     my $plugin = shift;
-    my ($module, $dir, $dist, $func);
 
-# TODO Refactor:
-# - Look up module in %INC
-# - If blib?/lib/$module
-#   - If Makefile.PL (or Build.PL) at this level
-#     - Use share from here
-# - Determine DIST from module
-#   - Look for $class->DISTNAME
-#   - or peel back back nodes until $VERSION
-#   - or die
-#     - return File::ShareDir::dist_dir($dist)
-    {
-        my $module = "$plugin.pm";
-        $module =~ s!::!/!g;
-        while (1) {
-            $dir = $INC{$module} or last;
-            $dir =~ s!(blib/)?lib/\Q$module\E$!! or last;
-            $dir .= "share";
-            return $dir if -e $dir;
-            last;
-        }
-    }
+    my $dist = $plugin->DISTNAME;
+    my $modpath = "$dist.pm";
+    $modpath =~ s!-!/!g;
 
-    {
-        ($dist = $plugin) =~ s/::/-/g;
-        $dir = eval { File::ShareDir::dist_dir($dist) };
-        return $dir if $dir;
-    }
-
-    {
-        $func = "${plugin}::SHARE_DIST";
-        no strict 'refs';
-        return '' unless defined &$func;
-        $dist = &$func();
-        my $dir = eval { File::ShareDir::dist_dir($dist) };
-        return $dir if $dir;
-    }
-
-    {
-        $dist =~ s!-!/!g;
-        $dist .= '.pm';
-        $dir = $INC{$dist} or return '';
-        $dir =~ s!(blib/)?lib/\Q$dist\E$!! or return '';
+    while (1) {
+        my $dir = $INC{$modpath} or last;
+        $dir =~ s!(blib/)?lib/\Q$modpath\E$!! or last;
         $dir .= "share";
         return $dir if -e $dir;
+        last;
     }
 
-    return '';
+    my $dir = eval { File::ShareDir::dist_dir($dist) };
+    return $dir if $dir;
+
+    return;
 }
 
 sub find_classes {

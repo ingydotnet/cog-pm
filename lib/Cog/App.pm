@@ -14,7 +14,6 @@ use Cwd 'abs_path';
 # use XXX;
 
 use constant Name => 'Cog';
-use constant SHARE_DIST => 'Cog';
 use constant app_root => ((-e '.cog') ? '.cog' : 'cog');
 use constant command_script => 'cog';
 
