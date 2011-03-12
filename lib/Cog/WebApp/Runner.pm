@@ -26,7 +26,7 @@ sub app {
         enable 'ETag', file_etag => [qw/inode mtime size/];
         enable 'ConditionalGET';
         # Serve static files from disk
-        enable 'Static', path => qr{^/(static|cache)/}, root => './';
+        enable 'Static', path => qr{^/(static|view)/}, root => './';
         # Everything else is from the web app.
         $self->webapp->web_app;
     }

@@ -51,9 +51,9 @@ $Cog.home_page = function() {
 
 $Cog.page_display = function(id) {
     var self = this;
-    $.getJSON('/cache/' + id + '.json', function(data) {
+    $.getJSON('/view/' + id + '.json', function(data) {
         Jemplate.process('page-display.html.tt', data, $('div.content')[0]);
-        $.get('/cache/' + id + '.html', function(data) {
+        $.get('/view/' + id + '.html', function(data) {
             $('div.page').html(data);
         });
         setTimeout(function() {
@@ -63,7 +63,7 @@ $Cog.page_display = function(id) {
 };
 
 $Cog.page_list = function(title) {
-    $.getJSON('/cache/page-list.json', function(data) {
+    $.getJSON('/view/page-list.json', function(data) {
         data = {pages: data};
         data.title = title,
         Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
@@ -71,14 +71,14 @@ $Cog.page_list = function(title) {
 };
 
 $Cog.tag_list = function() {
-    $.getJSON('/cache/tag-list.json', function(data) {
+    $.getJSON('/view/tag-list.json', function(data) {
         data = {tags: data};
         Jemplate.process('tag-list.html.tt', data, $('div.content')[0]);
     });
 };
 
 $Cog.tag_page_list = function(tag) {
-    $.getJSON('/cache/tag/' + tag + '.json', function(data) {
+    $.getJSON('/view/tag/' + tag + '.json', function(data) {
         data = {pages: data};
         data.title = 'Tag: ' + tag.replace(/%20/g, ' ');
         Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
@@ -93,7 +93,7 @@ $Cog.page_by_name = function(name) {
         .replace(/[^\w]+/g, '_')
         .replace(/_+/g, '_')
         .replace(/^_*(.*?)_*$/, '$1');
-    $.get('/cache/name/' + name + '.txt', function(id) {
+    $.get('/view/name/' + name + '.txt', function(id) {
         self.page_display(id);
     });
 };

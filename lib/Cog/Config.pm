@@ -34,7 +34,7 @@ has app_class => (
 has app_root => (
     is => 'ro',
     lazy => 1,
-    default => ($ENV{COG_ROOT_DIR} || 'cog'),
+    default => ($ENV{COG_APP_ROOT} || 'cog'),
 );
 has store_root => (
     is => 'ro',
@@ -61,15 +61,25 @@ has runner => (
         $_[0]->object_builder('runner', 'Cog::WebApp::Runner');
     },
 );
+has maker => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub { $_[0]->object_builder('maker', 'Cog::Maker') },
+);
 has store => (
     is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('store', 'Cog::Store') },
 );
-has maker => (
+has content => (
     is => 'ro',
     lazy => 1,
-    builder => sub { $_[0]->object_builder('maker', 'Cog::Maker') },
+    builder => sub { $_[0]->object_builder('content', 'Cog::Content') },
+);
+has view => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub { $_[0]->object_builder('view', 'Cog::View') },
 );
 
 sub object_builder {

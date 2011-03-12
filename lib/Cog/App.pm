@@ -18,19 +18,22 @@ use constant app_root => ((-e '.cog') ? '.cog' : 'cog');
 use constant command_script => 'cog';
 
 use constant config_class => 'Cog::Config';
-use constant webapp_class => '';
-use constant store_class => 'Cog::Store';
+use constant content_class => 'Cog::Content';
 use constant maker_class => 'Cog::Maker';
-use constant node_class => 'Cog::Node';
+use constant store_class => 'Cog::Store';
+use constant webapp_class => '';
+use constant view_class => 'Cog::View';
+
 sub plugins { [] };
 sub cog_classes {
     my $self = shift;
     return +{
-        webapp => $self->webapp_class,
         config => $self->config_class,
-        store => $self->store_class,
+        content => $self->content_class,
         maker => $self->maker_class,
-        node => $self->node_class,
+        store => $self->store_class,
+        webapp => $self->webapp_class,
+        view => $self->view_class,
     }
 }
 

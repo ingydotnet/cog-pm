@@ -13,10 +13,10 @@ all.js: $(ALL_JS)
 jemplate.js:
 	jemplate --runtime --compile $(ROOT)/template/ > $@
 
-config.js: $(ROOT)/cache/config.js
+config.js: $(ROOT)/static/config.js
 	cp $< $@
 
-url-map.js: $(ROOT)/cache/url-map.js
+url-map.js: $(ROOT)/static/url-map.js
 	cp $< $@
 
 clean:

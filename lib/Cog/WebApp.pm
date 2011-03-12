@@ -31,14 +31,14 @@ use constant runner_class => 'Cog::WebApp::Runner';
 
 sub web_app {
     my $self = shift;
-    my $layout_file = 'cache/layout.html';
-    open LAYOUT, $layout_file or die "Can't open '$layout_file'";
-    my $html = do {local $/; <LAYOUT>};
-    close LAYOUT or die;
+    my $index_file = 'static/index.html';
+    open INDEX, $index_file or die "Can't open '$index_file'";
+    my $html = do {local $/; <INDEX>};
+    close INDEX or die;
 
     my $time = scalar(gmtime);
     $time .= ' GMT' unless $time =~ /GMT/;
-    my $layout = [
+    my $index = [
         200, [
             'Content-Type' => 'text/html',
             'Last-Modified' => $time,
@@ -48,7 +48,7 @@ sub web_app {
         my $env = shift;
         return $env->{REQUEST_METHOD} eq 'POST'
             ? $self->handle_post($env)
-            : $layout;
+            : $index;
     };
 }
 

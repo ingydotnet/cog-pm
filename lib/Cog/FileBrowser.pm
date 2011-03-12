@@ -8,7 +8,7 @@ package Cog::FileBrowser::WebApp;
 use Mouse;
 extends 'Cog::WebApp';
 
-use constant index_file => 'layout.html';
+use constant index_file => 'index.html';
 
 sub site_navigation {
     [

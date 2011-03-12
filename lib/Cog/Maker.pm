@@ -5,15 +5,11 @@ package Cog::Maker;
 use Mouse;
 extends 'Cog::Base';
 
-# NOTE This module should generate a Makefile to do all this work.
-
 use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
 use JSON;
 use Pod::Simple::HTML;
-
-use XXX;
 
 has json => ('is' => 'ro', builder => sub {
     my $json = JSON->new;
@@ -22,36 +18,15 @@ has json => ('is' => 'ro', builder => sub {
     return $json;
 });
 
-# XXX Move this to CogWiki
 sub make {
     my $self = shift;
-    $self->make_cache;
     $self->make_config_js();
     $self->make_url_map_js();
     $self->make_all_js();
     $self->make_all_css();
-    $self->make_layout;
-}
-
-sub make_cache {
-    my $self = shift;
-    io('cache')->mkdir;
-}
-
-sub make_layout {
-    my $self = shift;
-    my $data = +{%{$self->config}};
-    my $html = tt()
-        ->path(['template/'])
-        ->data($data)
-        ->post_chomp
-        ->render('layout.html.tt');
-    io('cache/layout.html')->print($html);
-}
-
-sub all_tags {
-    my ($self, $page) = @_;
-    return @{$page->Tag};
+    $self->make_index_html;
+    $self->make_store();
+    $self->make_views();
 }
 
 sub make_config_js {
@@ -65,7 +40,7 @@ sub make_config_js {
         ->data($data)
         ->post_chomp
         ->render('config.js.tt');
-    io('cache/config.js')->print($javascript);
+    io('static/config.js')->print($javascript);
 }
 
 sub make_url_map_js {
@@ -78,24 +53,7 @@ sub make_url_map_js {
         ->data($data)
         ->post_chomp
         ->render('url-map.js.tt');
-    io('cache/url-map.js')->print($javascript);
-}
-
-sub make_tag_cloud {
-    my $self = shift;
-    my $blobs = shift;
-    my $list = [];
-    my $tags = {};
-    for my $tag (sort {lc($a) cmp lc($b)} @{$self->store->all_tags}) {
-        my $ids = $self->store->indexed_tag($tag);
-        my $t = 0; for (@$ids) { if ((my $t1 = $blobs->{$_}{Time} || 0) > $t) { $t = $t1 } }
-        push @$list, [$tag, scalar(@$ids), "${t}000"];
-        my $tagged = [ map $blobs->{$_}, @$ids ];
-        io("cache/tag/$tag.json")->assert->print($self->json->encode($tagged));
-        $tags->{$tag} = 1;
-    }
-    io("cache/tag-cloud.json")->print($self->json->encode($list));
-    io("cache/tag-list.json")->print($self->json->encode([sort keys %$tags]));
+    io('static/url-map.js')->print($javascript);
 }
 
 sub make_all_js {
@@ -135,6 +93,29 @@ sub make_all_css {
     my ($file) = glob("$css/all-*.css") or die;
     $file =~ s!.*/!!;
     $self->config->all_css_file($file);
+}
+
+sub make_index_html {
+    my $self = shift;
+    my $data = +{%{$self->config}};
+    my $html = tt()
+        ->path(['template/'])
+        ->data($data)
+        ->post_chomp
+        ->render('index.html.tt');
+    io('static/index.html')->print($html);
+}
+
+sub make_store {
+    my $self = shift;
+    if (not $self->store->exists) {
+        $self->store->init();
+        $self->store->import_files($self->content->all_files);
+    }
+}
+
+sub make_views {
+    my $self = shift;
 }
 
 1;

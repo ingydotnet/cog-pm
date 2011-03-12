@@ -6,34 +6,18 @@
 package Cog::Node;
 use Mouse;
 
-# use XXX;
+use XXX;
 
-sub SCHEMA {
-    return (
-        'Id',
-        'Rev',
-        'Type',
-        'Time',
-        'User',
-        'Name*',
-        'Tag*',
-        'Url*',
-        'Content?',
-    )
-}
-
-my $time = time;
 has Id => (is => 'rw');
-# XXX default is just a temporary workaround
 has Rev => (is => 'rw', default => 1, lazy => 1);
 has Type => (is => 'rw');
-# XXX default is just a temporary workaround
-has Time => (is => 'rw', default => $time - 3600, lazy => 1);
+has Time => (is => 'rw');
 has User => (is => 'rw');
 has Name => (is => 'rw', default => sub {[]} );
 has Tag => (is => 'rw', default => sub {[]}, lazy => 1 );
 has Url => (is => 'rw', default => sub {[]}, lazy => 1 );
-has Content => (is => 'rw');
+has Body => (is => 'rw');
+has Format => (is => 'rw');
 
 # sub from_cog_file {
 #     my $self = shift;
@@ -57,31 +41,31 @@ sub Short {
 sub from_text {
     my $class = shift;
     my $text = shift;
+    my $type = $class->Type;
+
+    my $schema = Cog::App->new->store->schema_map->{$type};
 
     my $head = ($text =~ s/\A((?:[\w\-]+:\ .*\n)+)(\n|\z)//) ? $1 : '';
 
     my %hash;
 
-    for my $field ($class->SCHEMA) {
-        $field =~ s/([\?\+\*]?)$//;
-        my $mod = $1 || '';
-        my $list = ($mod =~ /[\+\*]/);
-        my $optional = ($mod =~ /[\*\?]/);
-        while ($head =~ s/^($field): +(.*)\n//m) {
+    for my $field (@{$schema->all_fields}) {
+        my ($name, $req, $list) = @{$field}{qw(name req list)};
+        while ($head =~ s/^($name): +(.*)\n//m) {
             my $value = $2;
             $value =~ s/^\s*(.*?)\s*$/$1/;
             if ($list) {
-                $hash{$field} ||= [];
-                push @{$hash{$field}}, $value;
+                $hash{$name} ||= [];
+                push @{$hash{$name}}, $value;
             }
             else {
-                $hash{$field} = $value;
+                $hash{$name} = $value;
             }
         }
     }
     # throw Error "Can't parse:\n$head" if $head;
 
-    $hash{Content} = $text;
+    $hash{Body} = $text;
     my $self = $class->new(%hash);
     return $self;
 }
@@ -92,7 +76,7 @@ sub to_text {
 
     for my $field ($self->SCHEMA) {
         $field =~ s/([\?\+\*]?)$//;
-        next if $field eq 'Content';
+        next if $field eq 'Body';
         my $mod = $1 || '';
         my $list = ($mod =~ /[\+\*]/);
         my $optional = ($mod =~ /[\*\?]/);
@@ -107,11 +91,11 @@ sub to_text {
             $text .= "${field}: $value\n";
         }
     }
-    if (defined $self->{Content}) {
-        my $Content = $self->{Content};
-        chomp $Content;
-        if (length $Content) {
-            $text .= "\n$Content\n";
+    if (defined $self->{Body}) {
+        my $Body = $self->{Body};
+        chomp $Body;
+        if (length $Body) {
+            $text .= "\n$Body\n";
         }
     }
 
