@@ -110,7 +110,8 @@ sub make_store {
     my $self = shift;
     if (not $self->store->exists) {
         $self->store->init();
-        $self->store->import_files($self->content->all_files);
+        $self->store->import_files($self->content->cog_files);
+        $self->store->reserve_keys($self->content->dead_cog_files);
     }
 }
 

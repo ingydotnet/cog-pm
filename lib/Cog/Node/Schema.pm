@@ -7,9 +7,10 @@ use constant parent => '';
 use constant fields => [
     'Id',
     'Rev',
+    'Type',
     'Time',
     'User',
-    'Name*',
+    ['Name*', ['Name', key => 'flatten $v']],
     'Tag*',
     'Url*',
     'Body?',

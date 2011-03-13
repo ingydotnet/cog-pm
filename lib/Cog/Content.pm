@@ -5,20 +5,30 @@ use IO::All;
 
 use XXX;
 
-sub all_files {
+sub cog_files {
     my $self = shift;
     my $root = $self->config->content_root;
-    my $paths = [ map {chomp; $_} `find $root -name *.cog` ];
-    return $paths;
+    my $files = [
+        map {
+            chomp;
+            $_;
+        } `find $root -name *.cog`
+    ];
+    return $files;
 }
 
-sub node_from_path {
+sub dead_cog_files {
     my $self = shift;
-    my $path = shift;
-    my $text = io($path)->all;
+    return [];
+}
+
+sub node_from_reference {
+    my $self = shift;
+    my $reference = shift;
+    my $text = io($reference)->all;
     my ($type) = ($text =~/^Type:\s+(\w+)$/mg)
-        or die "$path has no Type";
-    my $node_class = $self->store->node_class_map->{$type}
+        or die "$reference has no Type";
+    my $node_class = $self->store->schema_map->{$type}->node_class
         or die;
     return $node_class->from_text($text);
 }

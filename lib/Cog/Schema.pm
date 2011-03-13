@@ -14,6 +14,10 @@ sub BUILD {
     my $fields = $self->fields;
     for (my $i = 0; $i < @$fields; $i++) {
         my $field = $fields->[$i];
+        my $index;
+        if (ref($field) eq 'ARRAY') {
+            ($field, $index) = @$field;
+        }
         next if ref($field);
         my ($name, $modifier) = ($field =~ /^(\w+)([\*\+\?])?$/g);
         my ($req, $list) =
@@ -22,12 +26,21 @@ sub BUILD {
             $modifier eq '*' ? (0, 1) :
             $modifier eq '+' ? (1, 1) :
             die;
-        $fields->[$i] = Cog::Node::Schema::Field->new(
+        $field = $fields->[$i] = Cog::Schema::Field->new(
             name => $name,
             type => 'Str',
             req => $req,
             list => $list,
         );
+        next unless $index;
+        my @args;
+        if (ref($index) eq 'ARRAY') {
+            ($index, @args) = @$index;
+        }
+        unless (ref($index)) {
+            $index = Cog::Schema::Index->new(name => $index, @args);
+        }
+        $field->{index} = $index;
     }
     return $self;
 }
@@ -76,13 +89,20 @@ sub all_fields {
     return \ @fields;
 }
 
-package Cog::Node::Schema::Field;
+package Cog::Schema::Field;
 use Mouse;
 
 has name => (is => 'ro');
 has type => (is => 'ro');
 has req => (is => 'ro');
 has list => (is => 'ro');
+has index => (is => 'ro');
+
+package Cog::Schema::Index;
+use Mouse;
+
+has name => (is => 'ro');
+has key => (is => 'ro', default => '$v');
+has value => (is => 'ro', default => '$i');
 
 1;
-

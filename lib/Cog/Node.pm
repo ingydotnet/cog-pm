@@ -102,9 +102,4 @@ sub to_text {
     return $text;
 }
 
-# sub to_text {
-#     my $self = shift;
-#     my %keys = map ($_, 1), keys %$self;
-# }
-
 1;

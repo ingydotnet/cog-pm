@@ -52,8 +52,7 @@ sub get_app {
     }
     $app_class ||=
         $ENV{COG_APP} ||
-        $class->app_from('.cog/config.yaml') ||
-        $class->app_from('cog/config.yaml') ||
+        $class->app_from($class->app_root . '/config.yaml') ||
         die "Can't determine Cog App class";
     unless ($app_class->can('new')) {
         eval "use $app_class; 1"

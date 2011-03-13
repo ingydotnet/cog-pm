@@ -28,23 +28,49 @@ sub id_used {
     die "missing node store"
         unless -e "path/_";
     return if -e "$path/$short";
-    io("$path/$short")->print($full);
+    io("$path/$short")->symlink($full);
     return 1;
 }
 
 sub init {
     my $self = shift;
     my $root = $self->root;
-    io->dir($root)->assert->mkdir();
-    mkdir "$root/node" or die;
-    mkdir "$root/index" or die;
+    die "Cog store already initialized"
+        if -e "$root/node/_";
+    io("$root/node/_")->assert->touch();
+    io("$root/index/_")->assert->touch();
 }
 
 sub put {
     my $self = shift;
     my $node = shift;
-    XXX $node unless $node->Short;
-    io->file($self->root . '/node/' . $node->Short)->print($node->Id);
+    my $prev;
+    my $ref = $self->content->node_reference($node);
+    my $root = $self->root or die;
+    my $id = $node->Short or die;
+    my $type = $node->Type or die;
+    my $anchor = "$root/node/$id";
+
+    if (not -e $anchor) {
+        $prev = $self->store->schema_map->{$type}->node_class;
+        io($anchor)->symlink("../../" . $ref);
+    }
+    # if no node/id
+      # Create symlink of node/id -> file.cog
+      # $prev = empty_node
+    # else
+      # $prev = get prev node
+    # update node (Time, Rev, etc)
+    # delete prev content
+    # write node to content
+    # symlink node/id -> file.cog
+    # diff node with prev
+    # foreach (@diff)
+      # update appropriate index
+        # Check schema for index
+      # update appropriate view
+
+    io($self->root . '/node/' . $id)->symlink($ref);
 }
 
 # 2 - 352

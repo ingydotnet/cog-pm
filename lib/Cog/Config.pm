@@ -163,6 +163,7 @@ sub expand_list {
     my ($self, $list, $plugin, $expanded) = @_;
     return if $expanded->{$plugin};
     $expanded->{$plugin} = 1;
+    eval "use $plugin";
     unshift @$list, $plugin;
     my $adds = [];
     my $parent;

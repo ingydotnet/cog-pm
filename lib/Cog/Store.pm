@@ -13,7 +13,6 @@ use XXX;
 
 has root => (is => 'ro', default => 'cog');
 has schema_map => (is => 'ro', default => sub {+{}});
-has node_class_map => (is => 'ro', default => sub {+{}});
 use constant schemata => [
     'Cog::Node::Schema',
 ];
@@ -23,12 +22,10 @@ srand();
 sub BUILD {
     my $self = shift;
     $self->schema_map->{CogNode} = Cog::Node::Schema->new();
-    $self->node_class_map->{CogNode} = 'Cog::Node'; 
     for my $class (@{$self->schemata}) {
         my $schema = $class->new;
         my $type = $schema->type;
         $self->schema_map->{$type} = $schema;
-        $self->node_class_map->{$type} = $schema->node_class;
     }
     return $self;
 };
@@ -67,12 +64,19 @@ sub import_files {
     my $self = shift;
     my $files = shift;
     for my $path (@$files) {
-        my $node = $self->content->node_from_path($path);
-        $self->put($node);
+        my $node = $self->content->node_from_reference($path);
+        $self->put($node, $path);
     }
 }
 
-
+sub reserve_keys {
+    my $self = shift;
+    my $files = shift;
+    for my $path (@$files) {
+        my $node = $self->content->node_from_reference($path);
+        $self->id_used($node->Short, $node->Id . " archived");
+    }
+}
 
 # sub index_name {
 #     my $self = shift;
