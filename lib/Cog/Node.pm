@@ -102,4 +102,40 @@ sub to_text {
     return $text;
 }
 
+sub update_from_hash {
+    my $self = shift;
+    my $data = shift;
+    my $changed = 0;
+    for my $field (qw(Body Format abstract contact worker estimate worked remain status department iteration)) {
+        my $new_value = $data->{$field} || '';
+        my $old_value = $self->{$field} || '';
+        next unless $new_value or $old_value;
+        if ($new_value ne $old_value) {
+            $self->{$field} = $new_value;
+            $changed = 1;
+        }
+    }
+
+    for my $field (qw(Tag rt)) {
+        my $new_value = join(',', @{($data->{$field} || [])});
+        my $old_value = join(',', @{($self->{$field} || [])});
+        if ($new_value ne $old_value) {
+            $self->{$field} = ($data->{$field} || []);
+            $changed = 1;
+        }
+    }
+    return unless $changed;
+
+    $self->{User} = $data->{User};
+    $self->{Time} = time;
+    $self->{Rev} = ($self->{Rev} || 0) + 1;
+
+    return 1;
+
+#     my $new_text = $self->to_text;
+#     io($node_file_path)->print($new_text);
+#     $self->maker->make;
+#     $self->git_commit($content_root, $node_file, $page);
+}
+
 1;

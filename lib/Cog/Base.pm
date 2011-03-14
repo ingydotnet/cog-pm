@@ -1,5 +1,6 @@
 package Cog::Base;
 use Mouse;
+use JSON;
 
 # System singleton object pointers.
 my $config;
@@ -9,6 +10,7 @@ my $runner;
 my $store;
 my $webapp;
 my $view;
+my $json;
 
 # The config reference must be initialized at startup.
 sub initialize { $config ||= $_[1] }
@@ -47,6 +49,17 @@ sub DISTNAME {
     my $dist = $module;
     $dist =~ s/::/-/g;
     return $dist;
+}
+
+# Access to a set up JSON object
+sub json {
+    $json ||= do {
+        my $j = JSON->new;
+        $j->allow_blessed;
+        $j->convert_blessed;
+        $j;
+    };
+    return $json;
 }
 
 1;

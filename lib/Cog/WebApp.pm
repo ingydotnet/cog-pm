@@ -2,7 +2,7 @@ package Cog::WebApp;
 use Mouse;
 extends 'Cog::Base';
 
-use JSON;
+use XXX;
 
 has env => ( is => 'rw' );
 
@@ -19,6 +19,7 @@ use constant js_files => [qw(
     cog.js
     config.js
     url-map.js
+    fixups.js
 )];
 use constant css_files => [qw(
     layout.css
@@ -73,7 +74,10 @@ sub handle_post {
     @args = map {s/\$(\d+)/$captures[$1]/ge; ($_)} @args;
     my $method = "handle_$action";
     my $result = eval { $self->$method(@args) };
-    return [500, [], [ $@ ]] if $@;
+    if ($@) {
+        warn $@;
+        return [500, [], [ $@ ]];
+    }
     $result = 'OK' unless defined $result;
     if (ref($result) eq 'ARRAY') {
         return $result;
@@ -82,7 +86,7 @@ sub handle_post {
         return [
             200,
             [ 'Content-Type' => 'application/json' ],
-            [ $self->maker->json->encode($result) ]
+            [ $self->json->encode($result) ]
         ];
     }
     else {
@@ -97,7 +101,7 @@ sub read_json {
         $env->{CONTENT_TYPE} =~ m!application/json! and
         $env->{CONTENT_LENGTH};
     my $json = do { my $io = $env->{'psgi.input'}; local $/; <$io> };
-    $env->{post_data} = JSON::decode_json($json);
+    $env->{post_data} = $self->json->decode($json);
 }
 
 1;

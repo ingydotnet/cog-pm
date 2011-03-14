@@ -8,15 +8,7 @@ extends 'Cog::Base';
 use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
-use JSON;
 use Pod::Simple::HTML;
-
-has json => ('is' => 'ro', builder => sub {
-    my $json = JSON->new;
-    $json->allow_blessed;
-    $json->convert_blessed;
-    return $json;
-});
 
 sub make {
     my $self = shift;
@@ -26,7 +18,6 @@ sub make {
     $self->make_all_css();
     $self->make_index_html;
     $self->make_store();
-    $self->make_views();
 }
 
 sub make_config_js {
@@ -113,10 +104,6 @@ sub make_store {
         $self->store->import_files($self->content->cog_files);
         $self->store->reserve_keys($self->content->dead_cog_files);
     }
-}
-
-sub make_views {
-    my $self = shift;
 }
 
 1;

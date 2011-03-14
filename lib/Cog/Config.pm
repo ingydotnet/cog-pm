@@ -164,6 +164,8 @@ sub expand_list {
     return if $expanded->{$plugin};
     $expanded->{$plugin} = 1;
     eval "use $plugin";
+    die "use $plugin; error: $@"
+        if $@ and $@ !~ /Can't locate/;
     unshift @$list, $plugin;
     my $adds = [];
     my $parent;

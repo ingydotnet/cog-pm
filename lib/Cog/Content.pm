@@ -33,4 +33,18 @@ sub node_from_reference {
     return $node_class->from_text($text);
 }
 
+sub git_commit {
+    my ($self, $root, $file, $page) = @_;
+    my $user = $page->{User};
+    my $email = "$user\@strategicdata.com.au";
+    local $ENV{GIT_AUTHOR_NAME} = $user;
+    local $ENV{GIT_COMMITTER_NAME} = $user;
+    local $ENV{GIT_AUTHOR_EMAIL} = $email;
+    local $ENV{GIT_COMMITTER_EMAIL} = $email;
+    my $msg = "$file updated by SSB web editor";
+    my $cmd = "(cd $root; git add $file; git commit -m '$msg')";
+    system($cmd) == 0
+        or die "Failed to commit change to git repo.";
+}
+
 1;
