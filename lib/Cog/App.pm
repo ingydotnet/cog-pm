@@ -307,7 +307,15 @@ sub handle_edit {
 }
 
 sub handle_clean {
-    # TODO - Remove .cog files except config.yaml (if present)
+    my $self = shift;
+    $self->maker->make_clean;
+    print <<'...';
+Cog is clean. To rebuild, run this command:
+
+    cog make
+
+...
+    
 }
 
 1;

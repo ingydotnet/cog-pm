@@ -12,6 +12,7 @@ has views => ( is => 'ro', default => sub {+{}} );
 sub BUILD {
     my $self = shift;
     mkdir $self->root;
+    mkdir $self->root . "/tag";
     return $self;
 }
 
@@ -41,6 +42,30 @@ sub update {
     $self->update_page_json($id, $blob);
     $self->update_page_html($id, $node, $diff);
     $self->update_page_list($blob);
+    $self->update_tag_cloud($blob);
+}
+
+sub update_tag_cloud {
+    my ($self, $blob) = @_;
+    my $time = $blob->{Time} * 1000;
+    my $cloud = $self->views->{'tag-cloud'} ||= {};
+    for my $name (qw(contact iteration department)) {
+        my $tag = $blob->{$name} or next;
+        $self->add_tag($cloud, $tag, $time, $blob);
+    }
+    for my $tag (@{$blob->{Tag} || []}) {
+        $self->add_tag($cloud, $tag, $time, $blob);
+    }
+}
+
+sub add_tag {
+    my ($self, $cloud, $tag, $time, $blob) = @_;
+    $cloud->{$tag} ||= [$tag, 0, 0];
+    $cloud->{$tag}[1]++;
+    $cloud->{$tag}[2] = $time
+        if $time > $cloud->{$tag}[2];
+    my $group = $self->views->{"tag/$tag"} ||= [];
+    push @$group, $blob;
 }
 
 sub update_page_json {
@@ -66,14 +91,18 @@ sub flush {
     my $self = shift;
     for my $name (keys %{$self->views}) {
         my $view = delete $self->views->{$name};
-        if ($name eq 'page-list') {
-            $view = [
-                sort { $b->{Time} <=> $a->{Time} } @$view
-            ];
-        }
+        $view = [ sort { $b->{Time} <=> $a->{Time} } @$view ]
+            if $name eq 'page-list';
+        $view = [ values %$view ]
+            if $name eq 'tag-cloud';
         io($self->root . "/$name.json")
             ->print($self->json->encode($view));
     }
+}
+
+sub clear {
+    my $self = shift;
+    $self->{views} = {};
 }
 
 1;

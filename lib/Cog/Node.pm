@@ -43,7 +43,7 @@ sub from_text {
     my $text = shift;
     my $type = $class->Type;
 
-    my $schema = Cog::App->new->store->schema_map->{$type};
+    my $schema = Cog::Base->store->schema_map->{$type};
 
     my $head = ($text =~ s/\A((?:[\w\-]+:\ .*\n)+)(\n|\z)//) ? $1 : '';
 
@@ -74,25 +74,23 @@ sub to_text {
     my $self = shift;
     my $text = '';
 
-    for my $field ($self->SCHEMA) {
-        $field =~ s/([\?\+\*]?)$//;
-        next if $field eq 'Body';
-        my $mod = $1 || '';
-        my $list = ($mod =~ /[\+\*]/);
-        my $optional = ($mod =~ /[\*\?]/);
-        next unless defined $self->{$field};
-        my $value = $self->{$field};
+    my $schema = Cog::Base->store->schema_map->{$self->Type};
+    for my $field (@{$schema->all_fields}) {
+        my ($name, $req, $list) = @{$field}{qw(name req list)};
+        next if $name eq 'Body';
+        my $value = $self->$name;
+        next unless defined $value and length($value);
         if ($list) {
             for my $elem (@$value) {
-                $text .= "${field}: $elem\n";
+                $text .= "${name}: $elem\n";
             }
         }
         else {
-            $text .= "${field}: $value\n";
+            $text .= "${name}: $value\n";
         }
     }
-    if (defined $self->{Body}) {
-        my $Body = $self->{Body};
+    if (defined $self->Body) {
+        my $Body = $self->Body;
         chomp $Body;
         if (length $Body) {
             $text .= "\n$Body\n";
@@ -124,18 +122,10 @@ sub update_from_hash {
             $changed = 1;
         }
     }
-    return unless $changed;
 
     $self->{User} = $data->{User};
-    $self->{Time} = time;
-    $self->{Rev} = ($self->{Rev} || 0) + 1;
 
-    return 1;
-
-#     my $new_text = $self->to_text;
-#     io($node_file_path)->print($new_text);
-#     $self->maker->make;
-#     $self->git_commit($content_root, $node_file, $page);
+    return $changed;
 }
 
 1;

@@ -5,6 +5,8 @@ package Cog::Maker;
 use Mouse;
 extends 'Cog::Base';
 
+use XXX;
+
 use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
@@ -103,6 +105,15 @@ sub make_store {
         $self->store->init();
         $self->store->import_files($self->content->cog_files);
         $self->store->reserve_keys($self->content->dead_cog_files);
+    }
+}
+
+sub make_clean {
+    my $self = shift;
+    my $dir = $self->store->root;
+    if (-e $dir) {
+        system("rm -fr $dir") == 0
+            or die;
     }
 }
 

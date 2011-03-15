@@ -5,6 +5,22 @@ use IO::All;
 
 use XXX;
 
+has last_user => ( is => 'rw' );
+
+sub update {
+    my ($self, $node, $diff) = @_;
+
+    my $new_text = $node->to_text;
+    io($self->content_pointer($node))->print($new_text);
+
+    $self->last_user($node->User);
+}
+
+sub flush {
+    my $self = shift;
+    $self->git_commit();
+}
+
 sub cog_files {
     my $self = shift;
     my $root = $self->config->content_root;
@@ -34,15 +50,16 @@ sub node_from_reference {
 }
 
 sub git_commit {
-    my ($self, $root, $file, $page) = @_;
-    my $user = $page->{User};
+    my $self = shift;
+    my $root = $self->config->content_root;
+    my $user = $self->last_user;
     my $email = "$user\@strategicdata.com.au";
     local $ENV{GIT_AUTHOR_NAME} = $user;
     local $ENV{GIT_COMMITTER_NAME} = $user;
     local $ENV{GIT_AUTHOR_EMAIL} = $email;
     local $ENV{GIT_COMMITTER_EMAIL} = $email;
-    my $msg = "$file updated by SSB web editor";
-    my $cmd = "(cd $root; git add $file; git commit -m '$msg')";
+    my $msg = "updated by SSB web editor";
+    my $cmd = "(cd $root; git add .; git commit -m '$msg')";
     system($cmd) == 0
         or die "Failed to commit change to git repo.";
 }

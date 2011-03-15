@@ -7,12 +7,12 @@ extends 'Cog::Base';
 use Cog::Node;
 use Cog::Node::Schema;
 use IO::All;
-use Git::Wrapper;
 use Convert::Base32::Crockford ();
 
 use XXX;
 
 has root => (is => 'ro', default => 'store');
+has importing => (is => 'rw', default => '0');
 has schema_map => (is => 'ro', default => sub {+{}});
 use constant schemata => [
     'Cog::Node::Schema',
@@ -33,7 +33,7 @@ sub BUILD {
 
 sub exists {
     my $self = shift;
-    return -e "$self->root/node";
+    return -e $self->root . "/node";
 }
 
 sub init {
@@ -50,7 +50,7 @@ sub get {
     my $id = shift;
     my $root = $self->root;
     my $io = io("$root/node/$id");
-    die unless $io->exists;
+    die "$io does not exist" unless $io->exists;
     return $self->node_from_text($io->all);
 }
 
@@ -67,7 +67,7 @@ sub put {
     my $self = shift;
     my $node = shift;
     my $prev;
-    my $ref = $self->content->node_reference($node);
+    my $pointer = $self->content->content_pointer($node);
     my $root = $self->root or die;
     my $id = $node->Short or die;
     my $type = $node->Type or die;
@@ -75,28 +75,41 @@ sub put {
 
     if (not -e $anchor) {
         $prev = $self->schema_map->{$type}->node_class->new;
-        io($anchor)->symlink("../../" . $ref);
+        io($anchor)->symlink("../../" . $pointer);
     }
     else {
         $prev = $self->node_from_text(io($anchor)->all);
     }
 
-    # update node (Time, Rev, etc)
-    # delete prev content
-    # write node to content
-    # symlink node/id -> file.cog
-    # diff node with prev
-
-    $self->update($prev => $node);
+    $self->update($prev => $node)
+        unless $self->importing;
     my $diff = $self->diff($prev, $node);
     $self->index_update($node, $diff);
     $self->view->update($node, $diff);
+    $self->content->update($node, $diff)
+        unless $self->importing;
+}
+
+sub flush {
+    my $self = shift;
+
+# XXX - Temporary hack to sync everything on save. Very slow, but accurate.
+    if ($self->importing) {
+        $self->view->flush;
+    }
+    else {
+        $self->view->clear;
+        $self->content->flush;
+        $self->maker->make_clean;
+        $self->maker->make_store;
+    }
 }
 
 sub update {
-#     my ($self, $prev, $node) = @_;
-#     return $node unless $prev->Id;
-#     die;
+    my ($self, $prev, $node) = @_;
+
+    $node->Time(scalar time);
+    $node->Rev(($prev->{Rev} || 0) + 1);
 }
 
 sub diff {
@@ -177,12 +190,14 @@ sub id_used {
 
 sub import_files {
     my $self = shift;
+    $self->importing(1);
     my $files = shift;
     for my $path (@$files) {
         my $node = $self->content->node_from_reference($path);
         $self->put($node, $path);
     }
-    $self->view->flush;
+    $self->flush;
+    $self->importing(0);
 }
 
 sub reserve_keys {
