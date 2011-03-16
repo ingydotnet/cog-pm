@@ -43,13 +43,28 @@ sub update {
     $self->update_page_html($id, $node, $diff);
     $self->update_page_list($blob);
     $self->update_tag_cloud($blob);
+    $self->update_story_tasks($blob);
+}
+
+sub update_story_tasks {
+    my ($self, $task) = @_;
+    return unless $task->{Type} eq 'task';
+    my $story_id = $task->{story}
+        or return;
+    $story_id =~ s/^\*(\w{4})$/$1/
+        or die "$story_id is invalid story_id pointer";
+    my $story = $self->views->{$story_id}
+        or return;
+    return unless $story->{Type} eq 'story';
+    my $tasks = $story->{_tasks} ||= [];
+    push @$tasks, $task->{Id};
 }
 
 sub update_tag_cloud {
     my ($self, $blob) = @_;
     my $time = $blob->{Time} * 1000;
     my $cloud = $self->views->{'tag-cloud'} ||= {};
-    for my $name (qw(contact iteration department)) {
+    for my $name (qw(Type contact iteration department)) {
         my $tag = $blob->{$name} or next;
         $self->add_tag($cloud, $tag, $time, $blob);
     }
@@ -70,7 +85,7 @@ sub add_tag {
 
 sub update_page_json {
     my ($self, $id, $blob) = @_;
-    io($self->root . "/$id.json")->print($self->json->encode($blob));
+    $self->views->{"$id"} = $blob;
 }
 
 sub update_page_html {

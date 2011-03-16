@@ -100,32 +100,4 @@ sub to_text {
     return $text;
 }
 
-sub update_from_hash {
-    my $self = shift;
-    my $data = shift;
-    my $changed = 0;
-    for my $field (qw(Body Format abstract contact worker estimate worked remain status department iteration)) {
-        my $new_value = $data->{$field} || '';
-        my $old_value = $self->{$field} || '';
-        next unless $new_value or $old_value;
-        if ($new_value ne $old_value) {
-            $self->{$field} = $new_value;
-            $changed = 1;
-        }
-    }
-
-    for my $field (qw(Tag rt)) {
-        my $new_value = join(',', @{($data->{$field} || [])});
-        my $old_value = join(',', @{($self->{$field} || [])});
-        if ($new_value ne $old_value) {
-            $self->{$field} = ($data->{$field} || []);
-            $changed = 1;
-        }
-    }
-
-    $self->{User} = $data->{User};
-
-    return $changed;
-}
-
 1;

@@ -50,7 +50,7 @@ sub get {
     my $id = shift;
     my $root = $self->root;
     my $io = io("$root/node/$id");
-    die "$io does not exist" unless $io->exists;
+    return unless $io->exists;
     return $self->node_from_text($io->all);
 }
 
@@ -249,6 +249,46 @@ sub unindex {
         return 1;
     }
     return 0;
+}
+
+sub update_node_from_hash {
+    my $self = shift;
+    my $node = shift;
+    my $data = shift;
+    my $changed = 0;
+    for my $field (qw(Body Format story abstract contact worker estimate worked remain status department iteration)) {
+        my $new_value = $data->{$field} || '';
+        my $old_value = $node->{$field} || '';
+        next unless $new_value or $old_value;
+        if ($new_value ne $old_value) {
+            $node->{$field} = $new_value;
+            $changed = 1;
+            $self->check_story_ref($new_value)
+                if $field eq 'story' and $new_value;
+        }
+    }
+
+    for my $field (qw(Tag rt)) {
+        my $new_value = join(',', @{($data->{$field} || [])});
+        my $old_value = join(',', @{($node->{$field} || [])});
+        if ($new_value ne $old_value) {
+            $node->{$field} = ($data->{$field} || []);
+            $changed = 1;
+        }
+    }
+
+    $node->{User} = $data->{User};
+
+    return $changed;
+}
+
+sub check_story_ref {
+    my ($self, $id) = @_;
+    $id =~ s/^\*// or die "no asterisk";
+    my $node = $self->get($id)
+        or die "'$id' does not exist";
+    die "'$id' is not a story page"
+        unless $node->Type eq 'story';
 }
 
 1;
