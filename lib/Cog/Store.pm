@@ -256,7 +256,7 @@ sub update_node_from_hash {
     my $node = shift;
     my $data = shift;
     my $changed = 0;
-    for my $field (qw(Body Format story abstract contact worker estimate worked remain status department iteration)) {
+    for my $field (qw(Body Format story ticket abstract contact worker estimate worked remain status department iteration)) {
         my $new_value = $data->{$field} || '';
         my $old_value = $node->{$field} || '';
         next unless $new_value or $old_value;

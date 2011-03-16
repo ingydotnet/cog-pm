@@ -105,7 +105,9 @@ sub update_page_list {
 sub flush {
     my $self = shift;
     for my $name (keys %{$self->views}) {
-        my $view = delete $self->views->{$name};
+        my $view = $self->views->{$name};
+        $self->compile_hours($view)
+            if $name =~ /^[A-Z2-9]{4}$/ and $view->{_tasks};
         $view = [ sort { $b->{Time} <=> $a->{Time} } @$view ]
             if $name eq 'page-list';
         $view = [ values %$view ]
@@ -113,6 +115,21 @@ sub flush {
         io($self->root . "/$name.json")
             ->print($self->json->encode($view));
     }
+    $self->clear;
+}
+
+sub compile_hours {
+    my ($self, $story) = @_;
+    my ($estimate, $worked, $remain) = (0, 0, 0);
+    for my $id (@{$story->{_tasks}}) {
+        my $task = $self->views->{$id};
+        $estimate += $task->{estimate} || 0;
+        $worked += $task->{worked} || 0;
+        $remain += $task->{remain} || 0;
+    }
+    $story->{estimate} = $estimate;
+    $story->{worked} = $worked;
+    $story->{remain} = $remain;
 }
 
 sub clear {
