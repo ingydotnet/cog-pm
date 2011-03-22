@@ -21,10 +21,10 @@ sub app {
         enable_if sub { fingerprinted(@_) },
             'Header', set => ['Expires' => MAX_DATE];
         # All other files get ETagged
-        enable_if sub {! fingerprinted(@_) },
+        enable_if sub { ! fingerprinted(@_) },
             'Header', set => ['Cache-Control' => 'no-cache'];
-        enable 'ETag', file_etag => [qw/inode mtime size/];
         enable 'ConditionalGET';
+        enable 'ETag', file_etag => [qw/inode mtime size/];
         # Serve static files from disk
         enable 'Static', path => qr{^/(static|view)/}, root => './';
         # Everything else is from the web app.

@@ -39,17 +39,16 @@ sub web_app {
 
     my $time = scalar(gmtime);
     $time .= ' GMT' unless $time =~ /GMT/;
-    my $index = [
-        200, [
-            'Content-Type' => 'text/html',
-            'Last-Modified' => $time,
-        ], [$html]
-    ];
     return sub {
         my $env = shift;
         return $env->{REQUEST_METHOD} eq 'POST'
             ? $self->handle_post($env)
-            : $index;
+            : [
+                200, [
+                    'Content-Type' => 'text/html',
+                    'Last-Modified' => $time,
+                ], [$html]
+            ];
     };
 }
 

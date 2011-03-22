@@ -1,5 +1,5 @@
 body {
-    background: url("/static/image/tile.gif") repeat scroll 0 0 #84856A;
+    background-color: #fff;
     border: 0;
     font-family: Helvetica;
     font-size: 100%;
@@ -21,8 +21,8 @@ html, body {
 }
 
 .logo {
-    border: 0px;
-    width: 145px;
+    float: left;
+    width: 80px;
 }
 
 .layout {

@@ -11,10 +11,15 @@ use Getopt::Long qw(:config pass_through);
 use YAML::XS;
 use Cwd 'abs_path';
 
-# use XXX;
+use XXX;
 
 use constant Name => 'Cog';
-use constant app_root => ((-e '.cog') ? '.cog' : 'cog');
+# use constant app_root => 'cog';
+use constant app_root => (
+    (-e '.cog') ? '.cog' :
+    (-e 'cog') ? 'cog' :
+    '.'
+);
 use constant command_script => 'cog';
 
 use constant config_class => 'Cog::Config';
@@ -88,6 +93,8 @@ around BUILDARGS => sub {
 
     $app_root = abs_path($app_root) || $app_root;
     my $config_path = abs_path("$app_root/$config_file") || '';
+    $config_path = ''
+        unless -e $config_path;
     my $hash = $config_path
         ? YAML::XS::LoadFile($config_path)
         : {};
@@ -188,7 +195,7 @@ See:
 sub handle_init {
     my $self = shift;
     my $root = $self->config->app_root;
-    throw Error "Can't init. Cog environment already exists."
+    throw Error "Can't init. Cog environment already exists.\n"
         if $self->config->is_init;
 
     $self->_copy_assets();
@@ -208,7 +215,7 @@ sub handle_init {
 
     $self->config->chdir_root;
 
-    $self->store->create;
+    $self->store->init;
 
     my $Name = $self->Name;
     my $name = $self->config->command_script;

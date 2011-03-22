@@ -110,10 +110,20 @@ sub make_store {
 
 sub make_clean {
     my $self = shift;
-    my $dir = $self->store->root;
-    if (-e $dir) {
-        system("rm -fr $dir") == 0
-            or die;
+    my $app_root = $self->config->app_root
+        or die "app_root not available";
+    $app_root =~ m!/!
+        or die "app_root not absolute";
+    for my $dir (
+        "$app_root/static",
+        "$app_root/template",
+        $self->store->root,
+    ) {
+        if (-e $dir) {
+            my $cmd = "rm -fr $dir";
+            system($cmd) == 0
+                or die "'$cmd' failed";
+        }
     }
 }
 

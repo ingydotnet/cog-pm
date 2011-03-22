@@ -16,6 +16,18 @@ $Cog.init = function() {
     }
 };
 
+$Cog.setup_functions.push(function() {
+    $('.site-navigation a._navigate')
+        .unbind('click')
+        .bind('click', this.bind('navigate'));
+});
+
+$Cog.navigate = function(elem) {
+    var f = $(elem).attr('href').replace(/^#/, '');
+    this.bind(f)();
+    return false;
+};
+
 $Cog.dispatch = function(path) {
     var map = this.url_map;
     for (var i = 0, il = map.length; i < il; i++) {

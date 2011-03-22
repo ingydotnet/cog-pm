@@ -10,7 +10,11 @@
 [% SET url = elem.1 %]
 [% SET sublist = elem.2 %]
 
+[% IF url.search("") %]
   <li><a href="[% base_url %][% url %]" class="[% label | lower %]">[% label %]</a>
+[% ELSE %]
+  <li><a href="#[% url.0 %]" class="_navigate [% label | lower %]">[% label %]</a>
+[% END %]
 
 [% IF sublist %]
 [% INCLUDE nav_list nav=sublist %]

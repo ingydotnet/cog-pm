@@ -44,7 +44,7 @@ has store_root => (
 has content_root => (
     is => 'ro',
     lazy => 1,
-    default => '..',
+    default => '.',
 );
 
 # Cog singleton object references
