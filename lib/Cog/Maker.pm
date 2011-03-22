@@ -117,6 +117,7 @@ sub make_clean {
     for my $dir (
         "$app_root/static",
         "$app_root/template",
+        "$app_root/view",
         $self->store->root,
     ) {
         if (-e $dir) {
