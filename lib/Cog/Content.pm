@@ -53,12 +53,12 @@ sub git_commit {
     my $self = shift;
     my $root = $self->config->content_root;
     my $user = $self->last_user;
-    my $email = "$user\@strategicdata.com.au";
+    my $email = "$user\@example.com";
     local $ENV{GIT_AUTHOR_NAME} = $user;
     local $ENV{GIT_COMMITTER_NAME} = $user;
     local $ENV{GIT_AUTHOR_EMAIL} = $email;
     local $ENV{GIT_COMMITTER_EMAIL} = $email;
-    my $msg = "updated by SSB web editor";
+    my $msg = "updated by Cog web editor";
     my $cmd = "(cd $root; git add .; git commit -m '$msg')";
     system($cmd) == 0
         or die "Failed to commit change to git repo.";
