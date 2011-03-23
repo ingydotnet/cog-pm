@@ -22,7 +22,8 @@ has html_title => (is => 'ro');
 
 # Server options
 has server_port => (is => 'ro', default => '');
-has proxymap => (is => 'ro', default => '');
+has proxymap => (is => 'ro');
+has cache_urls => (is => 'ro');
 
 ### These fields are part of the Cog framework:
 

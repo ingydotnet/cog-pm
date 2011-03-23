@@ -14,9 +14,15 @@ use constant MAX_DATE => 'Sun, 17-Jan-2038 19:14:07 GMT';
 sub app {
     my $self = shift;
     return builder {
+        # Serve cached stuff...
+        enable 'Cache' => (
+            match_url => $self->config->cache_urls,
+            cache_dir => 'cache',
+        ) if $self->config->cache_urls;
         # If this is a proxy url, just serve that.
-        enable 'ProxyMap', proxymap => $self->config->proxymap
-            if $self->config->proxymap;
+        enable 'ProxyMap' => (
+            proxymap => $self->config->proxymap,
+        ) if $self->config->proxymap;
         # Fingerprinted files live forever
         enable_if sub { fingerprinted(@_) },
             'Header', set => ['Expires' => MAX_DATE];
