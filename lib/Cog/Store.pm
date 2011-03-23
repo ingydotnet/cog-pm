@@ -100,7 +100,7 @@ sub flush {
     else {
         $self->view->clear;
         $self->content->flush;
-        $self->maker->make_clean;
+        system("rm -fr store");
         $self->maker->make_store;
     }
 }
