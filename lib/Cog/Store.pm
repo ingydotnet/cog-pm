@@ -170,7 +170,6 @@ sub new_id {
         $short = $1;
         next unless
             ($short =~/[2-9]/ and $short =~ /[A-Z]/ and $short !~ /[01]/);
-        warn $short;
         return $full
             unless $self->id_used($short, $full);
     }
@@ -255,29 +254,34 @@ sub update_node_from_hash {
     my $self = shift;
     my $node = shift;
     my $data = shift;
+    my $type = $node->Type;
     my $changed = 0;
-    for my $field (qw(Body Format story ticket abstract contact worker estimate worked remain status department iteration)) {
-        my $new_value = $data->{$field} || '';
-        my $old_value = $node->{$field} || '';
-        next unless $new_value or $old_value;
-        if ($new_value ne $old_value) {
-            $node->{$field} = $new_value;
-            $changed = 1;
-            $self->check_story_ref($new_value)
-                if $field eq 'story' and $new_value;
+    for my $field (@{$self->schema_map->{$type}->all_fields}) {
+        my $name = $field->name;
+        next if $name =~ /^(Id|Type)$/;
+        my $list = $field->list;
+        if ($list) {
+            my $new_value = join(',', @{($data->{$name} || [])});
+            my $old_value = join(',', @{($node->{$name} || [])});
+            if ($new_value ne $old_value) {
+                $node->{$name} = ($data->{$name} || []);
+                $changed = 1;
+            }
+        }
+        else {
+            my $new_value = $data->{$name} || '';
+            my $old_value = $node->{$name} || '';
+            next unless $new_value or $old_value;
+            if ($new_value ne $old_value) {
+                $node->{$name} = $new_value;
+                $changed = 1;
+                $self->check_story_ref($new_value)
+                    if $name eq 'story' and $new_value;
+            }
         }
     }
 
-    for my $field (qw(Tag rt)) {
-        my $new_value = join(',', @{($data->{$field} || [])});
-        my $old_value = join(',', @{($node->{$field} || [])});
-        if ($new_value ne $old_value) {
-            $node->{$field} = ($data->{$field} || []);
-            $changed = 1;
-        }
-    }
-
-    $node->{User} = $data->{User};
+    $node->{User} = $data->{User} || $ENV{USER};
 
     return $changed;
 }

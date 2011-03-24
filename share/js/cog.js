@@ -144,8 +144,12 @@ $Cog.post_json = function(post_url, post_data, post_callback) {
 $Cog.bind = function(method) {
     var cog = this;
     var args = Array.prototype.slice.call(arguments, 1);
+    var func =
+        (typeof method == 'undefined') ? function() {} :
+        (typeof method == 'string') ? cog[method] :
+        method;
     return function() {
-        return cog[method].apply(
+        return func.apply(
             cog, args.concat(this, Array.prototype.slice.call(arguments))
         );
     };

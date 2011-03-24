@@ -16,16 +16,9 @@ has User => (is => 'rw');
 has Name => (is => 'rw', default => sub {[]} );
 has Tag => (is => 'rw', default => sub {[]}, lazy => 1 );
 has Url => (is => 'rw', default => sub {[]}, lazy => 1 );
+has From => (is => 'rw');
 has Body => (is => 'rw');
 has Format => (is => 'rw');
-
-# sub from_cog_file {
-#     my $self = shift;
-# }
-
-# sub to_cog_file {
-#     my $self = shift;
-# }
 
 sub Title {
     my $self = shift;

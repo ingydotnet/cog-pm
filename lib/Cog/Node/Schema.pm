@@ -13,6 +13,7 @@ use constant fields => [
     ['Name*', ['Name', key => 'flatten $v']],
     'Tag*',
     'Url*',
+    'From?',
     'Body?',
     'Format?',
 ];

@@ -23,6 +23,7 @@ html, body {
 .logo {
     float: left;
     width: 80px;
+    margin: 15px 0px;
 }
 
 .layout {
