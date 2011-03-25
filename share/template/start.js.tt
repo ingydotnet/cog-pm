@@ -1,5 +1,5 @@
 jQuery(
     function() {
-        (new Cog()).dispatch(location.pathname);
+        (new window[Cog.App]()).dispatch(location.pathname);
     }
 );
