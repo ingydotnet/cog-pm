@@ -3,6 +3,8 @@ version: 0.06
 date:    
 changes:
 - Add missing prereqs
+- Tons of work since last release
+- Release for OSDC.tw
 ---
 version: 0.05
 date:    Thu Dec 23 00:23:17 EST 2010

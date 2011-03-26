@@ -4,7 +4,7 @@ extends 'Cog::Base';
 
 use IO::All;
 
-use XXX;
+# use XXX;
 
 has root => (is => 'ro', default => 'view');
 has views => ( is => 'ro', default => sub {+{}} );

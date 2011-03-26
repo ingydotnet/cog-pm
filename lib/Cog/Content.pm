@@ -3,7 +3,7 @@ use Mouse;
 extends 'Cog::Base';
 use IO::All;
 
-use XXX;
+# use XXX;
 
 has last_user => ( is => 'rw' );
 

@@ -5,7 +5,7 @@ package Cog::Maker;
 use Mouse;
 extends 'Cog::Base';
 
-use XXX;
+# use XXX;
 
 use Template::Toolkit::Simple;
 use IO::All;

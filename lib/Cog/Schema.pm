@@ -2,7 +2,7 @@ package Cog::Schema;
 use Mouse;
 extends 'Cog::Base';
 
-use XXX;
+# use XXX;
 
 has type => (is => 'ro');
 has parent => (is => 'ro');

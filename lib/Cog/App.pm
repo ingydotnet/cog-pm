@@ -11,7 +11,7 @@ use Getopt::Long qw(:config pass_through);
 use YAML::XS;
 use Cwd 'abs_path';
 
-use XXX;
+# use XXX;
 
 use constant Name => 'Cog';
 # use constant app_root => 'cog';

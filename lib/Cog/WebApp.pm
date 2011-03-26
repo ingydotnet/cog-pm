@@ -2,7 +2,7 @@ package Cog::WebApp;
 use Mouse;
 extends 'Cog::Base';
 
-use XXX;
+# use XXX;
 
 has env => ( is => 'rw' );
 

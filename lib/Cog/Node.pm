@@ -6,7 +6,7 @@
 package Cog::Node;
 use Mouse;
 
-use XXX;
+# use XXX;
 
 has Id => (is => 'rw');
 has Rev => (is => 'rw', default => 1, lazy => 1);

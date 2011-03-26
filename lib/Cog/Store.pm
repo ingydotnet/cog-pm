@@ -9,7 +9,7 @@ use Cog::Node::Schema;
 use IO::All;
 use Convert::Base32::Crockford ();
 
-use XXX;
+# use XXX;
 
 has root => (is => 'ro', default => 'store');
 has importing => (is => 'rw', default => '0');
