@@ -223,7 +223,7 @@ sub index {
     my $self = shift;
     my $name = shift or die;
     my $key = @_ ? shift : '';
-    my $index = "$self->root/index/$name";
+    my $index = $self->root . "/index/$name";
     if (not @_) {
         if ($key eq '') {
             return [] unless -d $index;
