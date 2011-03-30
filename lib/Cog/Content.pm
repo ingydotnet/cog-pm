@@ -28,7 +28,7 @@ sub content_pointer {
     my $id = $node->Short;
     my $type = $node->Type or die;
     my $title = $node->Title or die;
-    $title =~ s/[^-A-Za-z0-9]+/_/g;
+    $title =~ s/[^-.,:A-Za-z0-9]+/_/g;
     $title =~ s/^_?(.*?)_?$/$1/g;
     $title ||= '_';
     return "$content_root/$type/$title--$id.cog";

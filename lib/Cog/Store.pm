@@ -9,8 +9,6 @@ use Cog::Node::Schema;
 use IO::All;
 use Convert::Base32::Crockford ();
 
-# use XXX;
-
 has root => (is => 'ro', default => 'store');
 has importing => (is => 'rw', default => '0');
 has schema_map => (is => 'ro', default => sub {+{}});
@@ -261,6 +259,8 @@ sub update_node_from_hash {
         next if $name =~ /^(Id|Type)$/;
         my $list = $field->list;
         if ($list) {
+            $data->{$name} ||= [$data->{Title}]
+                if $name eq 'Name' and $data->{Title};
             my $new_value = join(',', @{($data->{$name} || [])});
             my $old_value = join(',', @{($node->{$name} || [])});
             if ($new_value ne $old_value) {
