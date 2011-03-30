@@ -221,7 +221,7 @@ sub index {
     my $self = shift;
     my $name = shift or die;
     my $key = @_ ? shift : '';
-    my $index = "$self->root/index/$name";
+    my $index = $self->root . "/index/$name";
     if (not @_) {
         if ($key eq '') {
             return [] unless -d $index;
@@ -240,7 +240,7 @@ sub unindex {
     my $name = shift or die;
     my $key = shift or die;
     my $value = shift or die;
-    my $file = "$self->root/index/$name/$key/$value";
+    my $file = $self->root . "/index/$name/$key/$value";
     if (-f $file) {
         io->file($file)->unlink;
         return 1;
