@@ -104,10 +104,14 @@ sub update_page_list {
 
 sub flush {
     my $self = shift;
+    # XXX Move to SSB
     for my $name (keys %{$self->views}) {
         my $view = $self->views->{$name};
         $self->compile_hours($view)
             if $name =~ /^[A-Z2-9]{4}$/ and $view->{_tasks};
+    }
+    for my $name (keys %{$self->views}) {
+        my $view = $self->views->{$name};
         $view = [ sort { $b->{Time} <=> $a->{Time} } @$view ]
             if $name eq 'page-list';
         $view = [ values %$view ]
