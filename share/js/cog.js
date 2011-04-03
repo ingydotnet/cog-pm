@@ -49,7 +49,7 @@ $Cog.dispatch = function(path) {
             return;
         }
     }
-    Jemplate.process('404.html.tt', null, $('div.content')[0]);
+    $('div.content').jemplate('404.html.tt');
     return;
 };
 
@@ -64,7 +64,7 @@ $Cog.home_page = function() {
 $Cog.page_display = function(id) {
     var self = this;
     $.getJSON('/view/' + id + '.json', function(data) {
-        Jemplate.process('page-display.html.tt', data, $('div.content')[0]);
+        $('div.content').jemplate('page-display.html.tt', data);
         $.get('/view/' + id + '.html', function(data) {
             $('div.page').html(data);
         });
@@ -76,16 +76,18 @@ $Cog.page_display = function(id) {
 
 $Cog.page_list = function(title) {
     $.getJSON('/view/page-list.json', function(data) {
-        data = {pages: data};
-        data.title = title,
-        Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+        data = {
+            'pages': data,
+            'title': title
+        };
+        $('div.content').jemplate('page-list.html.tt', data);
     });
 };
 
 $Cog.tag_list = function() {
     $.getJSON('/view/tag-list.json', function(data) {
         data = {tags: data};
-        Jemplate.process('tag-list.html.tt', data, $('div.content')[0]);
+        $('div.content').jemplate('tag-list.html.tt', data);
     });
 };
 
@@ -93,7 +95,7 @@ $Cog.tag_page_list = function(tag) {
     $.getJSON('/view/tag/' + tag + '.json', function(data) {
         data = {pages: data};
         data.title = 'Tag: ' + tag.replace(/%20/g, ' ');
-        Jemplate.process('page-list.html.tt', data, $('div.content')[0]);
+        $('div.content').jemplate('page-list.html.tt', data);
     });
 };
 

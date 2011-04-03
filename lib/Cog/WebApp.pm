@@ -15,6 +15,7 @@ use constant js_files => [qw(
     jquery-1.4.4.js
     jquery.json-2.2.js
     jquery.cookie.js
+    jquery.jemplate.js
     jemplate.js
     cog.js
     config.js
