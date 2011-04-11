@@ -82,6 +82,8 @@ around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
     my $config_class = $class->config_class;
+    eval "require $config_class"
+        unless UNIVERSAL::can($config_class, 'new');
     my $config_file = $class->config_file
         or die "Can't determine config file";
 
