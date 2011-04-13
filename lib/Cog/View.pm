@@ -42,8 +42,25 @@ sub update {
     $self->update_page_json($id, $blob);
     $self->update_page_html($id, $node, $diff);
     $self->update_page_list($blob);
+
+    # XXX move to SSB
     $self->update_tag_cloud($blob);
+    $self->update_project_tasks($blob);
     $self->update_story_tasks($blob);
+}
+
+sub update_project_tasks {
+    my ($self, $story) = @_;
+    return unless $story->{Type} eq 'story';
+    my $project_id = $story->{project}
+        or return;
+    $project_id =~ s/^\*(\w{4})$/$1/
+        or die "$project_id is invalid project_id pointer";
+    my $project = $self->views->{$project_id}
+        or return;
+    return unless $project->{Type} eq 'project';
+    my $stories = $project->{_story} ||= [];
+    push @$stories, $story->{Id};
 }
 
 sub update_story_tasks {
@@ -56,7 +73,7 @@ sub update_story_tasks {
     my $story = $self->views->{$story_id}
         or return;
     return unless $story->{Type} eq 'story';
-    my $tasks = $story->{_tasks} ||= [];
+    my $tasks = $story->{_task} ||= [];
     push @$tasks, $task->{Id};
 }
 
@@ -64,7 +81,7 @@ sub update_tag_cloud {
     my ($self, $blob) = @_;
     my $time = $blob->{Time} * 1000;
     my $cloud = $self->views->{'tag-cloud'} ||= {};
-    for my $name (qw(Type contact iteration department)) {
+    for my $name (qw(Type manager contact worker iteration department)) {
         my $tag = $blob->{$name} or next;
         $self->add_tag($cloud, $tag, $time, $blob);
     }
@@ -108,7 +125,7 @@ sub flush {
     for my $name (keys %{$self->views}) {
         my $view = $self->views->{$name};
         $self->compile_hours($view)
-            if $name =~ /^[A-Z2-9]{4}$/ and $view->{_tasks};
+            if $name =~ /^[A-Z2-9]{4}$/ and $view->{_task};
     }
     for my $name (keys %{$self->views}) {
         my $view = $self->views->{$name};
@@ -125,7 +142,7 @@ sub flush {
 sub compile_hours {
     my ($self, $story) = @_;
     my ($estimate, $worked, $remain) = (0, 0, 0);
-    for my $id (@{$story->{_tasks}}) {
+    for my $id (@{$story->{_task}}) {
         my $task = $self->views->{$id};
         $estimate += $task->{estimate} || 0;
         $worked += $task->{worked} || 0;
