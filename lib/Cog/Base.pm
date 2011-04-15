@@ -3,6 +3,7 @@ use Mouse;
 use JSON;
 
 # System singleton object pointers.
+my $app;
 my $config;
 my $content;
 my $maker;
@@ -13,12 +14,16 @@ my $view;
 my $json;
 
 # The config reference must be initialized at startup.
-sub initialize { $config ||= $_[1] }
+sub initialize {
+    $app ||= $_[1];
+    $config ||= $_[2];
+}
 
 # The accessors to common singleton objects are kept in single file
 # scoped lexicals, so that every Cog::Base subclass can access them
 # without needing to store them in their objects. This keeps things
 # clean and fast, and avoids needless circular refs.
+sub app { $app }
 sub config { $config }
 sub content { $content || ($content = $config->content) }
 sub maker { $maker || ($maker = $config->maker) }

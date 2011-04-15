@@ -24,7 +24,7 @@ sub make {
 
 sub make_config_js {
     my $self = shift;
-    my $config_path = $self->config->app_root . '/config.yaml';
+    my $config_path = $self->app->config_file;
     my $data = {
         json => $self->json->encode(YAML::XS::LoadFile($config_path)),
     };

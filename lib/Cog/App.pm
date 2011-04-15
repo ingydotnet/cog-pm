@@ -11,17 +11,13 @@ use Getopt::Long qw(:config pass_through);
 use YAML::XS;
 use Cwd 'abs_path';
 
-# use XXX;
+use XXX;
 
 use constant Name => 'Cog';
-# use constant app_root => 'cog';
-use constant app_root => (
-    (-e '.cog') ? '.cog' :
-    (-e 'cog') ? 'cog' :
-    '.'
-);
+use constant app_root => abs_path('.');
 use constant command_script => 'cog';
 
+# XXX Make these more dynamic so subclasses don't have to always override
 use constant config_class => 'Cog::Config';
 use constant content_class => 'Cog::Content';
 use constant maker_class => 'Cog::Maker';
@@ -30,6 +26,7 @@ use constant webapp_class => '';
 use constant view_class => 'Cog::View';
 
 sub plugins { [] };
+# XXX - Is this still needed??
 sub cog_classes {
     my $self = shift;
     return +{
@@ -52,10 +49,7 @@ sub get_app {
     Getopt::Long::GetOptions(
         'app=s' => \$app_class,
     );
-    $app_class ||=
-        $ENV{COG_APP} ||
-        $class->app_from($class->app_root . '/config.yaml') ||
-        die "Can't determine Cog App class";
+    $app_class ||= $ENV{COG_APP} || $class;
     unless ($app_class->can('new')) {
         eval "use $app_class; 1"
             or die $@;
@@ -67,22 +61,12 @@ sub get_app {
     return $app_class;
 }
 
-sub app_from {
-    my $class = shift;
-    my $config_path = shift;
-    return unless -e $config_path;
-    my $hash = YAML::XS::LoadFile($config_path);
-    my $app_class = $hash->{app_class}
-        or die "'app_class' is not defined in $config_path";
-}
-
-around BUILDARGS => sub {
-    my $orig = shift;
-    my $class = shift;
-    my $config_class = $class->config_class;
+sub BUILD {
+    my ($self) = @_;
+    my $config_class = $self->config_class;
     eval "require $config_class"
         unless UNIVERSAL::can($config_class, 'new');
-    my $config_file = $class->config_file
+    my $config_file = $self->config_file
         or die "Can't determine config file";
 
     my $app_root = '.';
@@ -91,35 +75,29 @@ around BUILDARGS => sub {
         ($app_root, $config_file) = ($1, $2);
     }
 
-    $app_root = abs_path($app_root) || $app_root;
-    my $config_path = abs_path("$app_root/$config_file") || '';
-    $config_path = ''
-        unless -e $config_path;
-    my $hash = $config_path
-        ? YAML::XS::LoadFile($config_path)
+    my $hash = -e $config_file
+        ? YAML::XS::LoadFile($config_file)
         : {};
-    die "'app_class' must be defined in '$config_path'"
-        if -e $config_path and not $hash->{app_class};
-    $hash->{app_class} ||= $class;
-    $hash->{app_root} = $app_root;
-    $hash->{config_file} = $config_file;
-    $hash->{maker_class} = $class->maker_class;
-    $hash->{store_class} = $class->store_class;
+    $hash = {
+        %$hash,
+        app_root => abs_path($app_root),
+        config_file => $config_file,
+        app_class => ref($self),
+        maker_class => $self->maker_class,
+        store_class => $self->store_class,
+        command_script => $0,
+        command_args => [@ARGV],
+    };
 
-    Cog::Base->initialize($config_class->new($hash));
-
-    return $class->$orig(@_);
-};
-
-sub BUILD {
-    my ($self) = @_;
-    $self->config->command_script($0);
-    $self->config->command_args([@ARGV]);
+    Cog::Base->initialize(
+        $self,
+        $config_class->new($hash),
+    );
 }
 
 sub config_file {
     my $class = shift;
-    return $class->app_root . "/config.yaml";
+    return $class->app_root . '/' . lc($class->Name) . '.conf.yaml';
 }
 
 sub run {
@@ -133,7 +111,7 @@ sub run {
     my $function = $self->can($method)
         or throw Error "'$action' is an invalid action\n";
 
-    $self->config->chdir_root()
+    $self->chdir_root()
         unless $action eq 'init';
 
     $function->($self);
@@ -166,7 +144,6 @@ sub parse_command_args {
         XXX::XXX(@_);
     }
     $self->action($action);
-    $self->config->command_args($argv);
 }
 
 #-----------------------------------------------------------------------------
@@ -219,7 +196,7 @@ sub handle_init {
         io($config_file)->print($config);
     }
 
-    $self->config->chdir_root;
+    $self->chdir_root;
 
     $self->store->init;
 
@@ -329,6 +306,14 @@ Cog is clean. To rebuild, run this command:
 
 ...
     
+}
+
+# Put the App in the context of its defined root directory.
+sub chdir_root {
+    my $self = shift;
+    my $app_root = $self->config->app_root;
+    chdir $app_root
+      or die "Can't chdir into $app_root";
 }
 
 1;

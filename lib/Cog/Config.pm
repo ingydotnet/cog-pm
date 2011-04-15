@@ -8,6 +8,7 @@
 package Cog::Config;
 use Mouse;
 use File::ShareDir;
+use Cwd qw(abs_path);
 
 use IO::All;
 
@@ -40,12 +41,12 @@ has app_root => (
 has store_root => (
     is => 'ro',
     lazy => 1,
-    default => '.',
+    builder => sub { abs_path('.') },
 );
 has content_root => (
     is => 'ro',
     lazy => 1,
-    default => '.',
+    builder => sub { abs_path('.') },
 );
 
 # Cog singleton object references
@@ -93,8 +94,8 @@ sub object_builder {
 }
 
 # App Command Values
-has command_script => (is => 'rw');
-has command_args => (is => 'rw', default => sub{[]});
+has command_script => (is => 'ro');
+has command_args => (is => 'ro', default => sub{[]});
 
 # App & WebApp definitions
 has url_map => (is => 'ro', default => sub{[]});
@@ -323,14 +324,6 @@ sub _build_files_map {
     }
 
     return $hash;
-}
-
-# Put the App in the context of its defined root directory.
-sub chdir_root {
-    my $self = shift;
-    my $app_root = $self->app_root;
-    chdir $app_root
-      or die "Can't chdir into $app_root";
 }
 
 1;
