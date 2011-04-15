@@ -48,13 +48,10 @@ has time => ( is => 'ro', builder => sub { time() } );
 sub get_app {
     my ($class, @argv) = @_;
     my $app_class;
-    {
-        local @ARGV = @argv;
-        Getopt::Long::GetOptions(
-            'app=s' => \$app_class,
-        );
-        @argv = @ARGV;
-    }
+    @ARGV = @argv;
+    Getopt::Long::GetOptions(
+        'app=s' => \$app_class,
+    );
     $app_class ||=
         $ENV{COG_APP} ||
         $class->app_from($class->app_root . '/config.yaml') ||
@@ -66,7 +63,8 @@ sub get_app {
     die "$app_class is not a Cog::App application"
         unless $app_class->isa('Cog::App') and
             $app_class ne 'Cog::App';
-    return ($app_class, @argv);
+
+    return $app_class;
 }
 
 sub app_from {
@@ -112,6 +110,12 @@ around BUILDARGS => sub {
 
     return $class->$orig(@_);
 };
+
+sub BUILD {
+    my ($self) = @_;
+    $self->config->command_script($0);
+    $self->config->command_args([@ARGV]);
+}
 
 sub config_file {
     my $class = shift;
