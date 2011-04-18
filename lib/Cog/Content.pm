@@ -24,7 +24,8 @@ sub flush {
 sub content_pointer {
     my $self = shift;
     my $node = shift;
-    my $content_root = $self->config->content_root;
+#     my $content_root = $self->config->content_root;
+    my $content_root = '.';
     my $id = $node->Short;
     my $type = $node->Type or die;
     my $title = $node->Title or die;

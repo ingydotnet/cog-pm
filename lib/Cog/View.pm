@@ -4,8 +4,6 @@ extends 'Cog::Base';
 
 use IO::All;
 
-# use XXX;
-
 has root => (is => 'ro', default => 'view');
 has views => ( is => 'ro', default => sub {+{}} );
 
@@ -43,61 +41,7 @@ sub update {
     $self->update_page_html($id, $node, $diff);
     $self->update_page_list($blob);
 
-    # XXX move to SSB
-    $self->update_tag_cloud($blob);
-    $self->update_project_tasks($blob);
-    $self->update_story_tasks($blob);
-}
-
-sub update_project_tasks {
-    my ($self, $story) = @_;
-    return unless $story->{Type} eq 'story';
-    my $project_id = $story->{project}
-        or return;
-    $project_id =~ s/^\*(\w{4})$/$1/
-        or die "$project_id is invalid project_id pointer";
-    my $project = $self->views->{$project_id}
-        or return;
-    return unless $project->{Type} eq 'project';
-    my $stories = $project->{_story} ||= [];
-    push @$stories, $story->{Id};
-}
-
-sub update_story_tasks {
-    my ($self, $task) = @_;
-    return unless $task->{Type} eq 'task';
-    my $story_id = $task->{story}
-        or return;
-    $story_id =~ s/^\*(\w{4})$/$1/
-        or die "$story_id is invalid story_id pointer";
-    my $story = $self->views->{$story_id}
-        or return;
-    return unless $story->{Type} eq 'story';
-    my $tasks = $story->{_task} ||= [];
-    push @$tasks, $task->{Id};
-}
-
-sub update_tag_cloud {
-    my ($self, $blob) = @_;
-    my $time = $blob->{Time} * 1000;
-    my $cloud = $self->views->{'tag-cloud'} ||= {};
-    for my $name (qw(Type manager contact worker iteration department)) {
-        my $tag = $blob->{$name} or next;
-        $self->add_tag($cloud, $tag, $time, $blob);
-    }
-    for my $tag (@{$blob->{Tag} || []}) {
-        $self->add_tag($cloud, $tag, $time, $blob);
-    }
-}
-
-sub add_tag {
-    my ($self, $cloud, $tag, $time, $blob) = @_;
-    $cloud->{$tag} ||= [$tag, 0, 0];
-    $cloud->{$tag}[1]++;
-    $cloud->{$tag}[2] = $time
-        if $time > $cloud->{$tag}[2];
-    my $group = $self->views->{"tag/$tag"} ||= [];
-    push @$group, $blob;
+    return $blob;
 }
 
 sub update_page_json {
@@ -121,36 +65,14 @@ sub update_page_list {
 
 sub flush {
     my $self = shift;
-    # XXX Move to SSB
-    for my $name (keys %{$self->views}) {
-        my $view = $self->views->{$name};
-        $self->compile_hours($view)
-            if $name =~ /^[A-Z2-9]{4}$/ and $view->{_task};
-    }
     for my $name (keys %{$self->views}) {
         my $view = $self->views->{$name};
         $view = [ sort { $b->{Time} <=> $a->{Time} } @$view ]
             if $name eq 'page-list';
-        $view = [ values %$view ]
-            if $name eq 'tag-cloud';
         io($self->root . "/$name.json")
             ->print($self->json->encode($view));
     }
     $self->clear;
-}
-
-sub compile_hours {
-    my ($self, $story) = @_;
-    my ($estimate, $worked, $remain) = (0, 0, 0);
-    for my $id (@{$story->{_task}}) {
-        my $task = $self->views->{$id};
-        $estimate += $task->{estimate} || 0;
-        $worked += $task->{worked} || 0;
-        $remain += $task->{remain} || 0;
-    }
-    $story->{estimate} = $estimate;
-    $story->{worked} = $worked;
-    $story->{remain} = $remain;
 }
 
 sub clear {
