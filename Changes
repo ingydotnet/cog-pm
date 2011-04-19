@@ -1,4 +1,10 @@
 ---
+version: 0.07
+date:    
+changes:
+- Lots of changes and refactoring.
+- Releasing now mostly to index Cog.pm to the Cog dist
+---
 version: 0.06
 date:    
 changes:
