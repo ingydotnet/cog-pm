@@ -9,7 +9,6 @@ repository 'git://github.com/ingydotnet/cog-pm.git';
 
 test_requires 'Capture::Tiny';
 
-requires 'Class::Throwable';
 requires 'Convert::Base32::Crockford';
 requires 'File::ShareDir';
 requires 'IO::All';

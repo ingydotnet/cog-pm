@@ -4,10 +4,8 @@ package Cog::App;
 use Mouse;
 extends 'Cog::Base';
 
-use Class::Throwable qw(Error);
-use Cog::Config;
-use IO::All;
 use Getopt::Long qw(:config pass_through);
+use IO::All;
 use YAML::XS;
 use Cwd 'abs_path';
 
@@ -17,7 +15,7 @@ use constant Name => 'Cog';
 use constant app_root => abs_path('.');
 use constant command_script => 'cog';
 
-# XXX Make these more dynamic so subclasses don't have to always override
+# TODO Make these more dynamic so subclasses don't have to always override
 use constant config_class => 'Cog::Config';
 use constant content_class => 'Cog::Content';
 use constant maker_class => 'Cog::Maker';
@@ -42,6 +40,8 @@ sub cog_classes {
 has action => ( is => 'rw' );
 has time => ( is => 'ro', builder => sub { time() } );
 
+# If we use the generic 'bin/cog' script, we need to determine which Cog
+# application class we are representing.
 sub get_app {
     my ($class, @argv) = @_;
     my $app_class;
@@ -109,7 +109,7 @@ sub run {
     my $method = "handle_$action";
 
     my $function = $self->can($method)
-        or throw Error "'$action' is an invalid action\n";
+        or die "'$action' is an invalid action\n";
 
     $self->chdir_root()
         unless $action eq 'init';
@@ -129,7 +129,7 @@ sub parse_command_args {
         $self->action($script);
     }
     elsif ($script ne $self->command_script) {
-        throw Error "unexpected script name '$script'\n";
+        die "unexpected script name '$script'\n";
     }
     elsif (@$argv and $argv->[0] =~ /^[\w\-]+$/) {
         $action = shift @$argv;
@@ -178,7 +178,7 @@ See:
 sub handle_init {
     my $self = shift;
     my $root = $self->config->app_root;
-    throw Error "Can't init. Cog environment already exists.\n"
+    die "Can't init. Cog environment already exists.\n"
         if $self->config->is_init;
 
     $self->_copy_assets();
