@@ -33,6 +33,7 @@ sub update {
     my $blob = {
         %$node,
         Id => $id,
+        Type => $node->Type,
         Title => $node->Title,
     };
     delete @{$blob}{qw(Name)};
