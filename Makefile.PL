@@ -1,11 +1,4 @@
-use inc::Module::Install;
-
-all_from 'lib/Cog.pm';
-readme_from;
-manifest_skip;
-version_check;
-ack_xxx;
-repository 'git://github.com/ingydotnet/cog-pm.git';
+use inc::Module::Package;
 
 test_requires 'Capture::Tiny';
 
@@ -22,9 +15,3 @@ requires 'Plack::Middleware::ETag';
 requires 'Plack::Middleware::ProxyMap';
 requires 'Template::Toolkit::Simple';
 requires 'YAML::XS';
-
-install_script 'bin/cog';
-
-install_share;
-
-WriteAll;
