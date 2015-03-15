@@ -162,7 +162,7 @@ sub new_id {
         # Base32 125bit random number.
         my $full = uc Convert::Base32::Crockford::encode_base32(
             join "", map { pack "S", int(rand(65536)) } 1..8
-        ); 
+        );
         chop $full;
         $full =~ s/(....)(.*)/$1-$2/ or die;
         $short = $1;
@@ -215,7 +215,7 @@ sub transform_flatten {
     $name ||= '_';
     return $name;
 }
- 
+
 # This little guy handles all the index reads and writes!
 sub index {
     my $self = shift;

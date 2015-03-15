@@ -16,7 +16,7 @@ Cog was successfully initialized in:
 The next step is to edit:
 
     $CWD/t/cog1/cog/config.yaml
-    
+
 Then run:
 
     $CWD/bin/cog update

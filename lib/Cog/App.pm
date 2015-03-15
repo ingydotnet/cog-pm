@@ -212,7 +212,7 @@ $Name was successfully initialized in:
 The next step is to edit:
 
     $config_file
-    
+
 Then run:
 
     $name update
@@ -277,7 +277,7 @@ this command:
     cog start
 
 ...
-    
+
 }
 
 sub handle_start {
@@ -305,7 +305,7 @@ Cog is clean. To rebuild, run this command:
     cog make
 
 ...
-    
+
 }
 
 # Put the App in the context of its defined root directory.

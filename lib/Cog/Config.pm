@@ -243,7 +243,7 @@ sub add_to_list {
             }
         }
         else {
-            splice(@$list, $point++, 0, $add); 
+            splice(@$list, $point++, 0, $add);
         }
     }
 }
@@ -256,7 +256,7 @@ sub add_to_list_list {
             $point = @$list = ();
         }
         else {
-            splice(@$list, $point++, 0, $add); 
+            splice(@$list, $point++, 0, $add);
         }
     }
 }
