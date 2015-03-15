@@ -296,39 +296,3 @@ sub check_story_ref {
 }
 
 1;
-
-=head1 NAME
-
-Cog::Store - Storage object base class for Cog App.
-
-=head1 API
-
-connect(root) -> $store - Connect to a store. Return store object.
-
-init(root) -> $ok - set up a new store
-
-$store->get(id) -> $node - retrieve a node object by id
-
-$store->add(type) -> $node - create a new placeholder node. reserve the id.
-
-$store->put(node) -> $ok - save a node, and update all indices
-
-$store->del(id) -> $ok - remove a node, and update all indices
-
-$store->schemata() -> { type => class } - get a map of the valid node classes
-
-$store->index(name) -> [ keys ] - get all keys of an index
-
-$store->index(name, key) -> [ values ] - get all values of an index key
-
-$store->index(name, key, value) -> $ok - add a value to an index key
-
-$store->unindex(name, key, value) -> $ok - remove a value from an index key
-
-=head1 NOTES
-
-- node schema defines what is indexed
-
-- node schema comes from node class for now
-
-

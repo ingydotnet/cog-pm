@@ -1,0 +1,13 @@
+Cog::FileBrowser
+================
+
+Sample App/WebApp Built on Cog Framework
+
+= Synopsis
+
+  > cog init Cog::FileBrowser
+  > cog update
+  > cog make
+  > cog start
+
+<<<cpan-tail>>>

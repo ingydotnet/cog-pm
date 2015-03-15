@@ -1,0 +1,46 @@
+Cog::Manual
+===========
+
+Full Documentation for Cog
+
+= Note
+
+This project is in a very early stage, and is woefully underdocumented.
+
+= Table of Contents
+
+This manual consists of a number of documents:
+
+- [Cog::Manual::Introduction]
+
+  What is Cog, and why does it rock out?
+
+- [Cog::Manual::Installation]
+
+  How to install Cog and its prerequisites.
+
+- [Cog::Manual::Configuration]
+
+  How to configure and customize Cog.
+
+- [Cog::Manual::Plugins]
+
+  Some of the common plugins available to extend Cog.
+
+- [Cog::Manual::FAQ]
+
+  Frequently asked questions about Cog.
+
+- [Cog::Manual::RestAPI]
+
+  Frequently asked questions about Cog.
+
+- [Cog::Manual::Development]
+
+  How to get involved in the Cog project.
+
+- [Cog::Manual::Internals]
+
+  How Cog works from the inside out.
+
+<<<cpan-tail>>>

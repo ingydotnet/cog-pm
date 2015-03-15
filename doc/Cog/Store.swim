@@ -1,0 +1,57 @@
+Cog::Store
+==========
+
+Storage object base class for Cog App.
+
+= API
+
+- `connect(root) -> $store`
+
+  Connect to a store. Return store object.
+
+- `init(root) -> $ok`
+
+  Set up a new store.
+
+- `$store->get(id) -> $node`
+
+  Retrieve a node object by id.
+
+- `$store->add(type) -> $node`
+
+  Create a new placeholder node. reserve the id.
+
+- `$store->put(node) -> $ok`
+
+  Save a node, and update all indices.
+
+- `$store->del(id) -> $ok`
+
+  Remove a node, and update all indices.
+
+- `$store->schemata() -> { type => class }`
+
+  Get a map of the valid node classes.
+
+- `$store->index(name) -> [ keys ]`
+
+  Get all keys of an index.
+
+- `$store->index(name, key) -> [ values ]`
+
+  Get all values of an index key.
+
+- `$store->index(name, key, value) -> $ok`
+
+  Add a value to an index key.
+
+- `$store->unindex(name, key, value) -> $ok`
+
+  Remove a value from an index key.
+
+= Notes
+
+* Node schema defines what is indexed.
+* Node schema comes from node class for now.
+
+<<<cpan-tail>>>

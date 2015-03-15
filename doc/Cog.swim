@@ -1,0 +1,31 @@
+<<<cpan-head>>>
+
+= Synopsis
+
+  > cd content/dir
+  > cog init
+  > cog make
+  > cog start
+
+= Status
+
+This software is pre-alpha. Don't use it yet.
+
+= Description
+
+Cog lets you turn any directory on your computer into an interactive
+application, like a website or a wiki.
+
+This module installs a command line utility called `cog`. This command can be
+used to create and update your application.
+
+= Documentation
+
+See [Cog::Manual] for more information.
+
+= Kudos
+
+Many thanks to the good people of Strategic Data in Melbourne Victoria
+Australia, for supporting me and this project. `\o/`
+
+<<<cpan-tail>>>
