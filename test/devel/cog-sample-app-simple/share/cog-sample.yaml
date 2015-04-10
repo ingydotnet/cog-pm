@@ -1,0 +1,6 @@
+# Required:
+app_class: Tinker
+site_name: Tinker with YAML
+
+# Options:
+server_port: 1234
