@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO This setup script belongs in test-more-bash/bin/setup.sh
-
 set -e
 
 export BASHLIB="`
@@ -11,4 +9,3 @@ export BASHLIB="`
 `"
 export PATH="$BASHLIB:$PATH"
 source bash+ :std
-

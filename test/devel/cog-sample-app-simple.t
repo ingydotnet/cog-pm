@@ -1,8 +1,26 @@
 #!/usr/bin/env bash
 
-source "$(dirname $0)/test-more-bash/init.bash"
+{
+  cd "$(dirname $0)"
+  source "test-more-bash/init.bash"
+  source setup cog-sample-app-simple
+}
+
 use Test::More
 
-pass 'Setup is OK'
+{
+  output="$(
+    cd $APP
+    cog-sample-app-simple init
+  )"
+  like "$output" \
+    "CogSampleAppSimple was successfully initialized" \
+    'App init says it was successful'
+  ok "`[ -f $APP/config.yaml ]`" \
+    'App init created config file'
+}
 
-done_testing
+{
+  done_testing
+  source teardown
+}
