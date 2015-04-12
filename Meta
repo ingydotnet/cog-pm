@@ -33,6 +33,7 @@ requires:
   Plack: 0
   Plack::Middleware::Cache: 0
   Plack::Middleware::ETag: 0
+  Plack::Middleware::Header: 0
   Plack::Middleware::ProxyMap: 0
   Template::Toolkit::Simple: 0
   YAML::XS: 0
