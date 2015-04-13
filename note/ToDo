@@ -1,3 +1,9 @@
+== Cog Apps
+- CogWiki
+- Tinker
+- Googler (googler-pm)
+
+== To Do
 - Switch from Mouse to Mo
 - Remove the storage db stuff from Cog.
   Just stick to App framework.
@@ -7,4 +13,9 @@
   - Cog::Content
   - Cog::Schema
   - Cog::Node::Schema
+- Build into dirs: assets/ site/
+- Remove coffee/ in 'clean' action
+
+== Done
+- Move javascript to end of body
 - Remove lib/Cog/Page.pm
