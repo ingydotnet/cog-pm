@@ -54,7 +54,16 @@ sub make_all_js {
     my $root = $self->config->app_root;
     my $js = "$root/static/js";
 
-    my $data = {list => join(' ', @{$self->config->js_files})};
+    my $data = {
+        list => join(
+            ' ',
+            @{$self->config->js_files},
+            map {
+                s/\.coffee$/\.js/;
+                $_;
+            } @{$self->config->coffee_files}
+        )
+    };
     my $makefile = tt()
         ->path(['template/'])
         ->data($data)

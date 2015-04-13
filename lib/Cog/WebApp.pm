@@ -11,6 +11,7 @@ use constant plugins => [];
 use constant site_navigation => [];
 use constant url_map => [];
 use constant post_map => [];
+use constant coffee_files => [];
 use constant js_files => [qw(
     jquery-1.4.4.js
     jquery.json-2.2.js

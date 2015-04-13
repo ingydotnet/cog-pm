@@ -1,1 +1,10 @@
-- Switch to Mo
+- Switch from Mouse to Mo
+- Remove the storage db stuff from Cog.
+  Just stick to App framework.
+  Move to CogDB.
+  - Cog::Store
+  - Cog::Node
+  - Cog::Content
+  - Cog::Schema
+  - Cog::Node::Schema
+- Remove lib/Cog/Page.pm

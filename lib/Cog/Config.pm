@@ -100,6 +100,7 @@ has command_args => (is => 'ro', default => sub{[]});
 # App & WebApp definitions
 has url_map => (is => 'ro', default => sub{[]});
 has post_map => (is => 'ro', default => sub{[]});
+has coffee_files => (is => 'ro', default => sub{[]});
 has js_files => (is => 'ro', default => sub{[]});
 has css_files => (is => 'ro', default => sub{[]});
 has image_files => (is => 'ro', default => sub{[]});
@@ -142,6 +143,7 @@ sub BUILD {
     $self->build_list('post_map', 'lol');
     $self->build_list('site_navigation', 'lol');
 
+    $self->build_list('coffee_files');
     $self->build_list('js_files');
     $self->build_list('css_files');
     $self->build_list('image_files');
@@ -315,7 +317,7 @@ sub _build_files_map {
     for my $plugin (@$plugins) {
         my $dir = $self->_class_share_map->{$plugin} or next;
         for (io->dir($dir)->All_Files) {
-            next if "$_" =~ /\.sw[p]$/;
+            next if "$_" =~ /\.(sw[p]|packlist)$/;
             my $full = $_->pathname;
             my $short = $full;
             $short =~ s!^\Q$dir\E/?!! or die;

@@ -19,5 +19,8 @@ config.js: $(ROOT)/static/config.js
 url-map.js: $(ROOT)/static/url-map.js
 	cp $< $@
 
+%.js: ../../coffee/%.coffee
+	coffee --compile --print $< > $@
+
 clean:
 	rm -f all*.js jemplate.js
