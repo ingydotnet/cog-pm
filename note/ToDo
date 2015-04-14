@@ -3,19 +3,15 @@
 - Tinker
 - Googler (googler-pm)
 
-== To Do
+== To Do  (See Also: GitHub Issues — `git hub issues`)
 - Switch from Mouse to Mo
-- Remove the storage db stuff from Cog.
-  Just stick to App framework.
-  Move to CogDB.
-  - Cog::Store
-  - Cog::Node
-  - Cog::Content
-  - Cog::Schema
-  - Cog::Node::Schema
 - Build into dirs: assets/ site/
 - Remove coffee/ in 'clean' action
+- Convert cog.js to cog.coffee
+- Add underscore support
+- Add min.js support (vs devel support)
 
 == Done
+- Get js dispatch working
 - Move javascript to end of body
 - Remove lib/Cog/Page.pm
