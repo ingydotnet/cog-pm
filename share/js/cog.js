@@ -49,7 +49,7 @@ $Cog.dispatch = function(path) {
             return;
         }
     }
-    $('div.content').jemplate('404.html.tt');
+    $('div.content').jemplate('404.html');
     return;
 };
 
@@ -64,7 +64,7 @@ $Cog.home_page = function() {
 $Cog.page_display = function(id) {
     var self = this;
     $.getJSON('/view/' + id + '.json', function(data) {
-        $('div.content').jemplate('page-display.html.tt', data);
+        $('div.content').jemplate('page-display.html', data);
         $.get('/view/' + id + '.html', function(data) {
             $('div.page').html(data);
         });
@@ -80,14 +80,14 @@ $Cog.page_list = function(title) {
             'pages': data,
             'title': title
         };
-        $('div.content').jemplate('page-list.html.tt', data);
+        $('div.content').jemplate('page-list.html', data);
     });
 };
 
 $Cog.tag_list = function() {
     $.getJSON('/view/tag-list.json', function(data) {
         data = {tags: data};
-        $('div.content').jemplate('tag-list.html.tt', data);
+        $('div.content').jemplate('tag-list.html', data);
     });
 };
 
@@ -95,7 +95,7 @@ $Cog.tag_page_list = function(tag) {
     $.getJSON('/view/tag/' + tag + '.json', function(data) {
         data = {pages: data};
         data.title = 'Tag: ' + tag.replace(/%20/g, ' ');
-        $('div.content').jemplate('page-list.html.tt', data);
+        $('div.content').jemplate('page-list.html', data);
     });
 };
 

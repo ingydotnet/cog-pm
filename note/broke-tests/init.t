@@ -34,17 +34,17 @@ files_exist qw(
     cog/static/js/jquery.cookie.js
     cog/static/js/start.js
     cog/static/js/jquery-1.4.4.min.js
-    cog/template/page-list.html.tt
-    cog/template/config.js.tt
-    cog/template/tag-list.html.tt
-    cog/template/js-mf.mk.tt
-    cog/template/page-display.html.tt
-    cog/template/css-mf.mk.tt
-    cog/template/url-map.js.tt
-    cog/template/layout.html.tt
-    cog/template/config.yaml.tt
-    cog/template/site-navigation.html.tt
-    cog/template/404.html.tt
+    cog/template/page-list.html
+    cog/template/config.js
+    cog/template/tag-list.html
+    cog/template/js-mf.mk
+    cog/template/page-display.html
+    cog/template/css-mf.mk
+    cog/template/url-map.js
+    cog/template/layout.html
+    cog/template/config.yaml
+    cog/template/site-navigation.html
+    cog/template/404.html
 );
 
 file_has_line

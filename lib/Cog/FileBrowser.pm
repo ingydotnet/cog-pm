@@ -57,16 +57,16 @@ sub image_files {
 
 sub template_files {
     [qw(
-        config.js.tt
-        js-mf.mk.tt
-        css-mf.mk.tt
+        config.js
+        js-mf.mk
+        css-mf.mk
 
-        layout.html.tt
-        site-navigation.html.tt
-        page-list.html.tt
-        page-display.html.tt
-        tag-list.html.tt
-        404.html.tt
+        layout.html
+        site-navigation.html
+        page-list.html
+        page-display.html
+        tag-list.html
+        404.html
     )];
 }
 

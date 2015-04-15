@@ -1,22 +1,24 @@
-body {
-    background-color: #fff;
-    border: 0;
-    font-family: Helvetica;
-    font-size: 100%;
-    margin: 0;
-    min-width: 960px;
-    padding: 0;
+html {
+    height: 100%;
 }
 
-html, body {
+body {
     height: 100%;
+
+    margin: 0;
+    border: 0;
+    padding: 0;
+
+    background-color: #ccc;
+    font-family: Helvetica;
+    font-size: 100%;
 }
 
 .header {
     background: #8f8;
     background-color: #8f8;
     border-bottom: 20px solid #888;
-    height: auto;
+    height: 100px;
     padding: 10px;
 }
 
@@ -65,8 +67,8 @@ html, body {
     text-decoration: none;
 }
 
-.content {
-    background-color: #fff;
+.main {
+    background-color: #cc8;
     float: left;
     min-height: 100%;
     padding: 15px;
@@ -77,16 +79,16 @@ html, body {
     width: 1200px;
 }
 
-.content a, .content a:visited {
+.main a, .main a:visited {
     color: #00f;
     text-decoration: none;
 }
 
-.content p, h1, h2, h3 {
+.main p, h1, h2, h3 {
     margin: 15px 5px;
 }
 
-.content pre {
+.main pre {
     margin-left: 20px;
 }
 

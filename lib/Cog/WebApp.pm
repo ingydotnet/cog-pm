@@ -13,8 +13,9 @@ use constant url_map => [];
 use constant post_map => [];
 use constant coffee_files => [];
 use constant js_files => [qw(
-    jquery-1.4.4.js
-    jquery.json-2.2.js
+    jquery.js
+    jquery-ui.js
+    jquery-json.js
     jquery.cookie.js
     jquery.jemplate.js
     jemplate.js
@@ -24,9 +25,9 @@ use constant js_files => [qw(
     fixups.js
 )];
 use constant css_files => [qw(
+    reset.css
     layout.css
-    page-list.css
-    page-display.css
+    layout-table.css
 )];
 use constant image_files => [];
 use constant template_files => [];

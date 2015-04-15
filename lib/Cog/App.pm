@@ -192,7 +192,7 @@ sub handle_init {
             ->path(["$root/template/"])
             ->data($data)
             ->post_chomp
-            ->render('config.yaml.tt');
+            ->render('config.yaml');
         io($config_file)->print($config);
     }
 

@@ -1,6 +1,6 @@
 # TODO:
 # - Generate a Makefile to bring everything up to date
-#   - Use tt with Makefile.tt template
+#   - Use tt with Makefile template
 package Cog::Maker;
 use Mouse;
 extends 'Cog::Base';
@@ -32,7 +32,7 @@ sub make_config_js {
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('config.js.tt');
+        ->render('config.js');
     io('static/config.js')->print($javascript);
 }
 
@@ -45,7 +45,7 @@ sub make_url_map_js {
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('url-map.js.tt');
+        ->render('url-map.js');
     io('static/url-map.js')->print($javascript);
 }
 
@@ -68,7 +68,7 @@ sub make_all_js {
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('js-mf.mk.tt');
+        ->render('js-mf.mk');
     io("$js/Makefile")->print($makefile);
 
     system("(cd $js; make)") == 0 or die;
@@ -88,7 +88,7 @@ sub make_all_css {
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('css-mf.mk.tt');
+        ->render('css-mf.mk');
     io("$css/Makefile")->print($makefile);
 
     system("(cd $css; make)") == 0 or die;
@@ -104,7 +104,7 @@ sub make_index_html {
         ->path(['template/'])
         ->data($data)
         ->post_chomp
-        ->render('index.html.tt');
+        ->render('index-table.html');
     io('static/index.html')->print($html);
 }
 
