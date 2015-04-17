@@ -100,7 +100,7 @@ sub read_json {
     my $self = shift;
     my $env = $self->env;
     return unless
-        $env->{CONTENT_TYPE} =~ m!application/json! and
+#         $env->{CONTENT_TYPE} =~ m!application/json! and
         $env->{CONTENT_LENGTH};
     my $json = do { my $io = $env->{'psgi.input'}; local $/; <$io> };
     $env->{post_data} = $self->json->decode($json);
