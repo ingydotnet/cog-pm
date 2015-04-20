@@ -32,6 +32,14 @@ sub app {
         enable 'ConditionalGET';
         enable 'ETag', file_etag => [qw/inode mtime size/];
         # Serve static files from disk
+        if (my $rewrites = $self->webapp->rewrite) {
+            enable 'Rewrite', rules => sub {
+                for my $rewrite (@$rewrites) {
+                    s!$rewrite->[0]!$rewrite->[1]! and last;
+                }
+                return;
+            };
+        }
         enable 'Static', path => qr{^/(static|view)/}, root => './';
         # Everything else is from the web app.
         $self->webapp->web_app;
