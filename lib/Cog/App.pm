@@ -154,24 +154,19 @@ sub handle_help {
 
 sub usage {
     my $self = shift;
-    return <<'...';
-Usage: cog command
+    my $Name = $self->Name;
+    my $name = $self->config->command_script;
+    $name =~ s!.*/!!;
+    return <<"...";
+Usage: $name <command>
 
 Commands:
-    init   - Make current directory into a Cog app
-    init Cog::Class
-           - Make a Cog::Class app specifically
+    init   - Make current directory into a $Name app
     update - Update the app with the latest assets
     make   - Prepare the app content for the web
     start  - Start the local app server
     stop   - Stop the server
 
-    bless file-name - Turn a text file into a cog file
-    edit name|id - Start an editor with the contents of the cog page
-
-See:
-    `perldoc cog` - Documentation on this command.
-    `perldoc Cog::Manual` - Complete Cog documentation.
 ...
 }
 
@@ -245,7 +240,7 @@ sub _copy_assets {
     my $files = $self->config->files_map;
     my $root = $self->config->app_root;
 
-    for my $file (keys %$files) {
+    for my $file (sort keys %$files) {
         my $source = $files->{$file};
         my $target = $file =~ m!^(js|css|image)/!
             ? "$root/static/$file"
@@ -261,7 +256,7 @@ sub _copy_assets {
             unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
                 unlink $target;
                 io($target)->assert->print(io($source)->all);
-                print "> copy $source => $target\n";
+                printf "* %-25s  |  $source => $target\n", $file;
             }
         }
     }
@@ -270,11 +265,15 @@ sub _copy_assets {
 sub handle_make {
     my $self = shift;
     $self->maker->make;
-    print <<'...';
-Cog is up to date and ready to use. To start the web server, run
+    my $Name = $self->Name;
+    my $name = $self->config->command_script;
+    $name =~ s!.*/!!;
+    print <<"...";
+
+$Name is up to date and ready to use. To start the web server, run
 this command:
 
-    cog start
+    $name start
 
 ...
 
@@ -282,8 +281,9 @@ this command:
 
 sub handle_start {
     my $self = shift;
-    print <<'...';
-Cog web server is starting up...
+    my $Name = $self->Name;
+    print <<"...";
+$Name web server is starting up...
 
 ...
     my @args = @{$self->config->command_args};
@@ -299,10 +299,13 @@ sub handle_edit {
 sub handle_clean {
     my $self = shift;
     $self->maker->make_clean;
-    print <<'...';
-Cog is clean. To rebuild, run this command:
+    my $Name = $self->Name;
+    my $name = $self->config->command_script;
+    $name =~ s!.*/!!;
+    print <<"...";
+$Name is clean. To rebuild, run this command:
 
-    cog make
+    $name update
 
 ...
 

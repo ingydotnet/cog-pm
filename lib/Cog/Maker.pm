@@ -127,6 +127,7 @@ sub make_clean {
         "$app_root/static",
         "$app_root/template",
         "$app_root/view",
+        "$app_root/coffee",
         $self->store->root,
     ) {
         if (-e $dir) {
