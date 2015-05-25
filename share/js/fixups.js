@@ -8,6 +8,3 @@ if (typeof console.log == 'undefined') console.log =
         called = ! confirm(msg);
     };
 })(false);
-
-
-
