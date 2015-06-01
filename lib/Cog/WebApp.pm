@@ -97,6 +97,17 @@ sub handle_post {
     }
 }
 
+sub response_json {
+    my ($self, $data) = @_;
+    die "response_json() requires a hash or array" unless ref $data;
+    my $json = $self->json->encode($data);
+    return [
+        200,
+        [ 'Content-Type' => 'application/json' ],
+        [ $json ],
+    ];
+}
+
 sub read_json {
     my $self = shift;
     my $env = $self->env;
