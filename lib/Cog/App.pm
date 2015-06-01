@@ -128,7 +128,7 @@ sub parse_command_args {
         $script =~ s/-/_/;
         $self->action($script);
     }
-    elsif ($script ne $self->command_script) {
+    elsif ($script ne $self->command_script and $script ne 'cog') {
         die "unexpected script name '$script'\n";
     }
     elsif (@$argv and $argv->[0] =~ /^[\w\-]+$/) {
