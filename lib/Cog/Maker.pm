@@ -19,7 +19,6 @@ sub make {
     $self->make_all_js();
     $self->make_all_css();
     $self->make_index_html;
-    $self->make_store();
 }
 
 sub make_config_js {
@@ -108,15 +107,6 @@ sub make_index_html {
     io('static/index.html')->print($html);
 }
 
-sub make_store {
-    my $self = shift;
-    if (not $self->store->exists) {
-        $self->store->init();
-        $self->store->import_files($self->content->cog_files);
-        $self->store->reserve_keys($self->content->dead_cog_files);
-    }
-}
-
 sub make_clean {
     my $self = shift;
     my $app_root = $self->config->app_root
@@ -126,9 +116,7 @@ sub make_clean {
     for my $dir (
         "$app_root/static",
         "$app_root/template",
-        "$app_root/view",
         "$app_root/coffee",
-        $self->store->root,
     ) {
         if (-e $dir) {
             my $cmd = "rm -fr $dir";

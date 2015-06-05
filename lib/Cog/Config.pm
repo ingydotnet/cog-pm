@@ -36,14 +36,6 @@ has app_root => (
     lazy => 1,
     default => ($ENV{COG_APP_ROOT} || 'cog'),
 );
-has store_root => (
-    lazy => 1,
-    builder => sub { abs_path('.') },
-);
-has content_root => (
-    lazy => 1,
-    builder => sub { abs_path('.') },
-);
 
 # Cog singleton object references
 has webapp => (
@@ -60,18 +52,6 @@ has runner => (
 has maker => (
     lazy => 1,
     builder => sub { $_[0]->object_builder('maker', 'Cog::Maker') },
-);
-has store => (
-    lazy => 1,
-    builder => sub { $_[0]->object_builder('store', 'Cog::Store') },
-);
-has content => (
-    lazy => 1,
-    builder => sub { $_[0]->object_builder('content', 'Cog::Content') },
-);
-has view => (
-    lazy => 1,
-    builder => sub { $_[0]->object_builder('view', 'Cog::View') },
 );
 
 sub object_builder {

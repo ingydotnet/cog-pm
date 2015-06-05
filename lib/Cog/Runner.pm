@@ -1,7 +1,7 @@
 # TODO:
 #
 # Redo fingerprinting
-package Cog::WebApp::Runner;
+package Cog::Runner;
 use Mo;
 extends 'Cog::Base';
 
@@ -40,7 +40,7 @@ sub app {
                 return;
             };
         }
-        enable 'Static', path => qr{^/(static|view)/}, root => './';
+        enable 'Static', path => qr{^/\b(static)/\b}, root => './';
         # Everything else is from the web app.
         $self->webapp->web_app;
     }

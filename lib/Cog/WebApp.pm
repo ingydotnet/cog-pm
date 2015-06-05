@@ -31,7 +31,7 @@ use constant css_files => [qw(
 )];
 use constant image_files => [];
 use constant template_files => [];
-use constant runner_class => 'Cog::WebApp::Runner';
+use constant runner_class => 'Cog::Runner';
 use constant rewrite => undef;
 
 sub web_app {

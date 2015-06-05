@@ -1,10 +1,10 @@
-package Cog::FileBrowser;
+package Cog::App::FileBrowser;
 use Mo;
 extends 'Cog::App';
 
-use constant webapp => 'Cog::FileBrowser::WebApp';
+use constant webapp => 'Cog::App::FileBrowser::WebApp';
 
-package Cog::FileBrowser::WebApp;
+package Cog::App::FileBrowser::WebApp;
 use Mo;
 extends 'Cog::WebApp';
 

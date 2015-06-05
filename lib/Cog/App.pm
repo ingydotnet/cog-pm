@@ -18,11 +18,8 @@ use constant command_script => 'cog';
 
 # TODO Make these more dynamic so subclasses don't have to always override
 use constant config_class => 'Cog::Config';
-use constant content_class => 'Cog::Content';
 use constant maker_class => 'Cog::Maker';
-use constant store_class => 'Cog::Store';
 use constant webapp_class => '';
-use constant view_class => 'Cog::View';
 
 sub plugins { [] };
 # XXX - Is this still needed??
@@ -30,11 +27,8 @@ sub cog_classes {
     my $self = shift;
     return +{
         config => $self->config_class,
-        content => $self->content_class,
         maker => $self->maker_class,
-        store => $self->store_class,
         webapp => $self->webapp_class,
-        view => $self->view_class,
     }
 }
 
@@ -85,7 +79,6 @@ sub BUILD {
         config_file => $config_file,
         app_class => ref($self),
         maker_class => $self->maker_class,
-        store_class => $self->store_class,
         command_script => $0,
         command_args => [@ARGV],
     };
@@ -193,8 +186,6 @@ sub handle_init {
     }
 
     $self->chdir_root;
-
-    $self->store->init;
 
     my $Name = $self->Name;
     my $name = $self->config->command_script;
