@@ -2,9 +2,9 @@
 - CogWiki
 - Tinker
 - Googler (googler-pm)
+- Cog::FileBrowser
 
 == To Do  (See Also: GitHub Issues — `git hub issues`)
-- Switch from Mouse to Mo
 - Build into dirs: assets/ site/
 - Remove coffee/ in 'clean' action
 - Convert cog.js to cog.coffee
@@ -15,3 +15,4 @@
 - Get js dispatch working
 - Move javascript to end of body
 - Remove lib/Cog/Page.pm
+- Switch from Mouse to Mo

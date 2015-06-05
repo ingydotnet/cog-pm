@@ -1,11 +1,11 @@
 package Cog::View;
-use Mouse;
+use Mo qw'build default';
 extends 'Cog::Base';
 
 use IO::All;
 
-has root => (is => 'ro', default => 'view');
-has views => ( is => 'ro', default => sub {+{}} );
+has root => (default => 'view');
+has views => (default => sub {+{}});
 
 sub BUILD {
     my $self = shift;

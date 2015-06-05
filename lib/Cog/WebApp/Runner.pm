@@ -2,7 +2,7 @@
 #
 # Redo fingerprinting
 package Cog::WebApp::Runner;
-use Mouse;
+use Mo;
 extends 'Cog::Base';
 
 use Plack::Builder;

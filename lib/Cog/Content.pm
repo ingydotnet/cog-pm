@@ -1,11 +1,11 @@
 package Cog::Content;
-use Mouse;
+use Mo;
 extends 'Cog::Base';
 use IO::All;
 
 # use XXX;
 
-has last_user => ( is => 'rw' );
+has last_user => ();
 
 sub update {
     my ($self, $node, $diff) = @_;

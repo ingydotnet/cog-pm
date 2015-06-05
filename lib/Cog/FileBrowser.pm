@@ -1,11 +1,11 @@
 package Cog::FileBrowser;
-use Mouse;
+use Mo;
 extends 'Cog::App';
 
 use constant webapp => 'Cog::FileBrowser::WebApp';
 
 package Cog::FileBrowser::WebApp;
-use Mouse;
+use Mo;
 extends 'Cog::WebApp';
 
 use constant index_file => 'index.html';

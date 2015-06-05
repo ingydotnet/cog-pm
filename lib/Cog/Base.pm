@@ -1,5 +1,5 @@
 package Cog::Base;
-use Mouse;
+use Mo;
 use JSON;
 
 # System singleton object pointers.

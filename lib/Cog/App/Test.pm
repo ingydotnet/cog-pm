@@ -1,5 +1,5 @@
 package Cog::App::Test;
-use Mouse;
+use Mo;
 extends 'Cog::App';
 
 1;

@@ -2,7 +2,7 @@
 # - Generate a Makefile to bring everything up to date
 #   - Use tt with Makefile template
 package Cog::Maker;
-use Mouse;
+use Mo;
 extends 'Cog::Base';
 
 # use XXX;

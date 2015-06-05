@@ -4,21 +4,21 @@
 # - as_html
 # - add validation to setters
 package Cog::Node;
-use Mouse;
+use Mo qw'default';
 
 # use XXX;
 
-has Id => (is => 'rw');
-has Rev => (is => 'rw', default => 1, lazy => 1);
-has Type => (is => 'rw');
-has Time => (is => 'rw');
-has User => (is => 'rw');
-has Name => (is => 'rw', default => sub {[]} );
-has Tag => (is => 'rw', default => sub {[]}, lazy => 1 );
-has Url => (is => 'rw', default => sub {[]}, lazy => 1 );
-has From => (is => 'rw');
-has Body => (is => 'rw');
-has Format => (is => 'rw');
+has Id => ();
+has Rev => (default => 1, lazy => 1);
+has Type => ();
+has Time => ();
+has User => ();
+has Name => (default => sub {[]} );
+has Tag => (default => sub {[]}, lazy => 1 );
+has Url => (default => sub {[]}, lazy => 1 );
+has From => ();
+has Body => ();
+has Format => ();
 
 sub Title {
     my $self = shift;

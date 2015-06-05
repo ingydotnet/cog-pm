@@ -2,4 +2,4 @@
 
 use Cog::App;
 
-exit Cog::App->get_app(@ARGV)->new()->run();
+exit Cog::App->get_app_class(@ARGV)->new(argv => \@ARGV)->run();

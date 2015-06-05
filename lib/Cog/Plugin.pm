@@ -1,5 +1,5 @@
 package Cog::Plugin;
-use Mouse;
+use Mo;
 
 sub plugins { [] }
 

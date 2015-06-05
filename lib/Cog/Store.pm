@@ -1,7 +1,7 @@
 # TODO:
 # Split this into Cog::Store::CogFiles
 package Cog::Store;
-use Mouse;
+use Mo qw'build default';
 extends 'Cog::Base';
 
 use Cog::Node;
@@ -9,9 +9,9 @@ use Cog::Node::Schema;
 use IO::All;
 use Convert::Base32::Crockford ();
 
-has root => (is => 'ro', default => 'store');
-has importing => (is => 'rw', default => '0');
-has schema_map => (is => 'ro', default => sub {+{}});
+has root => (default => 'store');
+has importing => (default => '0');
+has schema_map => (default => sub {+{}});
 use constant schemata => [
     'Cog::Node::Schema',
 ];

@@ -1,10 +1,10 @@
 package Cog::WebApp;
-use Mouse;
+use Mo;
 extends 'Cog::Base';
 
 # use XXX;
 
-has env => ( is => 'rw' );
+has env => ();
 
 use constant index_file => '';
 use constant plugins => [];

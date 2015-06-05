@@ -6,57 +6,51 @@
 # - plugins can update config to map urls to code
 # - Make all config options 'foo' respect $COG_FOO
 package Cog::Config;
-use Mouse;
+use Mo qw'build builder default';
 use File::ShareDir;
 use Cwd qw(abs_path);
 
 use IO::All;
 
-# use XXX;
+use XXX;
 
 ### These options are set by user in config file:
 
 # Common webapp options
-has site_name => (is => 'ro');
-has home_page_id => (is => 'ro');
-has html_title => (is => 'ro');
+has site_name => ();
+has home_page_id => ();
+has html_title => ();
 
 # Server options
-has server_port => (is => 'ro', default => '');
-has proxymap => (is => 'ro');
-has cache_urls => (is => 'ro');
+has server_port => (default => '');
+has proxymap => ();
+has cache_urls => ();
 
 ### These fields are part of the Cog framework:
 
 # Bootstrapping config values (root directories)
 has app_class => (
-    is => 'ro',
     required => 1,
 );
 has app_root => (
-    is => 'ro',
     lazy => 1,
     default => ($ENV{COG_APP_ROOT} || 'cog'),
 );
 has store_root => (
-    is => 'ro',
     lazy => 1,
     builder => sub { abs_path('.') },
 );
 has content_root => (
-    is => 'ro',
     lazy => 1,
     builder => sub { abs_path('.') },
 );
 
 # Cog singleton object references
 has webapp => (
-    is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('webapp', 'Cog::WebApp') },
 );
 has runner => (
-    is => 'ro',
     lazy => 1,
     builder => sub {
         $_[0]->classes->{runner} = $_[0]->webapp->runner_class;
@@ -64,22 +58,18 @@ has runner => (
     },
 );
 has maker => (
-    is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('maker', 'Cog::Maker') },
 );
 has store => (
-    is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('store', 'Cog::Store') },
 );
 has content => (
-    is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('content', 'Cog::Content') },
 );
 has view => (
-    is => 'ro',
     lazy => 1,
     builder => sub { $_[0]->object_builder('view', 'Cog::View') },
 );
@@ -94,31 +84,31 @@ sub object_builder {
 }
 
 # App Command Values
-has command_script => (is => 'ro');
-has command_args => (is => 'ro', default => sub{[]});
+has command_script => ();
+has command_args => (default => sub{[]});
 
 # App & WebApp definitions
-has url_map => (is => 'ro', default => sub{[]});
-has post_map => (is => 'ro', default => sub{[]});
-has coffee_files => (is => 'ro', default => sub{[]});
-has js_files => (is => 'ro', default => sub{[]});
-has css_files => (is => 'ro', default => sub{[]});
-has image_files => (is => 'ro', default => sub{[]});
-has template_files => (is => 'ro', default => sub{[]});
-has site_navigation => (is => 'ro', default => sub{[]});
-has files_map => (is => 'ro', builder => '_build_files_map', lazy => 1);
-has classes => (is => 'rw');
-has all_js_file => (is => 'rw');
-has all_css_file => (is => 'rw');
+has url_map => (default => sub{[]});
+has post_map => (default => sub{[]});
+has coffee_files => (default => sub{[]});
+has js_files => (default => sub{[]});
+has css_files => (default => sub{[]});
+has image_files => (default => sub{[]});
+has template_files => (default => sub{[]});
+has site_navigation => (default => sub{[]});
+has files_map => (builder => '_build_files_map', lazy => 1);
+has classes => ();
+has all_js_file => ();
+has all_css_file => ();
 
 # App readiness
-has is_init => (is => 'ro', default => 0);
-has is_config => (is => 'ro', default => 0);
-has is_ready => (is => 'ro', default => 0);
+has is_init => (default => 0);
+has is_config => (default => 0);
+has is_ready => (default => 0);
 
 # Private accessors
-has _plugins => (is => 'ro', default => sub{[]});
-has _class_share_map => (is => 'ro', default => sub{{}});
+has _plugins => (default => sub{[]});
+has _class_share_map => (default => sub{{}});
 
 
 # Build the config object scanning through all the classes and merging

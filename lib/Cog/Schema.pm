@@ -1,13 +1,13 @@
 package Cog::Schema;
-use Mouse;
+use Mo qw'build default';
 extends 'Cog::Base';
 
 # use XXX;
 
-has type => (is => 'ro');
-has parent => (is => 'ro');
-has fields => (is => 'ro');
-has perl_class => (is => 'ro');
+has type => ();
+has parent => ();
+has fields => ();
+has perl_class => ();
 
 sub BUILD {
     my $self = shift;
@@ -64,14 +64,14 @@ sub generate_class {
     $parent = 'Cog::Node' if $parent eq 'CogNode';
     my $code = <<"...";
 package $class;
-use Mouse;
+use Mo;
 extends '$parent';
 use constant Type => '$type';
 
 ...
     for my $field (@{$self->fields}) {
         my $name = $field->name;
-        $code .= "has $name => (is => 'ro');\n";
+        $code .= "has $name => ();\n";
     }
     eval $code;
     die $@ if $@;
@@ -90,19 +90,19 @@ sub all_fields {
 }
 
 package Cog::Schema::Field;
-use Mouse;
+use Mo;
 
-has name => (is => 'ro');
-has type => (is => 'ro');
-has req => (is => 'ro');
-has list => (is => 'ro');
-has index => (is => 'ro');
+has name => ();
+has type => ();
+has req => ();
+has list => ();
+has index => ();
 
 package Cog::Schema::Index;
-use Mouse;
+use Mo qw'default';
 
-has name => (is => 'ro');
-has key => (is => 'ro', default => '$v');
-has value => (is => 'ro', default => '$i');
+has name => ();
+has key => (default => '$v');
+has value => (default => '$i');
 
 1;

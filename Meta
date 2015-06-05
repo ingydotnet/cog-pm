@@ -29,7 +29,7 @@ requires:
   IPC::Run: 0
   Jemplate: 0
   JSON: 0
-  Mouse: 0
+  Mo: 0
   Plack: 0
   Plack::Middleware::Cache: 0
   Plack::Middleware::ETag: 0

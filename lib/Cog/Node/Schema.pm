@@ -1,5 +1,5 @@
 package Cog::Node::Schema;
-use Mouse;
+use Mo;
 extends 'Cog::Schema';
 
 use constant type => 'CogNode';

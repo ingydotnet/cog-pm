@@ -1,7 +1,8 @@
 # TODO:
 # - handle_stop
+
 package Cog::App;
-use Mouse;
+use Mo qw'build builder';
 extends 'Cog::Base';
 
 use Getopt::Long qw(:config pass_through);
@@ -37,12 +38,12 @@ sub cog_classes {
     }
 }
 
-has action => ( is => 'rw' );
-has time => ( is => 'ro', builder => sub { time() } );
+has action => ();
+has time => (builder => sub { time() });
 
 # If we use the generic 'bin/cog' script, we need to determine which Cog
 # application class we are representing.
-sub get_app {
+sub get_app_class {
     my ($class, @argv) = @_;
     my $app_class;
     @ARGV = @argv;
@@ -91,7 +92,7 @@ sub BUILD {
 
     Cog::Base->initialize(
         $self,
-        $config_class->new($hash),
+        $config_class->new(%$hash),
     );
 }
 
