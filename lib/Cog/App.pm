@@ -73,6 +73,7 @@ sub BUILD {
     my $hash = -e $config_file
         ? YAML::XS::LoadFile($config_file)
         : {};
+    $hash = $config_class->flatten_namespace($hash);
     $hash = {
         %$hash,
         app_root => abs_path($app_root),

@@ -17,9 +17,7 @@ use XXX;
 ### These options are set by user in config file:
 
 # Common webapp options
-has site_name => ();
 has home_page_id => ();
-has html_title => ();
 
 # Server options
 has server_port => (default => '');
@@ -296,6 +294,39 @@ sub _build_files_map {
     }
 
     return $hash;
+}
+
+use constant namespace_map => {
+    'app/app_class' => 'app_class',
+    'app/webapp_class' => 'webapp_class',
+    'server/port' => 'server_port',
+    'server/host' => 'server_host',
+};
+sub flatten_namespace {
+    my ($class, $hash, $path) = @_;
+    $path ||= '';
+    my $map = $class->namespace_map;
+    my $ns = {};
+    for my $key (keys %$hash) {
+        my $value = $hash->{$key};
+        my $name = $path ? "$path/$key" : $key;
+        if (ref($value) eq 'HASH') {
+            $ns = { %$ns, %{$class->flatten_namespace($value, $name)} };
+        }
+        elsif ($map->{$name}) {
+            $ns->{$map->{$name}} = $value;
+        }
+        else {
+            my $root = $ns;
+            my @keys = split '/', $name;
+            my $leaf = pop @keys;
+            for my $k (@keys) {
+                $root = $root->{$k} = {};
+            }
+            $root->{$leaf} = $value;
+        }
+    }
+    return $ns;
 }
 
 1;
