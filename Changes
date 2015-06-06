@@ -1,4 +1,12 @@
 ---
+version: 0.09
+date:    Sat Jun  6 13:09:22 PDT 2015
+changes:
+- Big refactor
+- Make Cog just a web thing
+- Remove database ambitions
+- Supports Tinker and Tinker::App::YAMLTesting
+---
 version: 0.08
 date:    Sun Mar 15 07:18:53 PDT 2015
 changes:

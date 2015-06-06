@@ -15,7 +15,7 @@ Cog - The Cog Information Application Framework
 
 =head1 Version
 
-This document describes L<Cog> version B<0.08>.
+This document describes L<Cog> version B<0.09>.
 
 =head1 Synopsis
 
