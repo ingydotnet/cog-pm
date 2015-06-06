@@ -247,7 +247,7 @@ sub _build_files_map {
             my $full = $_->pathname;
             my $short = $full;
             $short =~ s!^\Q$dir\E/?!! or die;
-            $hash->{$short} = $full;
+            $hash->{$short} = [$plugin => $full];
         }
     }
 

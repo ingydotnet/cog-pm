@@ -25,7 +25,8 @@ sub make_assets {
     my $root = $self->app->app_root;
 
     for my $file (sort keys %$files) {
-        my $source = $files->{$file};
+        my $plugin = $files->{$file}[0];
+        my $source = $files->{$file}[1];
         my $target = $file =~ m!^(js|css|image)/!
             ? "$root/static/$file"
             : "$root/$file";
@@ -37,10 +38,14 @@ sub make_assets {
             }
         }
         else {
-            unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
+            unless (
+                -f $target and
+                not(-l $target) and
+                io($target)->all eq io($source)->all
+            ) {
                 unlink $target;
                 io($target)->assert->print(io($source)->all);
-                printf "* %-25s  |  $source => $target\n", $file;
+                printf "Update: %-25s %s\n", $plugin, $file;
             }
         }
     }
