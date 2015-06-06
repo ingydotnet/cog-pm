@@ -34,7 +34,8 @@ use constant rewrite => undef;
 
 sub web_app {
     my $self = shift;
-    my $index_file = 'static/index.html';
+    my $webapp = $self->app->webapp_root;
+    my $index_file = "$webapp/index.html";
     open INDEX, $index_file or die "Can't open '$index_file'";
     my $html = do {local $/; <INDEX>};
     close INDEX or die;

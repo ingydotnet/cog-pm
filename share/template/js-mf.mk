@@ -1,6 +1,6 @@
-ROOT=../..
+BUILD = [% build %]
 
-ALL_JS=[% list %]
+ALL_JS = [% list %]
 
 all: clean all_file
 
@@ -11,15 +11,15 @@ all.js: $(ALL_JS)
 	cat $(ALL_JS) > $@
 
 jemplate.js:
-	jemplate --runtime --compile $(ROOT)/template/ > $@
+	jemplate --runtime --compile ../template/ > $@
 
-config.js: $(ROOT)/static/config.js
+config.js: $(BUILD)/js/config.js
 	cp $< $@
 
-url-map.js: $(ROOT)/static/url-map.js
+url-map.js: $(BUILD)/js/url-map.js
 	cp $< $@
 
-%.js: ../../coffee/%.coffee
+%.js: $(BUILD)/coffee/%.coffee
 	coffee --compile --print $< > $@
 
 clean:

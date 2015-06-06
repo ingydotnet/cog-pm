@@ -9,9 +9,13 @@ use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
 use Pod::Simple::HTML;
+use File::Copy;
+use File::Path;
 
 sub make {
     my $self = shift;
+    File::Path::mkpath $self->app->build_root;
+    File::Path::mkpath $self->app->webapp_root;
     $self->make_config_js();
     $self->make_url_map_js();
     $self->make_all_js();
@@ -22,14 +26,12 @@ sub make {
 sub make_assets {
     my $self = shift;
     my $files = $self->config->files_map;
-    my $root = $self->app->app_root;
+    my $root = $self->app->build_root;
 
     for my $file (sort keys %$files) {
         my $plugin = $files->{$file}[0];
         my $source = $files->{$file}[1];
-        my $target = $file =~ m!^(js|css|image)/!
-            ? "$root/static/$file"
-            : "$root/$file";
+        my $target = "$root/$file";
         if ($ENV{COG_SYMLINK_INSTALL}) {
             unless (-l $target and readlink($target) eq $source) {
                 unlink $target;
@@ -57,12 +59,13 @@ sub make_config_js {
     my $data = {
         json => $self->json->encode(YAML::XS::LoadFile($config_path)),
     };
+    my $build = $self->app->build_root;
     my $javascript = tt()
-        ->path(['template/'])
+        ->path(["$build/template/"])
         ->data($data)
         ->post_chomp
         ->render('config.js');
-    io('static/config.js')->print($javascript);
+    io("$build/js/config.js")->print($javascript);
 }
 
 sub make_url_map_js {
@@ -70,20 +73,22 @@ sub make_url_map_js {
     my $data = {
         json => $self->json->encode($self->config->url_map),
     };
+    my $build = $self->app->build_root;
     my $javascript = tt()
-        ->path(['template/'])
+        ->path(["$build/template/"])
         ->data($data)
         ->post_chomp
         ->render('url-map.js');
-    io('static/url-map.js')->print($javascript);
+    io("$build/js/url-map.js")->print($javascript);
 }
 
 sub make_all_js {
     my $self = shift;
-    my $root = $self->app->app_root;
-    my $js = "$root/static/js";
+    my $build = $self->app->build_root;
+    my $js = "$build/js";
 
     my $data = {
+        build => $build,
         list => join(
             ' ',
             @{$self->config->js_files},
@@ -94,7 +99,7 @@ sub make_all_js {
         )
     };
     my $makefile = tt()
-        ->path(['template/'])
+        ->path(["$build/template/"])
         ->data($data)
         ->post_chomp
         ->render('js-mf.mk');
@@ -103,18 +108,21 @@ sub make_all_js {
     system("(cd $js; make)") == 0 or die;
     # TODO - Make fingerprint file here instead of Makefile
     my ($file) = glob("$js/all-*.js") or die;
+    copy $file, $self->app->webapp_root;
     $file =~ s!.*/!!;
     $self->config->all_js_file($file);
 }
 
 sub make_all_css {
     my $self = shift;
-    my $root = $self->app->app_root;
-    my $css = "$root/static/css";
+    my $build = $self->app->build_root;
+    my $css = "$build/css";
 
-    my $data = {list => join(' ', @{$self->config->css_files})};
+    my $data = {
+        list => join(' ', @{$self->config->css_files}),
+    };
     my $makefile = tt()
-        ->path(['template/'])
+        ->path(["$build/template/"])
         ->data($data)
         ->post_chomp
         ->render('css-mf.mk');
@@ -122,38 +130,32 @@ sub make_all_css {
 
     system("(cd $css; make)") == 0 or die;
     my ($file) = glob("$css/all-*.css") or die;
+    copy $file, $self->app->webapp_root;
     $file =~ s!.*/!!;
     $self->config->all_css_file($file);
 }
 
 sub make_index_html {
     my $self = shift;
+    my $build = $self->app->build_root;
+    my $webapp = $self->app->webapp_root;
     my $data = +{%{$self->config}};
     my $html = tt()
-        ->path(['template/'])
+        ->path(["$build/template/"])
         ->data($data)
         ->post_chomp
         ->render('index-table.html');
-    io('static/index.html')->print($html);
+    io("$webapp/index.html")->print($html);
 }
 
 sub make_clean {
     my $self = shift;
-    my $app_root = $self->app->app_root
-        or die "app_root not available";
-    $app_root =~ m!/!
-        or die "app_root not absolute";
-    for my $dir (
-        "$app_root/static",
-        "$app_root/template",
-        "$app_root/coffee",
-    ) {
-        if (-e $dir) {
-            my $cmd = "rm -fr $dir";
-            system($cmd) == 0
-                or die "'$cmd' failed";
-        }
-    }
+    my $build_root = $self->app->build_root
+        or die "build_root not available";
+    my $webapp_root = $self->app->webapp_root
+        or die "webapp_root not available";
+    File::Path::rmtree $build_root if -e $build_root;
+    File::Path::rmtree $webapp_root if -e $webapp_root;
 }
 
 1;

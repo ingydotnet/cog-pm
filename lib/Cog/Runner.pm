@@ -40,7 +40,9 @@ sub app {
                 return;
             };
         }
-        enable 'Static', path => qr{^/\b(static)/\b}, root => './';
+        enable 'Static',
+            path => qr{^/(all-.*\.(css|js)|image/)},
+            root => $self->config->app->webapp_root;
         # Everything else is from the web app.
         $self->webapp->web_app;
     }
