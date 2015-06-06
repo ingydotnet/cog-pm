@@ -22,6 +22,8 @@ install:
 - cpanm --quiet --notest
   Devel::Cover::Report::Coveralls
   Convert::Base32::Crockford
+  File::Basename
+  File::Copy
   File::ShareDir
   IO::All
   IPC::Run
@@ -33,6 +35,7 @@ install:
   Plack::Middleware::ETag
   Plack::Middleware::Header
   Plack::Middleware::ProxyMap
+  Pod::Simple::HTML
   Template::Toolkit::Simple
   YAML::XS
 

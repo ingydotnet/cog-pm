@@ -24,6 +24,8 @@ devel:
 requires:
   perl: 5.8.1
   Convert::Base32::Crockford: 0
+  File::Basename: 0
+  File::Copy: 0
   File::ShareDir: 0
   IO::All: 0
   IPC::Run: 0
@@ -35,6 +37,7 @@ requires:
   Plack::Middleware::ETag: 0
   Plack::Middleware::Header: 0
   Plack::Middleware::ProxyMap: 0
+  Pod::Simple::HTML: 0
   Template::Toolkit::Simple: 0
   YAML::XS: 0
 
