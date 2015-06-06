@@ -36,9 +36,7 @@ has webapp_root => sub {
     };
 
 has config_file => sub {
-        my $file = abs_path($_[0]->app_script . '.yaml');
-        return $file if -f $file;
-        die "Can't determine 'config_file' for '${\ref($_[0])}'";
+        abs_path($_[0]->app_script . '.yaml');
     };
 
 use constant config_class => 'Cog::Config';
@@ -84,13 +82,17 @@ sub BUILD {
     my $hash = $config_class->flatten_namespace(
         -e $config_file ? YAML::XS::LoadFile($config_file) : {}
     );
+    my $app_class = $hash->{app_class} ||= ref($self);
+    if ($app_class ne ref($self)) {
+        eval "require $app_class; 1" or die $@;
+        $self = $_[0] = $app_class->new();
+    }
 
     $Cog::Base::initialize->(
         $self,
         $config_class->new(
             %$hash,
             app => $self,
-            app_class => ref($self),
             cli_args => [@ARGV],
         ),
     );
@@ -107,8 +109,11 @@ sub run {
     my $function = $self->can($method)
         or die "'$action' is an invalid action\n";
 
-    $self->_chdir_root()
-        unless $action eq 'init';
+    if ($action ne 'init') {
+        die "Can't determine 'config_file' for '${\ref($_[0])}'"
+          unless $self->config_file;
+        $self->_chdir_root();
+    }
 
     $function->($self);
 
@@ -164,11 +169,10 @@ Commands:
 
 sub handle_init {
     my $self = shift;
-    my $root = $self->config->app_root;
+    my $root = $self->app_root;
     die "Can't init. Cog environment already exists.\n"
         if $self->config->is_init;
-
-    $self->maker->make_assets();
+    my $share = $self->config->find_share_dir($self);
 
     my $config_file = $self->config_file;
     if (not -e $config_file) {
@@ -176,7 +180,7 @@ sub handle_init {
         my $data = +{%$self};
         $data->{app_class} = ref($self);
         my $config = Template::Toolkit::Simple::tt()
-            ->path(["$root/template/"])
+            ->path(["$share/template/"])
             ->data($data)
             ->post_chomp
             ->render('config.yaml');
