@@ -1,18 +1,17 @@
-#TODO:
+# TODO:
 # - Support uri_base
 # - Support uri_port
 # - Support uri_path
 # - Support daemon, logfile and pid
 # - plugins can update config to map urls to code
 # - Make all config options 'foo' respect $COG_FOO
+
 package Cog::Config;
-use Mo qw'build builder default';
+use Mo qw'build builder default required';
+
 use File::ShareDir;
 use Cwd qw(abs_path);
-
 use IO::All;
-
-use XXX;
 
 ### These options are set by user in config file:
 
@@ -20,50 +19,20 @@ use XXX;
 has home_page_id => ();
 
 # Server options
-has server_port => (default => '');
+has server_host => (default => 'localhost');
+has server_port => (default => '12345');
 has proxymap => ();
 has cache_urls => ();
 
 ### These fields are part of the Cog framework:
 
-# Bootstrapping config values (root directories)
-has app_class => (
-    required => 1,
-);
-has app_root => (
-    lazy => 1,
-    default => ($ENV{COG_APP_ROOT} || 'cog'),
-);
-
-# Cog singleton object references
-has webapp => (
-    lazy => 1,
-    builder => sub { $_[0]->object_builder('webapp', 'Cog::WebApp') },
-);
-has runner => (
-    lazy => 1,
-    builder => sub {
-        $_[0]->classes->{runner} = $_[0]->webapp->runner_class;
-        $_[0]->object_builder('runner', 'Cog::WebApp::Runner');
-    },
-);
-has maker => (
-    lazy => 1,
-    builder => sub { $_[0]->object_builder('maker', 'Cog::Maker') },
-);
-
-sub object_builder {
-    my ($self, $type, $base) = @_;
-    my $class = $self->classes->{$type};
-    unless (UNIVERSAL::isa($class, $base)) {
-        eval "require $class; 1" or die $@;
-    }
-    return $class->new();
-}
+# Bootstrapping config values
+my $app;
+sub app { $app }
+has app_class => required => 1;
 
 # App Command Values
-has command_script => ();
-has command_args => (default => sub{[]});
+has cli_args => (default => sub{[]});
 
 # App & WebApp definitions
 has url_map => (default => sub{[]});
@@ -75,7 +44,6 @@ has image_files => (default => sub{[]});
 has template_files => (default => sub{[]});
 has site_navigation => (default => sub{[]});
 has files_map => (builder => '_build_files_map', lazy => 1);
-has classes => ();
 has all_js_file => ();
 has all_css_file => ();
 
@@ -95,7 +63,9 @@ has _class_share_map => (default => sub{{}});
 # This is the hard part...
 sub BUILD {
     my $self = shift;
-    my $root = $self->app_root;
+    $app = delete $self->{app};
+
+    my $root = $self->app->app_root;
     $self->{is_init} = 1
         if -d "$root/static";
     $self->{is_config} = 1
@@ -116,8 +86,6 @@ sub BUILD {
     $self->build_list('css_files');
     $self->build_list('image_files');
     $self->build_list('template_files');
-
-    $self->find_classes();
 
     return $self;
 }
@@ -263,16 +231,6 @@ sub find_share_dir {
     return $dir if $dir;
 
     return;
-}
-
-sub find_classes {
-    my $self = shift;
-    my $classes = {};
-    for my $plugin (@{$self->_plugins}) {
-        next unless $plugin->can('cog_classes');
-        $classes = +{ %$classes, %{$plugin->cog_classes} };
-    }
-    $self->classes($classes);
 }
 
 sub _build_files_map {

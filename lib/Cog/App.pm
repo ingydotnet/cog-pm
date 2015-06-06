@@ -1,39 +1,55 @@
-# TODO:
-# - handle_stop
-
 package Cog::App;
-use Mo qw'build builder';
+use Mo qw'build default';
 extends 'Cog::Base';
 
 use Getopt::Long qw(:config pass_through);
 use IO::All;
 use YAML::XS;
 use Cwd 'abs_path';
+use File::Basename;
+use File::Spec;
 
-# use XXX;
+has Name => sub {
+        my $Name = ref($_[0]);
+        $Name =~ s/::App\b//;
+        return $Name if $Name =~ /^\w+$/;
+        die "Can't determine 'Name' attribute for '${\ref($_[0])}'";
+    };
 
-use constant Name => 'Cog';
-use constant app_root => abs_path('.');
-use constant command_script => 'cog';
+has app_script => basename $0;
 
-# TODO Make these more dynamic so subclasses don't have to always override
+has app_root => sub {
+        my $root = abs_path(dirname($_[0]->config_file));
+        return $root if -d $root;
+        die "Can't determine 'app_root' for '${\ref($_[0])}'";
+    };
+
+has build_root => sub {
+        my $root = $_[0]->app_root;
+        my $dir = basename($root) =~ /^\./ ? 'build' : '.build';
+        File::Spec->catdir($root, $dir);
+    };
+
+has webapp_root => sub {
+        my $root = $_[0]->app_root;
+        File::Spec->catdir($root, 'webapp');
+    };
+
+has config_file => sub {
+        my $file = abs_path($_[0]->app_script . '.yaml');
+        return $file if -f $file;
+        die "Can't determine 'config_file' for '${\ref($_[0])}'";
+    };
+
 use constant config_class => 'Cog::Config';
 use constant maker_class => 'Cog::Maker';
 use constant webapp_class => '';
+use constant runner_class => 'Cog::Runner';
 
 sub plugins { [] };
-# XXX - Is this still needed??
-sub cog_classes {
-    my $self = shift;
-    return +{
-        config => $self->config_class,
-        maker => $self->maker_class,
-        webapp => $self->webapp_class,
-    }
-}
 
 has action => ();
-has time => (builder => sub { time() });
+has time => time();
 
 # If we use the generic 'bin/cog' script, we need to determine which Cog
 # application class we are representing.
@@ -58,41 +74,26 @@ sub get_app_class {
 
 sub BUILD {
     my ($self) = @_;
+
     my $config_class = $self->config_class;
     eval "require $config_class"
         unless UNIVERSAL::can($config_class, 'new');
-    my $config_file = $self->config_file
-        or die "Can't determine config file";
 
-    my $app_root = '.';
+    my $config_file = $self->config_file;
 
-    if ($config_file =~ /(.*)\/(.*)/) {
-        ($app_root, $config_file) = ($1, $2);
-    }
-
-    my $hash = -e $config_file
-        ? YAML::XS::LoadFile($config_file)
-        : {};
-    $hash = $config_class->flatten_namespace($hash);
-    $hash = {
-        %$hash,
-        app_root => abs_path($app_root),
-        config_file => $config_file,
-        app_class => ref($self),
-        maker_class => $self->maker_class,
-        command_script => $0,
-        command_args => [@ARGV],
-    };
-
-    Cog::Base->initialize(
-        $self,
-        $config_class->new(%$hash),
+    my $hash = $config_class->flatten_namespace(
+        -e $config_file ? YAML::XS::LoadFile($config_file) : {}
     );
-}
 
-sub config_file {
-    my $class = shift;
-    return $class->app_root . '/' . lc($class->Name) . '.conf.yaml';
+    $Cog::Base::initialize->(
+        $self,
+        $config_class->new(
+            %$hash,
+            app => $self,
+            app_class => ref($self),
+            cli_args => [@ARGV],
+        ),
+    );
 }
 
 sub run {
@@ -106,25 +107,23 @@ sub run {
     my $function = $self->can($method)
         or die "'$action' is an invalid action\n";
 
-    $self->chdir_root()
+    $self->_chdir_root()
         unless $action eq 'init';
 
     $function->($self);
+
     return 0;
 }
 
 sub parse_command_args {
     my $self = shift;
-    my $argv = $self->config->command_args;
-    my $script = $self->config->command_script;
+    my $argv = $self->config->cli_args;
+    my $script = $self->app_script;
     $script =~ s!.*/!!;
     my $action = '';
     if ($script =~ /^(pre-commit|post-commit)$/) {
         $script =~ s/-/_/;
         $self->action($script);
-    }
-    elsif ($script ne $self->command_script and $script ne 'cog') {
-        die "unexpected script name '$script'\n";
     }
     elsif (@$argv and $argv->[0] =~ /^[\w\-]+$/) {
         $action = shift @$argv;
@@ -134,9 +133,7 @@ sub parse_command_args {
         $action = 'help';
     }
     else {
-        require XXX;
-        warn "\nInvalid cog command. Can't parse these arguments:\n";
-        XXX::XXX(@_);
+        die "Invalid cog command. Can't parse these arguments: '@_'";
     }
     $self->action($action);
 }
@@ -150,7 +147,7 @@ sub handle_help {
 sub usage {
     my $self = shift;
     my $Name = $self->Name;
-    my $name = $self->config->command_script;
+    my $name = $self->app_script;
     $name =~ s!.*/!!;
     return <<"...";
 Usage: $name <command>
@@ -171,9 +168,9 @@ sub handle_init {
     die "Can't init. Cog environment already exists.\n"
         if $self->config->is_init;
 
-    $self->_copy_assets();
+    $self->maker->make_assets();
 
-    my $config_file = "$root/config.yaml";
+    my $config_file = $self->config_file;
     if (not -e $config_file) {
         require Template::Toolkit::Simple;
         my $data = +{%$self};
@@ -186,13 +183,14 @@ sub handle_init {
         io($config_file)->print($config);
     }
 
-    $self->chdir_root;
+    $self->_chdir_root;
 
     my $Name = $self->Name;
-    my $name = $self->config->command_script;
+    my $name = $self->app_script;
     $name =~ s!.*/!!;
 
     print <<"...";
+
 $Name was successfully initialized in:
 
     $root
@@ -210,12 +208,12 @@ Then run:
 
 sub handle_update {
     my $self = shift;
-    my $root = $self->config->app_root;
+    my $root = $self->app_root;
 
-    $self->_copy_assets();
+    $self->maker->make_assets();
 
     my $Name = $self->Name;
-    my $name = $self->config->command_script;
+    my $name = $self->app_script;
     $name =~ s!.*/!!;
 
     print <<"...";
@@ -228,43 +226,16 @@ Now run:
 ...
 }
 
-sub _copy_assets {
-    my $self = shift;
-    my $files = $self->config->files_map;
-    my $root = $self->config->app_root;
-
-    for my $file (sort keys %$files) {
-        my $source = $files->{$file};
-        my $target = $file =~ m!^(js|css|image)/!
-            ? "$root/static/$file"
-            : "$root/$file";
-        if ($ENV{COG_SYMLINK_INSTALL}) {
-            unless (-l $target and readlink($target) eq $source) {
-                unlink $target;
-                io($target)->assert->symlink($source);
-                print "> link $source => $target\n";
-            }
-        }
-        else {
-            unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
-                unlink $target;
-                io($target)->assert->print(io($source)->all);
-                printf "* %-25s  |  $source => $target\n", $file;
-            }
-        }
-    }
-}
-
 sub handle_make {
     my $self = shift;
     $self->maker->make;
     my $Name = $self->Name;
-    my $name = $self->config->command_script;
+    my $name = $self->app_script;
     $name =~ s!.*/!!;
     print <<"...";
 
-$Name is up to date and ready to use. To start the web server, run
-this command:
+$Name is up to date and ready to use.
+To start the web server, run this command:
 
     $name start
 
@@ -279,23 +250,28 @@ sub handle_start {
 $Name web server is starting up...
 
 ...
-    my @args = @{$self->config->command_args};
+    my @args = @{$self->config->cli_args};
     unshift @args, ('-p' => $self->config->server_port)
         if $self->config->server_port;
     $self->runner->run(@args);
 }
 
+sub handle_stop {
+    die 'TODO';
+}
+
 sub handle_edit {
-    # TODO
+    die 'TODO';
 }
 
 sub handle_clean {
     my $self = shift;
     $self->maker->make_clean;
     my $Name = $self->Name;
-    my $name = $self->config->command_script;
+    my $name = $self->app_script;
     $name =~ s!.*/!!;
     print <<"...";
+
 $Name is clean. To rebuild, run this command:
 
     $name update
@@ -305,9 +281,9 @@ $Name is clean. To rebuild, run this command:
 }
 
 # Put the App in the context of its defined root directory.
-sub chdir_root {
+sub _chdir_root {
     my $self = shift;
-    my $app_root = $self->config->app_root;
+    my $app_root = $self->app_root;
     chdir $app_root
       or die "Can't chdir into $app_root";
 }

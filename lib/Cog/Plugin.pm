@@ -12,6 +12,4 @@ sub css_files { [] }
 sub image_files { [] }
 sub template_files { [] }
 
-sub cog_classes { {} }
-
 1;

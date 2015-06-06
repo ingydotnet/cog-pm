@@ -1,6 +1,5 @@
 package Cog::Base;
 use Mo;
-use JSON;
 
 # System singleton object pointers.
 my $app;
@@ -11,20 +10,31 @@ my $webapp;
 my $json;
 
 # The config reference must be initialized at startup.
-sub initialize {
-    $app ||= $_[1];
-    $config ||= $_[2];
-}
+$Cog::Base::initialize = sub {
+    $app ||= $_[0];
+    $config ||= $_[1];
+};
 
 # The accessors to common singleton objects are kept in single file
 # scoped lexicals, so that every Cog::Base subclass can access them
 # without needing to store them in their objects. This keeps things
 # clean and fast, and avoids needless circular refs.
-sub app { $app }
+my $singleton = sub {
+    my ($type) = @_;
+    my $method = lc($type) . "_class";
+    my $class = $app->$method
+        or die "Can't determine class for '$type'";
+    unless (UNIVERSAL::isa($class, 'Cog::Base')) {
+        eval "require $class; 1" or die $@;
+    }
+    return $class->new();
+};
+
+sub app    { $app }
 sub config { $config }
-sub maker { $maker || ($maker = $config->maker) }
-sub runner { $runner || ($runner = $config->runner) }
-sub webapp { $webapp || ($webapp = $config->webapp) }
+sub maker  { $maker  || ($maker  = $singleton->('Maker')) }
+sub runner { $runner || ($runner = $singleton->('Runner')) }
+sub webapp { $webapp || ($webapp = $singleton->('WebApp')) }
 
 # Cog plugins need to know their distribution name. This name is used to
 # locate shared files using File::ShareDir and other methods.
@@ -53,6 +63,7 @@ sub DISTNAME {
 # Access to a set up JSON object
 sub json {
     $json ||= do {
+        require JSON;
         my $j = JSON->new;
         $j->allow_blessed;
         $j->convert_blessed;

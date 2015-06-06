@@ -5,8 +5,6 @@ package Cog::Maker;
 use Mo;
 extends 'Cog::Base';
 
-# use XXX;
-
 use Template::Toolkit::Simple;
 use IO::All;
 use IPC::Run;
@@ -19,6 +17,33 @@ sub make {
     $self->make_all_js();
     $self->make_all_css();
     $self->make_index_html;
+}
+
+sub make_assets {
+    my $self = shift;
+    my $files = $self->config->files_map;
+    my $root = $self->app->app_root;
+
+    for my $file (sort keys %$files) {
+        my $source = $files->{$file};
+        my $target = $file =~ m!^(js|css|image)/!
+            ? "$root/static/$file"
+            : "$root/$file";
+        if ($ENV{COG_SYMLINK_INSTALL}) {
+            unless (-l $target and readlink($target) eq $source) {
+                unlink $target;
+                io($target)->assert->symlink($source);
+                print "> link $source => $target\n";
+            }
+        }
+        else {
+            unless (-f $target and not(-l $target) and io($target)->all eq io($source)->all) {
+                unlink $target;
+                io($target)->assert->print(io($source)->all);
+                printf "* %-25s  |  $source => $target\n", $file;
+            }
+        }
+    }
 }
 
 sub make_config_js {
@@ -50,7 +75,7 @@ sub make_url_map_js {
 
 sub make_all_js {
     my $self = shift;
-    my $root = $self->config->app_root;
+    my $root = $self->app->app_root;
     my $js = "$root/static/js";
 
     my $data = {
@@ -79,7 +104,7 @@ sub make_all_js {
 
 sub make_all_css {
     my $self = shift;
-    my $root = $self->config->app_root;
+    my $root = $self->app->app_root;
     my $css = "$root/static/css";
 
     my $data = {list => join(' ', @{$self->config->css_files})};
@@ -109,7 +134,7 @@ sub make_index_html {
 
 sub make_clean {
     my $self = shift;
-    my $app_root = $self->config->app_root
+    my $app_root = $self->app->app_root
         or die "app_root not available";
     $app_root =~ m!/!
         or die "app_root not absolute";

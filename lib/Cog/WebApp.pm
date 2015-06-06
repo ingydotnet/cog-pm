@@ -2,8 +2,6 @@ package Cog::WebApp;
 use Mo;
 extends 'Cog::Base';
 
-# use XXX;
-
 has env => ();
 
 use constant index_file => '';
