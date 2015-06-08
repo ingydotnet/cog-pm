@@ -20,6 +20,7 @@ sub make {
     $self->make_url_map_js();
     $self->make_all_js();
     $self->make_all_css();
+    $self->make_image();
     $self->make_index_html;
 }
 
@@ -133,6 +134,14 @@ sub make_all_css {
     copy $file, $self->app->webapp_root;
     $file =~ s!.*/!!;
     $self->config->all_css_file($file);
+}
+
+sub make_image {
+    my $self = shift;
+    my $build = $self->app->build_root;
+    my $webapp = $self->app->webapp_root;
+    symlink "$build/image", "$webapp/image"
+        unless -e "$webapp/image";
 }
 
 sub make_index_html {

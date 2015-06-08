@@ -1,4 +1,9 @@
 ---
+version: 0.11
+date:    Mon Jun  8 10:10:46 MDT 2015
+changes:
+- Fix image/ in `cog make`
+---
 version: 0.10
 date:    Mon Jun  8 06:07:54 MDT 2015
 changes:
