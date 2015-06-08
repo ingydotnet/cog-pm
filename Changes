@@ -1,4 +1,9 @@
 ---
+version: 0.10
+date:    Mon Jun  8 06:07:54 MDT 2015
+changes:
+- Change default build root to be same as app root
+---
 version: 0.09
 date:    Sat Jun  6 13:09:22 PDT 2015
 changes:

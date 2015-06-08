@@ -25,9 +25,7 @@ has app_root => sub {
     };
 
 has build_root => sub {
-        my $root = $_[0]->app_root;
-        my $dir = basename($root) =~ /^\./ ? 'build' : '.build';
-        File::Spec->catdir($root, $dir);
+        $_[0]->app_root;
     };
 
 has webapp_root => sub {

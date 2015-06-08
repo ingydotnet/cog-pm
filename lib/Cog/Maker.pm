@@ -154,7 +154,10 @@ sub make_clean {
         or die "build_root not available";
     my $webapp_root = $self->app->webapp_root
         or die "webapp_root not available";
-    File::Path::rmtree $build_root if -e $build_root;
+    for my $file_dir (qw(coffee css image js template)) {
+        File::Path::rmtree "$build_root/$file_dir"
+            if -e "$build_root/$file_dir";
+    }
     File::Path::rmtree $webapp_root if -e $webapp_root;
 }
 
